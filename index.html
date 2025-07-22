@@ -3020,6 +3020,144 @@ Create your own quiz now:`;
           }, 15000); // 15 seconds
         });
       </script>
+  <!-- HOW TO USE POPUP START -->
+<div id="howToUsePopup" class="popup-overlay">
+  <div class="popup-box">
+    <button class="popup-close" onclick="closePopup()">✖</button>
+    <h2>Question: How to use this website?</h2>
+    <p>
+      Answer: There are 4 methods to generate a quiz:<br>
+      1. From PDF of notes or books <br>
+      2. From text <br>
+      3. From topic <br>
+      4. From image
+    </p>
+    <p>
+      Click on your desired section to start unlimited quiz practice.<br><br>
+      A <b>Help Me</b> button is available in each step (right side and bottom) 
+      to guide first-time users.<br>
+      Please use the <b>Help Me</b> button in case of any difficulty. 
+      It will show a step-wise guide.
+    </p>
+    <button class="popup-gotit" onclick="closePopup()">Got It</button>
+  </div>
+</div>
+
+<style>
+  /* POPUP CSS */
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  .popup-box {
+    background: #fff;
+    padding: 20px;
+    max-width: 500px;
+    width: 90%;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+    text-align: left;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {opacity: 0; transform: scale(0.9);}
+    to {opacity: 1; transform: scale(1);}
+  }
+
+  .popup-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #333;
+  }
+
+  .popup-gotit {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .popup-gotit:hover {
+    background: #0056b3;
+  }
+
+  @media screen and (max-width: 768px) {
+    .popup-box {
+      font-size: 14px;
+    }
+    .popup-close {
+      font-size: 18px;
+    }
+  }
+</style>
+
+<script>
+  // Set a cookie
+  function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+  }
+
+  // Get a cookie
+  function getCookie(name) {
+    const cname = name + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i].trim();
+      if (c.indexOf(cname) === 0) {
+        return c.substring(cname.length, c.length);
+      }
+    }
+    return "";
+  }
+
+  // Show popup if cookie is not set
+  function checkPopup() {
+    if (!getCookie("popupShown")) {
+      document.getElementById('howToUsePopup').style.display = 'flex';
+    }
+  }
+
+  // Close popup and set cookie
+  function closePopup() {
+    document.getElementById('howToUsePopup').style.display = 'none';
+    setCookie("popupShown", "true", 1); // Hide for 1 day
+    startWebsite();
+  }
+
+  // Placeholder for website functionality
+  function startWebsite() {
+    console.log("Website main functionality started...");
+    // Add your quiz start or home page code here
+  }
+
+  // Check popup on page load
+  window.addEventListener('load', checkPopup);
+</script>
+<!-- HOW TO USE POPUP END -->
 </body>
 </html>
 
