@@ -659,21 +659,21 @@
 <!-- ======================================= -->
 <div class="container" id="manual-generator-container">
     <div class="header">
-        <span class="header-branding">✍️ <strong>EXAMYATRI</strong> - <span class="tagline">Quiz Se Kro Success Yatra</span></span>
+        <span class="header-branding">✍️ <strong>EXAMYATRI</strong> - <span class="tagline"> One Platform, All Exam </span></span>
         <button id="theme-toggle-btn" title="Toggle Dark/Light Mode">🌙</button>
     </div>
     <div id="manual-generator-screen">
-        <p>create free topicwise mock test, subjectwise mock test, unlimited quiz practice</p>
+        <p>❤️Create FREE Topicwise,  Subjectwise Mock Test,   Unlimited Quiz Practice❤️</p>
 
         <div id="creation-method-selector">
             <div class="creation-option-card" id="select-from-topic">
                 <span class="card-icon">📝</span><h4>Generate from Topic</h4><p>Provide a topic and generate quiz.</p>
             </div>
             <div class="creation-option-card" id="select-from-text">
-                <span class="card-icon">📋</span><h4>Generate from Text</h4><p>Paste text/formula to create questions.</p>
+                <span class="card-icon">📋</span><h4>Generate from Text</h4><p>Paste text/formula(physics,math) to create questions.</p>
             </div>
             <div class="creation-option-card" id="select-from-image">
-                <span class="card-icon">🖼️</span><h4>Generate from Image</h4><p>Use images of notes/book/Question for a quiz.</p>
+                <span class="card-icon">🖼️</span><h4>Generate from Image</h4><p>Use images of notes/any book/any Question for a quiz.</p>
             </div>
             <div class="creation-option-card" id="select-from-pdf">
                 <span class="card-icon">📄</span><h4>Generate from PDF</h4><p>Upload a PDF to create a quiz.</p>
@@ -708,7 +708,7 @@
               <h3 class="step-header">Step 1: Provide Your Text</h3>
               <div class="guide-container">
                   <button class="btn guide-btn" data-guide-id="text-step1" title="Show Guide">💁</button>
-                  <span class="guide-help-text">help me</span>
+                  <span class="guide-help-text">How to use</span>
               </div>
             </div>
             <div class="input-group"><label for="source-text-input" class="input-label">Paste your source text below</label><textarea id="source-text-input" placeholder="Paste the content you want to create a quiz from..."></textarea></div>
@@ -716,11 +716,11 @@
               <h3 class="step-header">Step 2: Define Your Quiz</h3>
               <div class="guide-container">
                   <button class="btn guide-btn" data-guide-id="text-step2" title="Show Guide">💁</button>
-                  <span class="guide-help-text">help me</span>
+                  <span class="guide-help-text">How to use</span>
               </div>
             </div>
             <div class="input-group"><label for="prompt-num-questions-text" class="input-label">Number of Questions</label><input type="number" id="prompt-num-questions-text" class="input-field" placeholder="e.g., 5" min="1" max="50"></div>
-            <div class="input-group"><label for="prompt-subject-text" class="input-label">Subject Area (Optional)</label><input type="text" id="prompt-subject-text" class="input-field" placeholder="e.g., Science, History"></div>
+            <div class="input-group"><label for="prompt-subject-text" class="input-label">Subject/Instruction (Generate Qustion on above formula</label><input type="text" id="prompt-subject-text" class="input-field" placeholder="e.g., Science/Generate Question on above formula"></div>
             <div class="input-group"><label for="prompt-language-text" class="input-label">Quiz Language</label><select id="prompt-language-text" class="input-field"><option value="English" selected>English</option><option value="Hindi">Hindi</option><option value="Spanish">Spanish</option><option value="French">French</option><option value="German">German</option></select></div>
             <div class="input-group"><label for="prompt-difficulty-text" class="input-label">Difficulty Level</label><select id="prompt-difficulty-text" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
             <div class="input-group"><label for="question-format-select-text" class="input-label">Question Format</label><select id="question-format-select-text" class="input-field"></select></div>
@@ -753,7 +753,7 @@
             </div>
 
             <div class="step-header-container">
-              <h3 class="step-header">Step 1: Add Your Images of notes/Question</h3>
+              <h3 class="step-header">Step 1: Add Your Images of Notes/ Question</h3>
               <div class="guide-container">
                   <button class="btn guide-btn" data-guide-id="image-step1" title="Show Guide">💁</button>
                   <span class="guide-help-text">How to use</span>
@@ -776,7 +776,7 @@
                 </div>
                 <div class="input-group hidden"><label for="source-text-image" class="input-label">Extracted Text</label><textarea id="source-text-image"></textarea></div>
                 <div class="input-group"><label for="prompt-num-questions-image" class="input-label">Number of Questions</label><input type="number" id="prompt-num-questions-image" class="input-field" placeholder="e.g., 5" min="1" max="50"></div>
-                <div class="input-group"><label for="prompt-topic-image" class="input-label">Quiz Topic/Instruction(generate similar question)</label><input type="text" id="prompt-topic-image" class="input-field" placeholder="e.g., Photosynthesis, The Mughal Empire"></div>
+                <div class="input-group"><label for="prompt-topic-image" class="input-label">Topic/ Instruction (Generate Similar Question or Generate Question on this Formula )</label><input type="text" id="prompt-topic-image" class="input-field" placeholder="e.g., Photosynthesis, The Mughal Empire"></div>
                 <div class="input-group"><label for="prompt-subject-image" class="input-label">Subject Area (Optional)</label><input type="text" id="prompt-subject-image" class="input-field" placeholder="e.g., Biology from textbook page"></div>
                 <div class="input-group"><label for="prompt-language-image" class="input-label">Quiz Language</label><select id="prompt-language-image" class="input-field"><option value="English" selected>English</option><option value="Hindi">Hindi</option><option value="Spanish">Spanish</option><option value="French">French</option><option value="German">German</option></select></div>
                 <div class="input-group"><label for="prompt-difficulty-image" class="input-label">Difficulty Level</label><select id="prompt-difficulty-image" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
