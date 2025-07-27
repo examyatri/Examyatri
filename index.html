@@ -663,17 +663,17 @@
         <button id="theme-toggle-btn" title="Toggle Dark/Light Mode">🌙</button>
     </div>
     <div id="manual-generator-screen">
-        <p>Hi! I’m your Quiz Genie 🧞‍♂️. How would you like to create your quiz?</p>
+        <p>create free topicwise mock test, subjectwise mock test, unlimited quiz practice</p>
 
         <div id="creation-method-selector">
             <div class="creation-option-card" id="select-from-topic">
-                <span class="card-icon">📝</span><h4>Generate from Topic</h4><p>Provide a topic for the AI.</p>
+                <span class="card-icon">📝</span><h4>Generate from Topic</h4><p>Provide a topic and generate quiz.</p>
             </div>
             <div class="creation-option-card" id="select-from-text">
-                <span class="card-icon">📋</span><h4>Generate from Text</h4><p>Paste text to create questions.</p>
+                <span class="card-icon">📋</span><h4>Generate from Text</h4><p>Paste text/formula to create questions.</p>
             </div>
             <div class="creation-option-card" id="select-from-image">
-                <span class="card-icon">🖼️</span><h4>Generate from Image</h4><p>Use images of text for a quiz.</p>
+                <span class="card-icon">🖼️</span><h4>Generate from Image</h4><p>Use images of notes/book/Question for a quiz.</p>
             </div>
             <div class="creation-option-card" id="select-from-pdf">
                 <span class="card-icon">📄</span><h4>Generate from PDF</h4><p>Upload a PDF to create a quiz.</p>
@@ -687,7 +687,7 @@
               <h3 class="step-header">Step 1: Define Your Quiz</h3>
               <div class="guide-container">
                   <button class="btn guide-btn" data-guide-id="topic-step1" title="Show Guide">💁</button>
-                  <span class="guide-help-text">help me</span>
+                  <span class="guide-help-text">How to use</span>
               </div>
             </div>
             <div class="input-group"><label for="prompt-topic" class="input-label">Quiz Topic (Required)</label><input type="text" id="prompt-topic" class="input-field" placeholder="e.g., The Solar System, World War II"></div>
@@ -753,10 +753,10 @@
             </div>
 
             <div class="step-header-container">
-              <h3 class="step-header">Step 1: Add Your Images</h3>
+              <h3 class="step-header">Step 1: Add Your Images of notes/Question</h3>
               <div class="guide-container">
                   <button class="btn guide-btn" data-guide-id="image-step1" title="Show Guide">💁</button>
-                  <span class="guide-help-text">help me</span>
+                  <span class="guide-help-text">How to use</span>
               </div>
             </div>
             <p>Select your images. Orientation will be corrected and text will be extracted automatically.</p>
@@ -771,12 +771,12 @@
                   <h3 class="step-header">Step 2: Define Your Quiz</h3>
                   <div class="guide-container">
                       <button class="btn guide-btn" data-guide-id="image-step3" title="Show Guide">💁</button>
-                      <span class="guide-help-text">help me</span>
+                      <span class="guide-help-text">How to use</span>
                   </div>
                 </div>
                 <div class="input-group hidden"><label for="source-text-image" class="input-label">Extracted Text</label><textarea id="source-text-image"></textarea></div>
                 <div class="input-group"><label for="prompt-num-questions-image" class="input-label">Number of Questions</label><input type="number" id="prompt-num-questions-image" class="input-field" placeholder="e.g., 5" min="1" max="50"></div>
-                <div class="input-group"><label for="prompt-topic-image" class="input-label">Quiz Topic (Optional)</label><input type="text" id="prompt-topic-image" class="input-field" placeholder="e.g., Photosynthesis, The Mughal Empire"></div>
+                <div class="input-group"><label for="prompt-topic-image" class="input-label">Quiz Topic/Instruction(generate similar question)</label><input type="text" id="prompt-topic-image" class="input-field" placeholder="e.g., Photosynthesis, The Mughal Empire"></div>
                 <div class="input-group"><label for="prompt-subject-image" class="input-label">Subject Area (Optional)</label><input type="text" id="prompt-subject-image" class="input-field" placeholder="e.g., Biology from textbook page"></div>
                 <div class="input-group"><label for="prompt-language-image" class="input-label">Quiz Language</label><select id="prompt-language-image" class="input-field"><option value="English" selected>English</option><option value="Hindi">Hindi</option><option value="Spanish">Spanish</option><option value="French">French</option><option value="German">German</option></select></div>
                 <div class="input-group"><label for="prompt-difficulty-image" class="input-label">Difficulty Level</label><select id="prompt-difficulty-image" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
@@ -794,7 +794,7 @@
               <h3 class="step-header">Step 1: Upload & Extract</h3>
               <div class="guide-container">
                   <button class="btn guide-btn" data-guide-id="pdf-step1" title="Show Guide">💁</button>
-                  <span class="guide-help-text">help me</span>
+                  <span class="guide-help-text">How to use</span>
               </div>
             </div>
             <div id="pdf-input-area">
@@ -817,7 +817,7 @@
                     </div>
                 </div>
                 <div class="input-group">
-                    <label><input type="checkbox" id="pdf-force-ocr"> Force OCR (for scanned or image-based PDFs)</label>
+                    <label><input type="checkbox" id="pdf-force-ocr" checked> Force OCR (for scanned or image-based PDFs)</label>
                 </div>
                 <button id="extract-text-pdf-btn" class="btn btn-full-width glowing">🔍 Extract Text from PDF</button>
                 <div id="pdf-status"></div>
@@ -827,7 +827,7 @@
                   <h3 class="step-header">Step 2: Define Your Quiz</h3>
                   <div class="guide-container">
                       <button class="btn guide-btn" data-guide-id="pdf-step2" title="Show Guide">💁</button>
-                      <span class="guide-help-text">help me</span>
+                      <span class="guide-help-text">How to use</span>
                   </div>
                 </div>
                 <div class="input-group hidden"><label for="source-text-pdf" class="input-label">Extracted Text</label><textarea id="source-text-pdf"></textarea></div>
@@ -2888,7 +2888,7 @@ Create your own quiz now:`;
   z-index: 9999;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 ">
-  Help Me
+  How to use
 </button>
 
 <!-- Help Modal -->
@@ -3024,19 +3024,19 @@ Create your own quiz now:`;
 <div id="howToUsePopup" class="popup-overlay">
   <div class="popup-box">
     <button class="popup-close" onclick="closePopup()">✖</button>
-    <h2>Question: How to use this website?</h2>
+    <h2>How to use this website?</h2>
     <p>
-      Answer: There are 4 methods to generate a quiz:<br>
-      1. From PDF of notes or books <br>
-      2. From text <br>
-      3. From topic <br>
-      4. From image
+      There are 4 methods to generate a quiz:<br>
+      1. From PDF of notes or NCERT books OR any other book) <br>
+      2. From any text <br>
+      3. From any topic   <br>
+      4. From image of notes/question
     </p>
     <p>
       Click on your desired section to start unlimited quiz practice.<br><br>
-      A <b>Help Me</b> button is available in each step (right side and bottom) 
+      A <b>How to use</b> button is available in each step (right side and bottom) 
       to guide first-time users.<br>
-      Please use the <b>Help Me</b> button in case of any difficulty. 
+      Please use the <b>How to use</b> button in case of any difficulty. 
       It will show a step-wise guide.
     </p>
     <button class="popup-gotit" onclick="closePopup()">Got It</button>
