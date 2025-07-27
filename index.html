@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>EXAMYATRI - Quiz Se Kro Success Yatra</title>
+  <title>EXAMYATRI - Multiplayer Quiz</title>
   <!-- Cropper.js CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
   <!-- Google tag (gtag.js) -->
@@ -15,6 +15,19 @@
 
   gtag('config', 'G-1HGZL93811');
 </script>
+  <!-- ADDED: MathJax for Math/Physics Formula Rendering -->
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\\\(', '\\\\)'], ['$', '$']] // Support for \(...\) and $...$ delimiters
+    },
+    svg: {
+      fontCache: 'global'
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
   <style>
     /* --- Base & Theme Variables --- */
     :root {
@@ -31,6 +44,9 @@
       --skipped-color: #ffc107;
       --bookmark-color: #a5a5a5;
       --bookmarked-active-color: #ffb300;
+      /* NEW: Multiplayer colors */
+      --multiplayer-accent: #8e44ad;
+      --multiplayer-accent-hover: #7b2a9a;
       --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
@@ -43,6 +59,9 @@
       --shadow-color: rgba(255, 255, 255, 0.08);
       --accent-color: #4dabf7;
       --accent-hover: #1c7ed6;
+       /* NEW: Multiplayer colors */
+      --multiplayer-accent: #a569bd;
+      --multiplayer-accent-hover: #c39bd3;
     }
 
     /* --- General Styles --- */
@@ -89,7 +108,7 @@
       border-radius: 10px 10px 0 0;
     }
     body.dark-mode .header { background-color: #1f1f1f; border-bottom: 1px solid var(--border-color); }
-    
+
     .header-branding {
         font-size: 1em;
         display: inline-flex;
@@ -123,13 +142,13 @@
         transform: translateY(0);
     }
 
-    @keyframes glow { 
-        0% { box-shadow: 0 0 4px var(--accent-color); } 
-        50% { box-shadow: 0 0 16px var(--accent-color), 0 0 24px var(--accent-hover); } 
-        100% { box-shadow: 0 0 4px var(--accent-color); } 
+    @keyframes glow {
+        0% { box-shadow: 0 0 4px var(--accent-color); }
+        50% { box-shadow: 0 0 16px var(--accent-color), 0 0 24px var(--accent-hover); }
+        100% { box-shadow: 0 0 4px var(--accent-color); }
     }
     .btn.glowing { animation: glow 1.8s infinite; }
-    
+
     @keyframes shake-horizontal { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
     .is-shaking { animation: shake-horizontal 0.8s cubic-bezier(.36,.07,.19,.97) both; }
 
@@ -146,7 +165,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        z-index: 3000;
+        z-index: 11000;
         color: white;
         font-size: 1.2em;
         text-align: center;
@@ -171,13 +190,47 @@
     .creation-option-card .card-icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
     .creation-option-card h4 { margin: 0.5rem 0; color: var(--accent-color); font-size: 1.1em; }
     .creation-option-card p { font-size: 0.9em; color: var(--text-color); opacity: 0.8; margin: 0; }
+
+    .creation-option-card#select-multiplayer {
+        border-color: var(--multiplayer-accent);
+        grid-column: 1 / -1; /* Make it full width */
+        background: linear-gradient(45deg, var(--multiplayer-accent), #a569bd);
+        color: white;
+    }
+    .creation-option-card#select-multiplayer h4 { color: white; }
+    .creation-option-card#select-multiplayer p { color: white; opacity: 0.9;}
+    .creation-option-card#select-multiplayer:hover {
+         border-color: var(--multiplayer-accent-hover);
+         box-shadow: 0 8px 25px rgba(142, 68, 173, 0.4);
+         transform: translateY(-5px) scale(1.02);
+    }
+
     @media (max-width: 600px) { #creation-method-selector { grid-template-columns: 1fr; gap: 1rem; } .creation-option-card { padding: 1rem; } }
+
+    /* --- MULTIPLAYER LOBBY STYLES --- */
+    #multiplayer-lobby { text-align: center; }
+    #multiplayer-lobby .header { background-color: var(--multiplayer-accent); }
+    #multiplayer-lobby .btn-primary { background-color: var(--multiplayer-accent); }
+    #multiplayer-lobby .btn-primary:hover { background-color: var(--multiplayer-accent-hover); }
+    #multiplayer-lobby .input-field { border-color: var(--multiplayer-accent); }
+    #multiplayer-lobby h3 { color: var(--multiplayer-accent); font-size: 1.5em; margin-bottom: 1rem;}
+    #multiplayer-lobby .lobby-actions { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; max-width: 400px; margin-left: auto; margin-right: auto; }
+    #multiplayer-lobby .or-divider { margin: 1rem 0; font-weight: bold; color: var(--border-color); }
+    #multiplayer-lobby .input-group { margin-bottom: 1.5rem; text-align: left; }
+    #multiplayer-lobby .join-game-group { display: flex; gap: 10px; }
+    .room-code-container { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    #room-code-display { font-size: 2em; font-weight: bold; background-color: var(--component-bg); padding: 0.5rem 1.5rem; border-radius: 8px; letter-spacing: 3px; border: 2px dashed var(--multiplayer-accent); }
+    #participant-list { list-style: none; padding: 0; margin: 1.5rem auto; max-width: 400px; }
+    #participant-list li { background-color: var(--component-bg); padding: 0.75rem 1rem; border-radius: 5px; margin-bottom: 0.5rem; text-align: left; border-left: 4px solid var(--multiplayer-accent); }
+    #name-prompt { margin-top: 2rem; }
+    #room-full-notification, #room-not-found-notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: var(--incorrect-color); color: white; padding: 1rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 12000; animation: fade-in-out 3s forwards; }
+    @keyframes fade-in-out { 0% { opacity: 0; top: 0; } 10% { opacity: 1; top: 20px; } 90% { opacity: 1; top: 20px; } 100% { opacity: 0; top: 0; } }
+    .multiplayer-disclaimer { background-color: var(--component-bg); border: 1px solid var(--multiplayer-accent); color: var(--multiplayer-accent); padding: 1rem; border-radius: 8px; margin-top: 1.5rem; font-size: 0.9em; line-height: 1.4; }
 
 
     /* --- GENERATOR STYLES --- */
     .step-header-container { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
     .step-header { padding-bottom: 10px; margin: 2rem 0 0 0; border-bottom: none; }
-    .input-group { margin-bottom: 1.5rem; }
     .input-label { display: block; margin-bottom: 8px; font-weight: bold; }
     .input-label-group { display: flex; justify-content: space-between; align-items: center; }
     textarea, .input-field, select.input-field { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 5px; box-sizing: border-box; background-color: var(--component-bg); color: var(--text-color); font-family: var(--font-family); font-size: 1em; resize: vertical; }
@@ -250,8 +303,7 @@
     @keyframes pop-in { 0% { transform: scale(0); opacity: 0; } 70% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
     #explanation-container { margin-top: 1.5rem; padding: 1rem; background-color: var(--component-bg); border-left: 5px solid var(--accent-color); border-radius: 5px; }
     #explanation-container h4 { margin-top: 0; }
-    
-    /* --- NEW: Flexible Button Layout --- */
+
     #quiz-actions { margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; }
     .quiz-actions-primary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
     .quiz-actions-primary .btn { flex: 1 1 120px; /* grow, shrink, basis */ }
@@ -270,7 +322,7 @@
     #check-answer-btn:hover:not(:disabled) { background-color: #218838; }
     #skip-question-btn { background-color: var(--skipped-color); color: #212529;}
     #skip-question-btn:hover:not(:disabled) { background-color: #e0a800; }
-    
+
     .exam-buttons-container, .ai-platform-selector { display: flex; flex-wrap: wrap; gap: 8px; }
     .ai-platform-selector { justify-content: center; margin-top: 10px; }
     .exam-btn, .ai-platform-btn { background-color: var(--component-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 6px 14px; font-size: 0.85em; min-width: auto; margin: 0; flex-grow: 1; }
@@ -282,7 +334,7 @@
     #results-screen h2 { color: var(--correct-color); border-bottom-color: var(--correct-color); }
     #score-summary { font-size: 1.5rem; font-weight: bold; text-align: center; margin-bottom: 1.5rem; transform: scale(0.8); opacity: 0; transition: transform 0.5s ease-out, opacity 0.5s ease-out; }
     #score-summary.visible { transform: scale(1); opacity: 1; }
-    
+
     #results-summary-wrapper {
         display: flex;
         flex-wrap: wrap;
@@ -339,7 +391,7 @@
             flex-direction: row;
         }
     }
-    
+
     .summary-item { display: flex; flex-direction: column; }
     .summary-label { font-size: 0.9em; color: #6c757d; font-weight: 500;}
     .summary-value { font-size: 1.2em; font-weight: bold; }
@@ -372,7 +424,7 @@
     .guide-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 5px; line-height: 1; opacity: 0.7; transition: opacity 0.2s, transform 0.2s; animation: pulse 2.5s infinite ease-in-out; }
     .guide-btn:hover { opacity: 1; transform: scale(1.2); animation-play-state: paused; }
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-    
+
     #telegram-backup-guide-container { display: flex; flex-direction: column; align-items: center; gap: 5px; margin-top: 15px; }
     #telegram-backup-guide-btn { background: none; border: none; font-size: 2rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
     #telegram-backup-guide-btn:hover { opacity: 1; }
@@ -440,8 +492,8 @@
     #ai-link-fallback a { font-weight: bold; }
 
 
-    /* --- MODAL STYLES --- */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+    /* --- MODAL STYLES (MODIFIED Z-INDEX) --- */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 10001; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
     .modal-overlay:not(.hidden) { opacity: 1; pointer-events: auto; }
     .modal-content { position: relative; background-color: var(--secondary-bg); color: var(--text-color); padding: 1.5rem; border-radius: 10px; width: 90%; max-width: 800px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); transform: scale(0.95); transition: transform 0.3s ease; display: flex; flex-direction: column; max-height: 90vh; }
     .modal-overlay:not(.hidden) .modal-content { transform: scale(1); }
@@ -464,34 +516,7 @@
         justify-content: center;
         align-items: center;
     }
-    #congrats-text {
-        font-size: 3rem;
-        font-weight: bold;
-        text-align: center;
-        padding: 0 20px;
-        /* Animation will be applied via class */
-    }
-    .congrats-text-animated {
-        animation: slideUpSettleAndFade 3.5s ease-in-out forwards;
-    }
-    @keyframes slideUpSettleAndFade {
-        0% {
-            transform: translateY(50vh) scale(0.3);
-            opacity: 0;
-        }
-        15% {
-            transform: translateY(0) scale(1.1);
-            opacity: 1;
-        }
-        25%, 85% {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-        }
-        100% {
-            transform: translateY(-20px) scale(0.9);
-            opacity: 0;
-        }
-    }
+
     .congrats-emoji {
         position: absolute;
         top: 50%; left: 50%;
@@ -504,7 +529,7 @@
         20% { opacity: 1; }
         100% { transform: var(--transform-end) scale(1); opacity: 0; }
     }
-    
+
     #sad-reaction-overlay {
       position: fixed;
       top: 0; left: 0;
@@ -627,7 +652,7 @@
     input:checked + .slider:before {
       transform: translateX(20px);
     }
-    
+
     @keyframes vibrate {
       0% { transform: translate(0); }
       20% { transform: translate(-2px, 2px); }
@@ -638,6 +663,37 @@
     }
     #check-answer-btn.vibrating {
         animation: vibrate 0.3s linear infinite;
+    }
+
+    /* --- NEW: Gemini Instructions Modal & Fire Button --- */
+    #gemini-instructions-modal-overlay .modal-content {
+        padding: 1rem 1.5rem;
+        height: auto;
+        max-height: calc(100vh - 40px);
+    }
+    #gemini-instructions-modal-overlay .guide-step {
+        margin-bottom: 0.8rem;
+        padding: 0.8rem;
+    }
+     #gemini-instructions-modal-overlay h3 {
+        text-align: center;
+        margin-bottom: 1rem;
+     }
+    #gemini-instructions-content-wrapper {
+        overflow-y: auto;
+        flex-grow: 1;
+        padding-right: 10px; /* space for scrollbar */
+        margin-bottom: 1rem; /* space above button */
+    }
+    @keyframes fire {
+        0% { box-shadow: 0 0 10px #ffc107, 0 0 20px #ffc107, 0 0 30px #ff8c00, 0 0 40px #ff4500, inset 0 0 5px #ffc107; }
+        50% { box-shadow: 0 0 15px #ffc107, 0 0 25px #ffc107, 0 0 35px #ff8c00, 0 0 45px #ff4500, inset 0 0 10px #ff8c00; }
+        100% { box-shadow: 0 0 10px #ffc107, 0 0 20px #ffc107, 0 0 30px #ff8c00, 0 0 40px #ff4500, inset 0 0 5px #ffc107; }
+    }
+    .fire-animation {
+        animation: fire 1.5s infinite ease-in-out;
+        background-color: #dc3545;
+        border-color: #ffc107;
     }
 
   </style>
@@ -652,6 +708,7 @@
 <div id="paste-notification"></div>
 <div id="congrats-animation-container"></div>
 <div id="sad-reaction-overlay" class="hidden"><span id="sad-reaction-emoji"></span></div>
+
 
 
 <!-- ======================================= -->
@@ -697,7 +754,7 @@
             <div class="input-group"><label for="prompt-difficulty-topic" class="input-label">Difficulty Level</label><select id="prompt-difficulty-topic" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
             <div class="input-group"><label class="input-label">Target Exam (Optional)</label><div class="exam-buttons-container"></div><input type="text" class="prompt-exam-other input-field hidden" id="prompt-exam-other-topic" placeholder="Enter custom exam name" style="margin-top: 10px;"></div>
             <div class="input-group"><label for="question-format-select-topic" class="input-label">Question Format</label><select id="question-format-select-topic" class="input-field"></select></div>
-            <button id="generate-prompt-btn-topic" class="btn btn-full-width glowing">Generate Prompt & Open AI 🚀</button>
+            <button id="generate-prompt-btn-topic" class="btn btn-full-width glowing">Start 🚀</button>
             <button class="btn btn-secondary btn-full-width back-to-selection-btn" style="margin-top: 1rem;">↩️ Back to Main Menu</button>
         </div>
 
@@ -725,14 +782,14 @@
             <div class="input-group"><label for="prompt-difficulty-text" class="input-label">Difficulty Level</label><select id="prompt-difficulty-text" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
             <div class="input-group"><label for="question-format-select-text" class="input-label">Question Format</label><select id="question-format-select-text" class="input-field"></select></div>
             <div class="input-group"><label class="input-label">Target Exam (Optional)</label><div class="exam-buttons-container"></div><input type="text" class="prompt-exam-other input-field hidden" id="prompt-exam-other-text" placeholder="Enter custom exam name" style="margin-top: 10px;"></div>
-            <button id="generate-prompt-btn-text" class="btn btn-full-width glowing">Generate Prompt & Open AI 🚀</button>
+            <button id="generate-prompt-btn-text" class="btn btn-full-width glowing">Start 🚀</button>
             <button class="btn btn-secondary btn-full-width back-to-selection-btn" style="margin-top: 1rem;">↩️ Back to Main Menu</button>
         </div>
 
         <!-- WORKFLOW 3: From Image -->
         <div id="image-generator-workflow" class="hidden">
             <button class="btn btn-secondary back-to-selection-btn" style="margin-bottom: 1.5rem;">&larr; Back to Options</button>
-            
+
             <div id="image-format-guide" class="hidden">
                 <div class="guide-card good">
                     <h5>✅ Good Example</h5>
@@ -762,7 +819,7 @@
             <p>Select your images. Orientation will be corrected and text will be extracted automatically.</p>
             <div id="image-input-area"><button id="select-images-btn" class="btn btn-secondary glowing">📂 Select Images</button><input type="file" id="image-file-input" multiple accept="image/*" class="hidden"></div>
             <div id="image-preview-container"></div>
-            
+
             <button id="extract-text-btn" class="btn btn-full-width hidden" style="margin-top: 1.5rem;">🔍 Extract Text from Images</button>
             <div id="ocr-status"></div>
 
@@ -782,7 +839,7 @@
                 <div class="input-group"><label for="prompt-difficulty-image" class="input-label">Difficulty Level</label><select id="prompt-difficulty-image" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
                 <div class="input-group"><label for="question-format-select-image" class="input-label">Question Format</label><select id="question-format-select-image" class="input-field"></select></div>
                 <div class="input-group"><label class="input-label">Target Exam (Optional)</label><div class="exam-buttons-container"></div><input type="text" class="prompt-exam-other input-field hidden" id="prompt-exam-other-image" placeholder="Enter custom exam name" style="margin-top: 10px;"></div>
-                <button id="generate-prompt-btn-image" class="btn btn-full-width glowing">Generate Prompt & Open AI 🚀</button>
+                <button id="generate-prompt-btn-image" class="btn btn-full-width glowing">Start 🚀</button>
                 <button class="btn btn-secondary btn-full-width back-to-selection-btn" style="margin-top: 1rem;">↩️ Back to Main Menu</button>
             </div>
         </div>
@@ -838,12 +895,14 @@
                 <div class="input-group"><label for="prompt-difficulty-pdf" class="input-label">Difficulty Level</label><select id="prompt-difficulty-pdf" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
                 <div class="input-group"><label for="question-format-select-pdf" class="input-label">Question Format</label><select id="question-format-select-pdf" class="input-field"></select></div>
                 <div class="input-group"><label class="input-label">Target Exam (Optional)</label><div class="exam-buttons-container"></div><input type="text" class="prompt-exam-other input-field hidden" id="prompt-exam-other-pdf" placeholder="Enter custom exam name" style="margin-top: 10px;"></div>
-                <button id="generate-prompt-btn-pdf" class="btn btn-full-width glowing">Generate Prompt & Open AI 🚀</button>
+                <button id="generate-prompt-btn-pdf" class="btn btn-full-width glowing">Start 🚀</button>
                 <button class="btn btn-secondary btn-full-width back-to-selection-btn" style="margin-top: 1rem;">↩️ Back to Main Menu</button>
             </div>
         </div>
     </div>
 </div>
+
+
 
 <!-- ======================================= -->
 <!-- ===== PASTE CONTAINER (STEP 2) ====== -->
@@ -853,7 +912,7 @@
         <span class="header-branding">✍️ <strong>EXAMYATRI</strong> - <span class="tagline">Quiz Se Kro Success Yatra</span></span>
     </div>
     <p style="text-align: center; font-size: 1.1em;"><b>Welcome back!</b> I'm now waiting for the quiz text from the AI.</p>
-    
+
     <div id="ai-link-fallback" class="hidden">
         <p>⚠️ It looks like the AI tab was blocked by your browser.</p>
         <a href="https://gemini.google.com" target="_blank" class="btn">Click Here to Open Gemini Manually</a>
@@ -978,7 +1037,6 @@
     </div>
 </div>
 
-
 <!-- PERMISSION MODAL -->
 <div id="clipboard-permission-modal-overlay" class="modal-overlay hidden">
     <div id="clipboard-permission-modal-content" class="modal-content">
@@ -988,6 +1046,38 @@
         <div class="modal-actions">
             <button id="deny-clipboard-btn" class="btn btn-secondary">No, I'll paste manually</button>
             <button id="grant-clipboard-btn" class="btn">Yes, allow auto-pasting</button>
+        </div>
+    </div>
+</div>
+
+<!-- NEW: Gemini Instructions Modal -->
+<div id="gemini-instructions-modal-overlay" class="modal-overlay hidden">
+    <div class="modal-content">
+        <h3>Ready for AI Magic? ✨</h3>
+        <div id="gemini-instructions-content-wrapper">
+            <div class="guide-step">
+                <strong>1️⃣ When Gemini opens:</strong>
+                <p>Just paste the instructions into the message box and hit send.</p>
+            </div>
+            <div class="guide-step">
+                <strong>2️⃣ Copy the Generated Questions:</strong>
+                <p>Once the AI finishes, copy the entire response.</p>
+                <ul style="padding-left: 20px; margin-top: 0.5em; font-size: 0.9em;">
+                    <li><strong>Method 1:</strong> Tap on 3 Vertical Dots (⋮) at the start of the generated question.</li>
+                    <li><strong>Method 2:</strong> Tap the Copy Icon (📋) at the end of the generated question.</li>
+                </ul>
+            </div>
+             <div class="guide-step">
+                <strong>3️⃣ Return to Examyatri:</strong>
+                <p>Come back to this tab to start the quiz.</p>
+                 <ul style="padding-left: 20px; margin-top: 0.5em; font-size: 0.9em;">
+                    <li><strong>Method 1:</strong> Press your device's 'Back' button twice.</li>
+                    <li><strong>Method 2:</strong> Manually switch tabs from Gemini back to Examyatri.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="modal-actions" style="justify-content: center;">
+            <button id="open-gemini-btn" class="btn btn-full-width fire-animation">Got it and Open Gemini Now ➜</button>
         </div>
     </div>
 </div>
@@ -1008,18 +1098,11 @@ document.addEventListener('DOMContentLoaded', () => {
         'mcq': { name: 'Multiple Choice (MCQ)' },
         'statement': { name: 'Statement-Based' },
         'assertion-reason': { name: 'Assertion-Reason' },
+        'math-physics': { name: 'Maths, Physics, or Other Questions'},
         'true-false': { name: 'True/False' },
         'fill-blank': { name: 'Fill-in-the-Blank' },
         'mix': { name: 'Mixed Format' }
     };
-    
-    const CONGRATS_PHRASES = [
-        // English
-        "You did it, legend!", "congratulation", "Flex mode: ON.","That’s a Dhoni", "Full toss win!", "Game-changer move!", "Captain Cool strikes again!", "Brain = 1000 IQ", "Achievement Unlocked!",
-        // Hinglish
-        "Bhai, kamaal kar diya", "Aaj toh party banti hai!", "Tu toh asli hero nikla!", "Maa kasam, dil jeet liya!", "Full jhakaas performance!", "Dil garden-garden ho gaya!", "Aaj toh nazar lag jayegi!", "Kohli bhi sharma jaaye!", "Dhoni wali calmness aur finish!",
-        "Match winner moment!", "Trophy ready hai, le jao!", "Achievement unlocked beta!", "Mission successful, boss!"
-    ];
 
     const LEGACY_FORMAT_TEXT = `Generate the quiz in plain text format only. Each question must be numbered and must include one of the following headers on the same line (e.g., "1. Multiple Choice Questions").
 
@@ -1058,7 +1141,17 @@ b) 2 and 3 only
 c) 1 and 3 only
 d) 1, 2, and 3
 Correct Answer: d) 1, 2, and 3
-Explanation: All three statements are correct.`;
+Explanation: All three statements are correct.
+
+4. Maths, Physics, or Other Questions
+Question: What is the value of the integral of 3x^2, i.e., \\( \\int 3x^2 \\,dx \\)?
+Options:
+a) \\( 3x^3 + C \\)
+b) \\( x^3 + C \\)
+c) \\( 6x + C \\)
+d) \\( \\frac{1}{3}x^3 + C \\)
+Correct Answer: b) \\( x^3 + C \\)
+Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) is \\( x^3 \\). C is the constant of integration. For math symbols, you MUST use LaTeX format enclosed in \\( ... \\) delimiters.`;
 
     const commonGuideAfterInput = `
         <div class="guide-step">
@@ -1068,8 +1161,8 @@ Explanation: All three statements are correct.`;
         </div>
         <div class="guide-step">
             <strong>Step 3: Generate Prompt & Open AI</strong>
-            <p>Click the big "Generate Prompt & Open AI" button. This automatically copies the instructions for the AI and opens the Gemini website in a new tab.</p>
-            <p class="hindi-text">(चरण 3: 'Generate Prompt & Open AI' बटन पर क्लिक करें - यह AI के लिए निर्देश अपने आप कॉपी कर लेगा और एक नए टैब में Gemini वेबसाइट खोल देगा।)</p>
+            <p>Click the big "Start 🚀" button. This automatically copies the instructions for the AI and opens the Gemini website in a new tab.</p>
+            <p class="hindi-text">(चरण 3: 'Start 🚀' बटन पर क्लिक करें - यह AI के लिए निर्देश अपने आप कॉपी कर लेगा और एक नए टैब में Gemini वेबसाइट खोल देगा।)</p>
         </div>
         <div class="guide-step">
             <strong>Step 4: Use the AI (Gemini)</strong>
@@ -1111,7 +1204,7 @@ Explanation: All three statements are correct.`;
                 ${commonGuideAfterInput}
             `
         },
-        'text-step2': { 
+        'text-step2': {
             title: 'Guide: Create Quiz from Text',
             content: `
                 <div class="guide-step">
@@ -1133,8 +1226,8 @@ Explanation: All three statements are correct.`;
                 ${commonGuideAfterInput}
             `
         },
-        'image-step3': { 
-            title: 'Guide: Create Quiz from Image', 
+        'image-step3': {
+            title: 'Guide: Create Quiz from Image',
             content: `
                  <div class="guide-step">
                     <strong>Step 1: Upload Your Images</strong>
@@ -1142,7 +1235,7 @@ Explanation: All three statements are correct.`;
                     <p class="hindi-text">(चरण 1: अपनी इमेज अपलोड करें - "Select Images" पर क्लिक करें और अपनी किताब के पन्नों या नोट्स की तस्वीरें चुनें। ऐप अपने आप टेक्स्ट की सही दिशा का पता लगा लेगा और आपके लिए टेक्स्ट निकाल देगा।)</p>
                 </div>
                 ${commonGuideAfterInput}
-            ` 
+            `
         },
         'pdf-step1': {
             title: 'Guide: Create Quiz from PDF',
@@ -1160,8 +1253,8 @@ Explanation: All three statements are correct.`;
                 ${commonGuideAfterInput}
             `
         },
-        'pdf-step2': { 
-            title: 'Guide: Create Quiz from a PDF', 
+        'pdf-step2': {
+            title: 'Guide: Create Quiz from a PDF',
             content: `
                <div class="guide-step">
                     <strong>Step 1: Select Your PDF</strong>
@@ -1174,7 +1267,7 @@ Explanation: All three statements are correct.`;
                     <p class="hindi-text">(चरण 2: विकल्प चुनें और टेक्स्ट निकालें - आप सभी पृष्ठ या एक विशिष्ट रेंज निकाल सकते हैं। <strong>महत्वपूर्ण:</strong> यदि आपकी PDF एक स्कैन की हुई कॉपी है या उसमें टेक्स्ट की तस्वीरें हैं, तो सर्वोत्तम परिणामों के लिए "Force OCR" बॉक्स को चेक करें। फिर "Extract Text from PDF" पर क्लिक करें।)</p>
                 </div>
                 ${commonGuideAfterInput}
-            ` 
+            `
         }
     };
 
@@ -1222,7 +1315,7 @@ Explanation: All three statements are correct.`;
         ocrStatus: document.getElementById('ocr-status'),
         imageQuizDefinitionArea: document.getElementById('image-quiz-definition-area'),
         sourceTextImage: document.getElementById('source-text-image'),
-        
+
         // PDF Workflow
         selectPdfBtn: document.getElementById('select-pdf-btn'),
         pdfFileInput: document.getElementById('pdf-file-input'),
@@ -1253,7 +1346,7 @@ Explanation: All three statements are correct.`;
         explanationText: document.getElementById('explanation-text'),
         quizActions: document.getElementById('quiz-actions'),
 
-        // NEW: Feedback & Pressure Mode Elements
+        // Feedback & Pressure Mode Elements
         congratsAnimationContainer: document.getElementById('congrats-animation-container'),
         sadReactionOverlay: document.getElementById('sad-reaction-overlay'),
         sadReactionEmoji: document.getElementById('sad-reaction-emoji'),
@@ -1294,7 +1387,9 @@ Explanation: All three statements are correct.`;
         clipboardPermissionModalOverlay: document.getElementById('clipboard-permission-modal-overlay'),
         grantClipboardBtn: document.getElementById('grant-clipboard-btn'),
         denyClipboardBtn: document.getElementById('deny-clipboard-btn'),
-        
+        geminiInstructionsModalOverlay: document.getElementById('gemini-instructions-modal-overlay'),
+        openGeminiBtn: document.getElementById('open-gemini-btn'),
+
         // Misc
         themeToggleBtn: document.getElementById('theme-toggle-btn'),
     };
@@ -1304,7 +1399,7 @@ Explanation: All three statements are correct.`;
         db: null,
         dbName: 'examyatriDB',
         storeName: 'sessionState',
-        
+
         async init() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(this.dbName, 1);
@@ -1324,7 +1419,7 @@ Explanation: All three statements are correct.`;
                 };
             });
         },
-        
+
         async set(key, value) {
             if (!this.db) await this.init();
             return new Promise((resolve, reject) => {
@@ -1335,7 +1430,7 @@ Explanation: All three statements are correct.`;
                 request.onerror = (event) => reject(event.target.error);
             });
         },
-        
+
         async get(key) {
             if (!this.db) await this.init();
             return new Promise((resolve, reject) => {
@@ -1358,8 +1453,7 @@ Explanation: All three statements are correct.`;
             });
         }
     };
-    
-    // --- ADDED FOR STATE PERSISTENCE ---
+
     // --- FORM & SCROLL PERSISTENCE ---
     function getPersistableInputs() {
         return document.querySelectorAll('#manual-generator-container input, #manual-generator-container textarea, #manual-generator-container select');
@@ -1427,7 +1521,7 @@ Explanation: All three statements are correct.`;
                 }
             }
         }
-        
+
         document.querySelectorAll('input[name="pdf-page-option"]').forEach(radio => {
             if (radio.checked) {
                 elements.pdfPageRangeSelector.classList.toggle('hidden', radio.value !== 'range');
@@ -1439,7 +1533,7 @@ Explanation: All three statements are correct.`;
         localStorage.removeItem(FORM_STATE_KEY);
         localStorage.removeItem(SCROLL_POS_KEY);
     }
-    
+
     function saveScrollPosition() {
         if (elements.manualGeneratorContainer.offsetParent !== null) {
             localStorage.setItem(SCROLL_POS_KEY, window.scrollY);
@@ -1452,7 +1546,6 @@ Explanation: All three statements are correct.`;
             setTimeout(() => window.scrollTo(0, parseInt(scrollY, 10)), 100);
         }
     }
-    // --- END ---
 
     // --- STATE MANAGEMENT & SESSION ---
     const QUIZ_STATE_KEY = 'examyatriQuizState';
@@ -1467,29 +1560,30 @@ Explanation: All three statements are correct.`;
     let currentEditingImageId = null;
     let selectedExam = '';
     let ocrWorker = null;
+    let promptForGemini = null;
 
-    // --- NEW: Pressure Mode State ---
+    // --- Pressure Mode State ---
     let isShakeReminderEnabled = true; // Enabled by default
     let pressureTextCounter = 1;
 
-    // --- MODIFIED: Sound Effects ---
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAE=');
-    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8-BAAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkAZQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
-    
+    // --- Sound Effects ---
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAE=');
+    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//-BAAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
+
     // --- INITIALIZATION ---
     async function init() {
         applyInitialTheme();
         populateSharedElements();
         setupAudio();
-        
+
         loadFormState();
         loadScrollPosition();
-        
+
         loadPressureModeSettings();
         setupEventListeners();
-        
+
         await dbHelper.init();
-        
+
         const quizRestored = await loadQuizState();
         if (quizRestored) {
             // Active quiz session takes precedence.
@@ -1499,11 +1593,12 @@ Explanation: All three statements are correct.`;
         } else {
             showScreen('manualGenerator');
         }
+
     }
-    
+
     function setupAudio() {
         optionClickSound.volume = 0.7;
-        clapSound.volume = 0.5; // NEW: Set volume for clap sound
+        clapSound.volume = 0.5;
     }
 
     init();
@@ -1518,7 +1613,7 @@ Explanation: All three statements are correct.`;
     function hideLoading() {
         elements.loadingOverlay.classList.add('hidden');
     }
-    
+
     function shakeElement(element) {
         element.classList.add('is-shaking');
         element.addEventListener('animationend', () => {
@@ -1531,7 +1626,7 @@ Explanation: All three statements are correct.`;
             manualGenerator: elements.manualGeneratorContainer,
             paste: elements.pasteQuizContainer,
             player: elements.quizPlayerContainer,
-            results: elements.resultsScreen
+            results: elements.resultsScreen,
         };
         const activeScreen = Object.values(screens).find(s => s && !s.classList.contains('hidden'));
 
@@ -1552,21 +1647,24 @@ Explanation: All three statements are correct.`;
     }
 
     function showCreationSelector() { ['topic', 'text', 'image', 'pdf'].forEach(w => elements[w+'GeneratorWorkflow'].classList.add('hidden')); elements.creationMethodSelector.classList.remove('hidden'); elements.imageFormatGuide.classList.add('hidden'); }
+
     function showWorkflow(workflowName) {
         ['topic', 'text', 'image', 'pdf'].forEach(w => {
-            const wf = elements[w+'GeneratorWorkflow'];
-            if (wf) wf.classList.add('hidden');
+            elements[w + 'GeneratorWorkflow'].classList.add('hidden');
         });
         elements.creationMethodSelector.classList.add('hidden');
-        elements.imageFormatGuide.classList.add('hidden');
 
-        if (elements[workflowName+'GeneratorWorkflow']) {
-            elements[workflowName+'GeneratorWorkflow'].classList.remove('hidden');
-            if (workflowName === 'image') {
-                setTimeout(() => { elements.imageFormatGuide.classList.remove('hidden'); }, 50);
-            }
+        const workflowElement = elements[workflowName + 'GeneratorWorkflow'];
+        if (workflowElement) {
+            workflowElement.classList.remove('hidden');
+        }
+
+        elements.imageFormatGuide.classList.toggle('hidden', workflowName !== 'image');
+        if (workflowName === 'image') {
+            setTimeout(() => { elements.imageFormatGuide.classList.remove('hidden'); }, 50);
         }
     }
+
 
     function populateSharedElements() {
         const formatSelects = document.querySelectorAll('select[id^="question-format-select"]');
@@ -1579,6 +1677,10 @@ Explanation: All three statements are correct.`;
                 option.textContent = QUESTION_FORMATS[key].name;
                 select.appendChild(option);
             });
+             // Set default for math/physics if applicable
+            if (select.id.includes('text') || select.id.includes('image')) {
+                select.value = 'math-physics';
+            }
         });
 
         const examHtml = `<button class="btn exam-btn" data-exam-name="NEET">NEET</button><button class="btn exam-btn" data-exam-name="IIT-JEE">IIT-JEE</button><button class="btn exam-btn" data-exam-name="NEET PG">NEET PG</button><button class="btn exam-btn" data-exam-name="CUET">CUET</button><button class="btn exam-btn" data-exam-name="AIAPGET">AIAPGET</button><button class="btn exam-btn" data-exam-name="UPSC Civil Services">UPSC</button><button class="btn exam-btn" data-exam-name="SSC CGL">SSC</button><button class="btn exam-btn" data-exam-name="UP-SI">UP-SI</button><button class="btn exam-btn" data-exam-name="State PSC">State PSC</button><button class="btn exam-btn" data-exam-name="Banking Exams">Bank</button><button class="btn exam-btn" data-exam-name="Railway Exams">Railway</button><button class="btn exam-btn" data-exam-name="Other">Other</button>`;
@@ -1595,17 +1697,18 @@ Explanation: All three statements are correct.`;
         elements.backToSelectionBtns.forEach(btn => btn.addEventListener('click', showCreationSelector));
 
         // Prompt Generation
-        elements.generatePromptBtnTopic.addEventListener('click', generateTopicPrompt);
-        elements.generatePromptBtnText.addEventListener('click', generateTextPrompt);
-        elements.generatePromptBtnImage.addEventListener('click', generateImagePrompt);
-        elements.generatePromptBtnPdf.addEventListener('click', generatePdfPrompt);
+        elements.generatePromptBtnTopic.addEventListener('click', () => handleGeneratePrompt('topic'));
+        elements.generatePromptBtnText.addEventListener('click', () => handleGeneratePrompt('text'));
+        elements.generatePromptBtnImage.addEventListener('click', () => handleGeneratePrompt('image'));
+        elements.generatePromptBtnPdf.addEventListener('click', () => handleGeneratePrompt('pdf'));
+
 
         // Image Workflow
         elements.selectImagesBtn.addEventListener('click', () => elements.imageFileInput.click());
         elements.imageFileInput.addEventListener('change', handleImageSelection);
         elements.saveCropBtn.addEventListener('click', saveCrop);
         elements.cancelCropBtn.addEventListener('click', closeCropModal);
-        
+
         // PDF Workflow
         elements.selectPdfBtn.addEventListener('click', () => elements.pdfFileInput.click());
         elements.pdfFileInput.addEventListener('change', handlePdfSelection);
@@ -1618,8 +1721,8 @@ Explanation: All three statements are correct.`;
 
         // Shared Components & Fallbacks
         document.querySelectorAll('.exam-btn').forEach(btn => btn.addEventListener('click', handleExamSelection));
-        
-        // Guide Modal Listeners (Using Event Delegation for robustness)
+
+        // Guide Modal Listeners
         document.body.addEventListener('click', (event) => {
             const guideBtn = event.target.closest('.guide-btn');
             if (guideBtn) {
@@ -1630,7 +1733,6 @@ Explanation: All three statements are correct.`;
                 const modal = event.target.closest('.modal-overlay');
                 if (modal) modal.classList.add('hidden');
             }
-             // NEW: Close pressure controls on outside click
             if (!event.target.closest('#pressure-mode-container')) {
                 elements.pressureModeControls.classList.add('hidden');
             }
@@ -1655,8 +1757,10 @@ Explanation: All three statements are correct.`;
         elements.themeToggleBtn.addEventListener('click', toggleTheme);
         elements.manualCopyCloseBtn.addEventListener('click', () => elements.manualCopyModalOverlay.classList.add('hidden'));
         document.addEventListener('visibilitychange', handleVisibilityChange);
-        window.addEventListener('beforeunload', saveQuizState);
-        
+        window.addEventListener('beforeunload', () => {
+            saveQuizState();
+        });
+
         // Clipboard Permission & Automation
         elements.grantClipboardBtn.addEventListener('click', requestClipboardAndPaste);
         elements.denyClipboardBtn.addEventListener('click', () => {
@@ -1665,7 +1769,19 @@ Explanation: All three statements are correct.`;
         });
         elements.quizDataInput.addEventListener('focus', tryAutoPasteOnFocus);
 
-        // --- NEW: Pressure Mode Event Listeners ---
+        // Gemini Instructions Modal Listener
+        elements.openGeminiBtn.addEventListener('click', () => {
+            if (promptForGemini) {
+                executePostPromptActions(promptForGemini);
+                promptForGemini = null; // Clear it after use
+                elements.geminiInstructionsModalOverlay.classList.add('hidden');
+            } else {
+                console.error("No prompt was available to send to Gemini.");
+                elements.geminiInstructionsModalOverlay.classList.add('hidden');
+            }
+        });
+
+        // Pressure Mode Event Listeners
         elements.pressureModeToggleBtn.addEventListener('click', () => {
             elements.pressureModeControls.classList.toggle('hidden');
         });
@@ -1677,9 +1793,8 @@ Explanation: All three statements are correct.`;
                 checkBtn.classList.remove('vibrating');
             }
         });
-        // --- END ---
 
-        // --- ADDED FOR STATE PERSISTENCE ---
+        // Form persistence
         let scrollTimeout;
         window.addEventListener('scroll', () => {
             clearTimeout(scrollTimeout);
@@ -1690,13 +1805,13 @@ Explanation: All three statements are correct.`;
             input.addEventListener('input', saveFormState);
             input.addEventListener('change', saveFormState);
         });
-        
+
         document.querySelectorAll('.exam-btn').forEach(btn => {
             btn.addEventListener('click', saveFormState);
         });
-        // --- END ---
+
     }
-    
+
     // --- SESSION MANAGEMENT (Quiz-in-progress ONLY) ---
     async function saveQuizState() {
         if (quizData.length === 0 || elements.quizPlayerContainer.classList.contains('hidden')) {
@@ -1707,7 +1822,7 @@ Explanation: All three statements are correct.`;
             originalQuizData, userAnswers, currentQuestionIndex,
             bookmarkedQuestions: Array.from(bookmarkedQuestions),
             quizStartTime: quizStartTime.toISOString(),
-            quizMetaData: quizMetaData // <-- ADDED
+            quizMetaData: quizMetaData
         };
         await dbHelper.set(QUIZ_STATE_KEY, state);
     }
@@ -1722,7 +1837,7 @@ Explanation: All three statements are correct.`;
             currentQuestionIndex = state.currentQuestionIndex;
             bookmarkedQuestions = new Set(state.bookmarkedQuestions);
             quizStartTime = new Date(state.quizStartTime);
-            quizMetaData = state.quizMetaData || {}; // <-- ADDED
+            quizMetaData = state.quizMetaData || {};
             showScreen('player');
             loadQuestion(currentQuestionIndex);
             showPasteNotification('✅ Your active quiz has been restored.');
@@ -1733,7 +1848,7 @@ Explanation: All three statements are correct.`;
             return false;
         }
     }
-    
+
     // --- CLIPBOARD PERMISSION & AUTOMATION ---
     async function handleClipboardPermission() {
         if (!navigator.clipboard || !navigator.permissions) return;
@@ -1774,7 +1889,7 @@ Explanation: All three statements are correct.`;
             }
         }
     }
-    
+
     async function tryAutoPasteOnFocus() {
         if(elements.quizDataInput.value.trim() !== '') return;
         try {
@@ -1791,7 +1906,7 @@ Explanation: All three statements are correct.`;
             await handleClipboardPermission();
         }
     }
-    
+
     // --- GUIDE MODAL FUNCTIONS ---
     function showFlowchartGuide(guideId) {
         const guideContent = GUIDE_DATA[guideId];
@@ -1808,67 +1923,79 @@ Explanation: All three statements are correct.`;
         elements.flowchartModalOverlay.classList.add('hidden');
     }
 
-    // --- PROMPT BUILDER LOGIC (Centralized & Enhanced) ---
-    function generatePrompt(source, sourceType) {
-        const { numQuestions, topic, subject, difficulty, language, formatKey, exam } = source;
-        const sourceText = sourceType === 'pdf' ? elements.sourceTextPdf.value.trim() :
-                           sourceType === 'image' ? elements.sourceTextImage.value.trim() :
-                           sourceType === 'text' ? document.getElementById('source-text-input').value.trim() : '';
-        
-        if (sourceType === 'topic' && !topic) {
-            shakeElement(document.getElementById('prompt-topic'));
-            alert('Please enter a Quiz Topic.');
-            return;
+    // --- PROMPT BUILDER AND GENERATION LOGIC ---
+    function handleGeneratePrompt(sourceType) {
+        let source;
+        let workflowContainer;
+        let activeExam = '';
+
+        workflowContainer = document.getElementById(`${sourceType}-generator-workflow`);
+        const activeExamBtn = workflowContainer.querySelector('.exam-btn.active');
+        activeExam = activeExamBtn ? activeExamBtn.dataset.examName : '';
+
+        quizMetaData = {
+            topic: workflowContainer.querySelector(`#prompt-topic-${sourceType}`)?.value.trim(),
+            subject: workflowContainer.querySelector(`#prompt-subject-${sourceType}`)?.value.trim(),
+            difficulty: workflowContainer.querySelector(`#prompt-difficulty-${sourceType}`).value
+        };
+        source = {
+            numQuestions: workflowContainer.querySelector(`#prompt-num-questions-${sourceType}`).value || 5,
+            topic: quizMetaData.topic,
+            subject: quizMetaData.subject,
+            difficulty: quizMetaData.difficulty,
+            language: workflowContainer.querySelector(`#prompt-language-${sourceType}`).value,
+            formatKey: workflowContainer.querySelector(`#question-format-select-${sourceType}`).value,
+            exam: (activeExam === 'Other') ? workflowContainer.querySelector('.prompt-exam-other').value.trim() : activeExam,
+        };
+
+        const sourceTextInput = sourceType === 'pdf' ? `#source-text-pdf` :
+                                sourceType === 'image' ? `#source-text-image` :
+                                sourceType === 'text' ? `#source-text-input` : null;
+
+        const sourceText = sourceTextInput ? workflowContainer.querySelector(sourceTextInput)?.value.trim() : '';
+
+        // Validation
+        if (sourceType === 'topic' && !source.topic) {
+            alert('Please enter a Quiz Topic.'); return;
+        }
+        if ((sourceType !== 'topic' && !sourceText)) {
+            alert('Please provide the source material (text, image, or PDF).'); return;
+        }
+         if (!source.numQuestions) {
+            alert('Please specify the number of questions.'); return;
         }
 
-        if ((sourceType !== 'topic' && !sourceText) || !numQuestions) {
-            alert('Please ensure you have provided the source material and specified the number of questions.');
-            return;
-        }
 
-        const formatInfo = QUESTION_FORMATS[formatKey];
-        let formatRequest = `in the "${formatInfo.name}" format.`;
-        if (formatKey === 'mix') { formatRequest = 'in a mix of different formats (like Multiple Choice, Statement-Based, Assertion-Reason, etc.).'; }
-
-        let prompt = `Based ${sourceType !== 'topic' ? '*only* on the text I provide below, ' : ''}`;
-        prompt += `please generate exactly ${numQuestions} question(s)`;
-        if (sourceType === 'topic') prompt += ` about the topic "${topic}". `;
-        else prompt += `. `;
-
-        if (subject) prompt += `The quiz should be on the subject of "${subject}". `;
-        if (exam) prompt += `The questions should be tailored for the ${exam} exam. `;
-        if (language) prompt += `The quiz questions and all related content (options, explanation) MUST be in the ${language} language. `;
-        prompt += `The difficulty level should be ${difficulty}. The questions must be ${formatRequest}\n\n`;
-        prompt += `IMPORTANT INSTRUCTIONS:
-- You MUST provide the response in plain text format only. Do not use markdown, JSON, or code blocks.
-- Each question must be numbered and must include a question type header on the same line (e.g., "1. Multiple Choice Questions").
-- You must provide the question, all options, the single correct answer, and a detailed explanation for each question based *only* on the provided text (if applicable).
----
-HERE ARE EXAMPLES OF THE REQUIRED STRUCTURE:
-${LEGACY_FORMAT_TEXT}
----
+        // Generate prompt for AI
+        let prompt = `You are an expert quiz creator. Based on the following details, generate a quiz.
+Quiz Details:
+- Language: ${source.language}
+- Number of Questions: ${source.numQuestions}
+- Difficulty: ${source.difficulty}
+- Question Format: ${QUESTION_FORMATS[source.formatKey].name}
+${source.exam ? `- Target Exam: ${source.exam}\n` : ''}
+${source.topic ? `- Main Topic: ${source.topic}\n` : ''}
+${source.subject ? `- Subject: ${source.subject}\n` : ''}
 `;
+
         if (sourceType !== 'topic') {
-            prompt += `\nNow, here is the source text to create the quiz from:\n--- START OF SOURCE TEXT ---\n${sourceText}\n--- END OF SOURCE TEXT ---`;
+            prompt += `\nSource Text to use for generating questions:\n---\n${sourceText}\n---\n`;
         }
-        
-        executePostPromptActions(prompt);
+
+        prompt += `\nStrict instructions for the output format:\n${LEGACY_FORMAT_TEXT}`;
+        promptForGemini = prompt;
+
+        elements.geminiInstructionsModalOverlay.classList.remove('hidden');
     }
 
     async function executePostPromptActions(prompt) {
-        // --- MODIFIED FOR STATE PERSISTENCE ---
-        clearFormState(); // Clear saved form data on successful submission
-        // --- END ---
-        
+        clearFormState();
         try {
             await copyTextToClipboard(prompt);
-            showPasteNotification('✅ Prompt copied! Opening Gemini...');
-        } catch {
-             // The manual copy modal is shown by copyTextToClipboard on failure, so we just proceed
-        }
-        
+        } catch {}
+
         sessionStorage.setItem('promptGenerated', 'true');
-        showScreen('paste'); 
+        showScreen('paste');
         openAiWithFallback();
     }
 
@@ -1883,98 +2010,32 @@ ${LEGACY_FORMAT_TEXT}
             elements.aiLinkFallback.classList.add('hidden');
         }
     }
-    
-    function generateTopicPrompt() {
-        quizMetaData = {
-            topic: document.getElementById('prompt-topic').value.trim(),
-            subject: document.getElementById('prompt-subject-topic').value.trim()
-        };
-        const source = {
-            numQuestions: document.getElementById('prompt-num-questions-topic').value || 5,
-            topic: quizMetaData.topic,
-            subject: quizMetaData.subject,
-            difficulty: document.getElementById('prompt-difficulty-topic').value,
-            language: document.getElementById('prompt-language-topic').value,
-            formatKey: document.getElementById('question-format-select-topic').value,
-            exam: (selectedExam === 'Other') ? elements.topicGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam,
-        };
-        generatePrompt(source, 'topic');
-    }
-
-    function generateTextPrompt() {
-        quizMetaData = {
-            topic: '', // Text-based quizzes don't have a user-defined topic field.
-            subject: document.getElementById('prompt-subject-text').value.trim()
-        };
-        const source = {
-            numQuestions: document.getElementById('prompt-num-questions-text').value,
-            subject: quizMetaData.subject,
-            difficulty: document.getElementById('prompt-difficulty-text').value,
-            language: document.getElementById('prompt-language-text').value,
-            formatKey: document.getElementById('question-format-select-text').value,
-            exam: (selectedExam === 'Other') ? elements.textGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam,
-        };
-        generatePrompt(source, 'text');
-    }
-
-    function generateImagePrompt() {
-        quizMetaData = {
-            topic: document.getElementById('prompt-topic-image').value.trim(),
-            subject: document.getElementById('prompt-subject-image').value.trim()
-        };
-        const source = {
-            numQuestions: document.getElementById('prompt-num-questions-image').value,
-            topic: quizMetaData.topic,
-            subject: quizMetaData.subject,
-            difficulty: document.getElementById('prompt-difficulty-image').value,
-            language: document.getElementById('prompt-language-image').value,
-            formatKey: document.getElementById('question-format-select-image').value,
-            exam: (selectedExam === 'Other') ? elements.imageGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam,
-        };
-        generatePrompt(source, 'image');
-    }
-
-    function generatePdfPrompt() {
-        quizMetaData = {
-            topic: document.getElementById('prompt-topic-pdf').value.trim(),
-            subject: document.getElementById('prompt-subject-pdf').value.trim()
-        };
-        const source = {
-            numQuestions: document.getElementById('prompt-num-questions-pdf').value,
-            topic: quizMetaData.topic,
-            subject: quizMetaData.subject,
-            difficulty: document.getElementById('prompt-difficulty-pdf').value,
-            language: document.getElementById('prompt-language-pdf').value,
-            formatKey: document.getElementById('question-format-select-pdf').value,
-            exam: (selectedExam === 'Other') ? elements.pdfGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam,
-        };
-        generatePrompt(source, 'pdf');
-    }
 
     function handleExamSelection(event) {
         event.preventDefault();
         const clickedBtn = event.currentTarget;
         const examName = clickedBtn.dataset.examName;
-        const parentContainer = clickedBtn.closest('.exam-buttons-container');
+        const parentContainer = clickedBtn.closest('.input-group');
         if (!parentContainer) return;
-        const otherInput = parentContainer.nextElementSibling;
-        const examButtons = parentContainer.querySelectorAll('.exam-btn');
+
+        const otherInput = parentContainer.querySelector('.prompt-exam-other');
+        const allButtonsInGroup = parentContainer.querySelectorAll('.exam-btn');
+
         if (clickedBtn.classList.contains('active')) {
             clickedBtn.classList.remove('active');
-            selectedExam = '';
-            if (otherInput && otherInput.classList.contains('prompt-exam-other')) otherInput.classList.add('hidden');
+            if (otherInput) otherInput.classList.add('hidden');
         } else {
-            examButtons.forEach(btn => btn.classList.remove('active'));
+            allButtonsInGroup.forEach(btn => btn.classList.remove('active'));
             clickedBtn.classList.add('active');
-            selectedExam = examName;
-            if (otherInput && otherInput.classList.contains('prompt-exam-other')) {
+            if (otherInput) {
                 otherInput.classList.toggle('hidden', examName !== 'Other');
                 if (examName === 'Other') otherInput.focus();
                 else otherInput.value = '';
             }
         }
+        saveFormState(); // Save state on change
     }
-    
+
     // --- PDF WORKFLOW ---
     function handlePdfSelection(event) {
         pdfFile = event.target.files[0];
@@ -1988,9 +2049,9 @@ ${LEGACY_FORMAT_TEXT}
 
     async function runPdfExtraction() {
         if (!pdfFile) { alert('Please select a PDF file first.'); return; }
-        
+
         showLoading('Initializing PDF processing...');
-        
+
         const forceOcr = elements.pdfForceOcrCheckbox.checked;
         const pageOption = document.querySelector('input[name="pdf-page-option"]:checked').value;
         let startPage = 1, endPage = Infinity;
@@ -2100,16 +2161,16 @@ ${LEGACY_FORMAT_TEXT}
         updateImagePreviews();
         elements.sourceTextImage.value = '';
         elements.imageQuizDefinitionArea.classList.add('hidden');
-        
+
         await processAndExtractAllImages(newFiles);
-        
+
         event.target.value = ''; // Reset file input for re-selection of same file
     }
 
     // Step 2: Orchestrate the entire process for all selected files
     async function processAndExtractAllImages(files) {
         let fullText = '';
-        
+
         if (!ocrWorker) {
             showLoading('Initializing OCR Engine (one-time setup)...');
             try {
@@ -2121,7 +2182,7 @@ ${LEGACY_FORMAT_TEXT}
                  return;
             }
         }
-        
+
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const progressPrefix = `Image ${i + 1}/${files.length}:`;
@@ -2132,14 +2193,14 @@ ${LEGACY_FORMAT_TEXT}
 
                 const orientedImg = await createImageFromFile(file);
                 const orientedCanvas = rotateCanvas(orientedImg, bestRotation);
-                
+
                 // Add a preview of the corrected image to the UI
                 const orientedBlob = await new Promise(resolve => orientedCanvas.toBlob(resolve, 'image/jpeg', 0.95));
                 const orientedFile = new File([orientedBlob], file.name, { type: 'image/jpeg' });
                 addImageFile(orientedFile);
 
                 showLoading(`${progressPrefix} Extracting text...`);
-                const { data: { text } } = await ocrWorker.recognize(orientedCanvas);
+                const { data: { text } } = await worker.recognize(orientedCanvas);
                 fullText += text + '\n\n';
 
             } catch (error) {
@@ -2147,7 +2208,7 @@ ${LEGACY_FORMAT_TEXT}
                 showPasteNotification(`❌ Skipped ${file.name} due to an error.`);
             }
         }
-        
+
         hideLoading();
 
         if (fullText.trim()) {
@@ -2165,7 +2226,7 @@ ${LEGACY_FORMAT_TEXT}
         let maxConfidence = -1;
         let bestRotation = 0;
         const rotations = [0, 270, 180, 90]; // Check upright, then common rotations
-        
+
         const img = await createImageFromFile(file);
 
         for (const rotation of rotations) {
@@ -2219,7 +2280,7 @@ ${LEGACY_FORMAT_TEXT}
 
         return canvas;
     }
-    
+
     function addImageFile(file) {
         imageFiles.push({ originalFile: file, id: `img_${Date.now()}_${Math.random()}`, croppedFile: null, previewUrl: null, });
         updateImagePreviews();
@@ -2238,7 +2299,7 @@ ${LEGACY_FORMAT_TEXT}
         });
         document.querySelectorAll('.crop-btn').forEach(btn => btn.addEventListener('click', () => openCropModal(btn.dataset.id)));
         document.querySelectorAll('.remove-btn').forEach(btn => btn.addEventListener('click', () => removeImage(btn.dataset.id)));
-        
+
         elements.imageQuizDefinitionArea.classList.add('hidden');
     }
 
@@ -2264,9 +2325,8 @@ ${LEGACY_FORMAT_TEXT}
         if (!cropper || !currentEditingImageId) return;
         cropper.getCroppedCanvas({ minWidth: 256, maxWidth: 4096, imageSmoothingQuality: 'high' }).toBlob((blob) => {
             const imgFile = imageFiles.find(f => f.id === currentEditingImageId);
-            if(imgFile) { 
-                imgFile.croppedFile = blob; 
-                // After cropping, re-run the full extraction process on the modified set of images
+            if(imgFile) {
+                imgFile.croppedFile = blob;
                 const currentFiles = imageFiles.map(f => f.croppedFile || f.originalFile);
                 processAndExtractAllImages(currentFiles);
             }
@@ -2279,29 +2339,28 @@ ${LEGACY_FORMAT_TEXT}
         const text = elements.quizDataInput.value.trim();
         if (!text) { alert('Please paste the quiz response into the box.'); return; }
 
-        // If metadata wasn't set by the prompt generator, initialize it.
         if (!quizMetaData || Object.keys(quizMetaData).length === 0) {
-            quizMetaData = { topic: '', subject: '' };
+            quizMetaData = { topic: 'Custom Quiz', subject: '', difficulty: 'Medium' };
         }
-        
-        sessionStorage.removeItem('promptGenerated'); // Clear the flag now that we're using the data
+
+        sessionStorage.removeItem('promptGenerated');
         const parsedQuestions = transformParsedData_Legacy(parseQuizText_Legacy(text));
-        
+
         if (!parsedQuestions || parsedQuestions.length === 0) {
-            alert('Parsing Failed: Could not find any valid questions in the provided text. Please check the format matches the prompt examples.');
+            alert('Parsing Failed: Could not find any valid questions. Please check if the AI response matches the required format.');
             return;
         }
-        
+
         const validation = validateParsedData(parsedQuestions);
         if (!validation.isValid) {
             alert(`Quiz Validation Failed:\n\n${validation.error}`);
             return;
         }
-        
+
         quizData = parsedQuestions;
         startQuiz();
     }
-    
+
     function validateParsedData(questions) {
         for (let i = 0; i < questions.length; i++) {
             const q = questions[i];
@@ -2315,15 +2374,15 @@ ${LEGACY_FORMAT_TEXT}
         }
         return { isValid: true };
     }
-    
+
     function transformParsedData_Legacy(parsedQuestions) {
         return parsedQuestions.map(q => {
             if (!q) return null;
             const cleanedOptions = q.options.map(opt => opt.replace(/^[a-zA-Z]\)\s*/, '').trim());
             const correctAnswerIndex = q.options.findIndex(opt => opt.trim().toLowerCase().startsWith(q.answer.toLowerCase() + ')'));
-            
+
             if (correctAnswerIndex === -1) { console.error("Could not find correct answer for question:", q); return null; }
-            
+
             let finalQuestionText = q.question;
             let statements = [];
 
@@ -2338,36 +2397,39 @@ ${LEGACY_FORMAT_TEXT}
             }
 
             return {
-                question: finalQuestionText, 
-                options: cleanedOptions, 
-                correctAnswerIndex: correctAnswerIndex, 
+                question: finalQuestionText,
+                options: cleanedOptions,
+                correctAnswerIndex: correctAnswerIndex,
                 explanation: q.explanation,
-                statements: statements, 
+                statements: statements,
                 image: null,
+                difficulty: quizMetaData.difficulty // Carry over from metadata
             };
         }).filter(Boolean);
     }
 
     function parseQuizText_Legacy(text) {
         if (!text || !text.trim()) return [];
-        
+
         const questionBlocks = text.trim().split(/\n(?=\d+\.\s)/);
 
         return questionBlocks.map(block => {
             const fullBlock = block.trim();
             const headerMatch = fullBlock.match(/^\d+\.\s(.*?Questions)/);
             if (!headerMatch) return null;
-            
+
             let data = { type: 'Unknown', question: '', options: [], answer: '', explanation: '' };
-            
-            if (headerMatch[1].includes('Assertion-Reason')) data.type = 'Assertion-Reason';
-            else if (headerMatch[1].includes('Statement-Based')) data.type = 'Statement';
+
+            const headerText = headerMatch[1];
+            if (headerText.includes('Assertion-Reason')) data.type = 'Assertion-Reason';
+            else if (headerText.includes('Statement-Based')) data.type = 'Statement';
+            else if (headerText.includes('Maths, Physics, or Other')) data.type = 'Maths';
             else data.type = 'MCQ';
 
             const questionRegex = /Question:([\s\S]*?)Options:\n([\s\S]*?)Correct Answer:([\s\S]*?)(?:Explanation:([\s\S]*))?$/;
             const arRegex = /Assertion \(A\):([\s\S]*?)Reason \(R\):([\s\S]*?)Options:\n([\s\S]*?)Correct Answer:([\s\S]*?)(?:Explanation:([\s\S]*))?$/;
             const match = (data.type === 'Assertion-Reason') ? fullBlock.match(arRegex) : fullBlock.match(questionRegex);
-            
+
             if (match) {
                 if (data.type === 'Assertion-Reason') {
                     data.question = `Assertion (A): ${match[1].trim()}\nReason (R): ${match[2].trim()}`;
@@ -2385,12 +2447,10 @@ ${LEGACY_FORMAT_TEXT}
             return null;
         }).filter(Boolean);
     }
-    
+
     // --- UTILITY & RESULTS FUNCTIONS ---
     async function restartQuiz() {
-        // --- MODIFIED FOR STATE PERSISTENCE ---
-        clearFormState(); // Clear saved form data when starting over
-        // --- END ---
+        clearFormState();
         sessionStorage.removeItem('promptGenerated');
         await dbHelper.clear();
         window.location.reload();
@@ -2400,7 +2460,7 @@ ${LEGACY_FORMAT_TEXT}
         const indicesToCopy = bookmarksOnly ? Array.from(bookmarkedQuestions) : Array.from(originalQuizData.keys());
 
         if (indicesToCopy.length === 0) {
-            return null; // Return null if no questions to format
+            return null;
         }
 
         const totalQuestions = originalQuizData.length;
@@ -2433,7 +2493,7 @@ ${LEGACY_FORMAT_TEXT}
 
         return preamble + (bookmarksOnly ? '*BOOKMARKED QUESTIONS*\n\n' : '*ALL QUESTIONS*\n\n') + questionsText;
     }
-    
+
     function copyQuizContent(bookmarksOnly) {
         const fullTextToCopy = getFullQuizContent(bookmarksOnly);
 
@@ -2451,7 +2511,7 @@ ${LEGACY_FORMAT_TEXT}
     function showPasteNotification(message) { elements.pasteNotification.textContent=message;elements.pasteNotification.classList.add('show');setTimeout(()=>elements.pasteNotification.classList.remove('show'),3000)}
     function toggleTheme(){document.body.classList.toggle('dark-mode');const isDarkMode=document.body.classList.contains('dark-mode');localStorage.setItem('quizTheme',isDarkMode?'dark':'light');elements.themeToggleBtn.textContent=isDarkMode?'☀️':'🌙'}
     function applyInitialTheme(){if(localStorage.getItem('quizTheme')==='dark'){document.body.classList.add('dark-mode');elements.themeToggleBtn.textContent='☀️'}}
-    
+
     function shareOnWhatsApp() {
         const totalQuestions = originalQuizData.length;
         if (totalQuestions === 0) return;
@@ -2460,12 +2520,12 @@ ${LEGACY_FORMAT_TEXT}
         const incorrectCount = userAnswers.filter(ans => ans.status === 'answered' && !ans.isCorrect).length;
         const skippedCount = totalQuestions - correctCount - incorrectCount;
         const percentage = (correctCount / totalQuestions) * 100;
-        
+
         let remark = "Keep Practicing!";
         if (percentage >= 90) remark = "Excellent Work! 🤩";
         else if (percentage >= 75) remark = "Great Job! 👍";
         else if (percentage >= 50) remark = "Good Effort! 😊";
-        
+
         const topic = quizMetaData.topic || 'a fun quiz';
         const urlToShare = window.location.href;
 
@@ -2490,11 +2550,10 @@ ${LEGACY_FORMAT_TEXT}
         window.open(whatsappUrl, '_blank');
     }
 
-    // --- NEW: Share Website Function ---
     function shareWebsite() {
         const shareTitle = "EXAMYATRI - Quiz Se Kro Success Yatra";
         const shareText = `Check out EXAMYATRI, an amazing AI-powered quiz generator!
-        
+
 *Quiz Se Kro Success Yatra!*
 
 Key Features:
@@ -2502,6 +2561,7 @@ Key Features:
 • 📋 Create quizzes by pasting Text
 • 🖼️ Make quizzes from Images of notes
 • 📄 Upload a PDF to get questions
+• 👥 Challenge friends in multiplayer mode
 • 🎯 Tailor questions for exams like UPSC, NEET, etc.
 • ✨ Fun, interactive quiz experience!
 
@@ -2521,8 +2581,7 @@ Create your own quiz now:`;
                 .catch(() => showPasteNotification('❌ Could not copy message.'));
         }
     }
-    
-    // --- FIXED: Automated Telegram Sharing Logic ---
+
     async function openTelegramWithBookmarks() {
         const username = elements.resultsPageTelegramInput.value.trim();
         if (!username) {
@@ -2531,66 +2590,41 @@ Create your own quiz now:`;
             return;
         }
 
-        const message = getFullQuizContent(true); // Get summary + bookmarked questions
+        const message = getFullQuizContent(true);
         if (!message) {
             showPasteNotification("🤔 You have no bookmarked questions. Bookmark some first!");
             return;
         }
 
         try {
-            // Step 1: Automatically copy the full content to the clipboard for the user.
             await copyTextToClipboard(message);
             showPasteNotification('✅ Bookmarks & summary copied!');
 
-            // Step 2: Open the direct channel link.
             const channel = username.replace(/^@/, '');
             const url = `https://t.me/${channel}`;
             window.open(url, '_blank');
-            
-            // Step 3: Guide the user for the next step.
+
             setTimeout(() => {
                 showPasteNotification('Now paste the text into your Telegram channel.');
-            }, 3200); // Display after the first notification fades.
+            }, 3200);
 
         } catch (error) {
-            // This block will be executed if copyTextToClipboard fails.
-            // The copyTextToClipboard function already shows a manual copy modal on failure.
             console.error("Could not complete the Telegram-open process:", error);
         }
     }
 
     async function generatePDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF(); let y = 15; const pageHeight = doc.internal.pageSize.height; const margin = 15; const checkY = (inc) => { if (y + inc > pageHeight - margin) { doc.addPage(); y = margin; } }; doc.setFontSize(18).setFont(undefined, 'bold').text("Quiz Results", margin, y); y += 10; doc.setFontSize(12).setFont(undefined, 'normal'); const summaryDetails = Array.from(elements.quizSummaryDetails.querySelectorAll('.summary-item')).map(item => `${item.querySelector('.summary-label').textContent}: ${item.querySelector('.summary-value').textContent}`).join(' | '); doc.text(elements.scoreSummary.textContent, margin, y); y += 7; let summaryLines = doc.splitTextToSize(summaryDetails, 180); doc.text(summaryLines, margin, y); y += summaryLines.length * 5 + 10; doc.line(margin, y - 5, doc.internal.pageSize.width - margin, y - 5); originalQuizData.forEach((q, i) => { checkY(20); doc.setFontSize(14).setFont(undefined, 'bold'); const questionText = doc.splitTextToSize(`Q${i + 1}: ${q.question.replace(/<[^>]*>/g, '')}`, 180); doc.text(questionText, margin, y); y += questionText.length * 6; doc.setFontSize(11).setFont(undefined, 'normal'); q.options.forEach((opt, oi) => { checkY(7); let prefix = '  '; if(oi === q.correctAnswerIndex) { doc.setTextColor(34, 139, 34); prefix = '✔ '; } if(userAnswers[i].selected === oi && !userAnswers[i].isCorrect) { doc.setTextColor(220, 20, 60); prefix = '✖ '; } doc.text(doc.splitTextToSize(`${prefix}${opt}`, 175), margin + 5, y); y += 6; doc.setTextColor(0, 0, 0); }); y += 5; checkY(15); doc.setFont(undefined, 'bold').text("Explanation:", margin, y); y += 5; doc.setFont(undefined, 'normal'); const explanationText = doc.splitTextToSize(q.explanation.replace(/<[^>]*>/g, ''), 180); checkY(explanationText.length * 5 + 10); doc.text(explanationText, margin, y); y += explanationText.length * 5 + 10; }); doc.save(`Quiz_Results_${new Date().toISOString().slice(0,10)}.pdf`); }
 
-    // --- MODIFIED: Feedback Effect Functions ---
+    // --- Feedback Effect Functions ---
     function triggerCongratsAnimation() {
         const container = elements.congratsAnimationContainer;
-        container.innerHTML = ''; // Clear previous animations
-        
-        // Play sound
+        container.innerHTML = '';
+
         clapSound.currentTime = 0;
         clapSound.play();
 
-        // Define color palette and emojis
-        const colorPalette = [
-            { text: '#FFD700', border: '#000000' }, { text: '#00FFCC', border: '#111111' },
-            { text: '#FF69B4', border: '#222222' }, { text: '#7FFF00', border: '#000000' },
-            { text: '#FF4500', border: '#111111' }, { text: '#9400D3', border: '#FFFFFF' }
-        ];
         const emojiList = ['🎉', '🥳', '🤩', '💯', '✨', '🎊', '🎇', '🎖️', '🏆', '🌟', '🎈'];
-
-        // Create and animate text
-        const text = document.createElement('div');
-        text.id = 'congrats-text';
-        text.classList.add('congrats-text-animated');
-        const randomPhrase = CONGRATS_PHRASES[Math.floor(Math.random() * CONGRATS_PHRASES.length)];
-        const randomColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-        text.textContent = randomPhrase;
-        text.style.color = randomColor.text;
-        text.style.textShadow = `2px 2px 0 ${randomColor.border}, -2px -2px 0 ${randomColor.border}, 2px -2px 0 ${randomColor.border}, -2px 2px 0 ${randomColor.border}, 3px 3px 5px rgba(0,0,0,0.3)`;
-        container.appendChild(text);
-
-        // Create and animate emojis
-        const numEmojis = 25;
+        const numEmojis = 60;
         for (let i = 0; i < numEmojis; i++) {
             const emoji = document.createElement('span');
             emoji.className = 'congrats-emoji';
@@ -2604,14 +2638,13 @@ Create your own quiz now:`;
             container.appendChild(emoji);
         }
 
-        // Cleanup after 3.5 seconds
         setTimeout(() => {
             container.innerHTML = '';
             if (!clapSound.paused) {
                 clapSound.pause();
                 clapSound.currentTime = 0;
             }
-        }, 3500);
+        }, 2500);
     }
 
     function showSadReaction() {
@@ -2623,10 +2656,8 @@ Create your own quiz now:`;
         }, 1500);
     }
 
-    // --- NEW: Pressure Mode Settings Persistence ---
     function loadPressureModeSettings() {
         const shakeEnabled = localStorage.getItem('shakeReminderEnabled');
-        // Default to true if not set
         isShakeReminderEnabled = shakeEnabled === null ? true : shakeEnabled === 'true';
         elements.shakeReminderToggle.checked = isShakeReminderEnabled;
     }
@@ -2643,14 +2674,13 @@ Create your own quiz now:`;
             const minutes = Math.floor(elapsedTime / 60);
             const seconds = elapsedTime % 60;
             elements.timerText.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            
+
             const emojiIntervalIndex = Math.floor(elapsedTime / 15);
             const currentEmoji = emojiSequence[emojiIntervalIndex % emojiSequence.length];
             if (currentEmoji && !currentEmoji.classList.contains('visible')) {
                 emojiSequence.forEach(face => face.classList.remove('visible'));
                 currentEmoji.classList.add('visible');
             }
-            // --- NEW: Pressure Mode Logic ---
             const pressureTextEl = document.getElementById('pressure-text-animation');
             if (elapsedTime >= 45 && userAnswers[currentQuestionIndex].status !== 'answered') {
                 if (isShakeReminderEnabled) {
@@ -2666,7 +2696,6 @@ Create your own quiz now:`;
                     pressureTextCounter++;
                 }
             }
-            // --- END ---
         };
         updateTimerDisplay();
         timerId = setInterval(updateTimerDisplay, 1000);
@@ -2680,8 +2709,13 @@ Create your own quiz now:`;
         originalQuizData=JSON.parse(JSON.stringify(quizData));
         loadQuestion(0);
     }
-    function loadQuestion(index){if(index<0||index>=originalQuizData.length)return;currentQuestionIndex=index;selectedOptionIndex=null;const question=originalQuizData[currentQuestionIndex];const answer=userAnswers[currentQuestionIndex];
-        // --- MODIFIED: Reset pressure animation state & clear congrats animation
+
+    function loadQuestion(index){
+        if(index<0||index>=originalQuizData.length)return;
+        currentQuestionIndex=index;selectedOptionIndex=null;
+        const question=originalQuizData[currentQuestionIndex];
+        const answer=userAnswers[currentQuestionIndex];
+
         elements.congratsAnimationContainer.innerHTML = '';
         if (!clapSound.paused) {
             clapSound.pause();
@@ -2691,10 +2725,26 @@ Create your own quiz now:`;
         const pressureTextEl = document.getElementById('pressure-text-animation');
         if(pressureTextEl) pressureTextEl.classList.add('hidden');
         elements.pressureModeToggleBtn.classList.remove('hidden');
-        
-        if(answer.status==='answered'){clearInterval(timerId);elements.timerText.textContent="--:--";Object.values(elements.faces).forEach(face=>face.classList.remove('visible'))}else{resetAndStartQuestionTimer()}updateQuestionUI(question);updateOptionsAndExplanationState();updateQuizActions()}
+
+        if(answer.status==='answered'){
+            clearInterval(timerId);
+            elements.timerText.textContent="--:--";
+            Object.values(elements.faces).forEach(face=>face.classList.remove('visible'))
+        } else {
+            resetAndStartQuestionTimer()
+        }
+
+        updateQuestionUI(question);
+        updateOptionsAndExplanationState();
+        updateQuizActions();
+
+        if (window.MathJax) {
+            MathJax.typesetPromise([elements.quizPlayerContainer]);
+        }
+    }
+
     function updateQuestionUI(q){
-        elements.questionTopic.textContent=quizMetaData.topic || ""; // <-- MODIFIED
+        elements.questionTopic.textContent=quizMetaData.topic || "Quiz";
         elements.progress.textContent=`Question ${currentQuestionIndex+1} / ${originalQuizData.length}`;
         elements.questionText.innerHTML=q.question.replace(/\n/g, '<br>');
         elements.bookmarkBtn.classList.toggle('bookmarked',bookmarkedQuestions.has(currentQuestionIndex));
@@ -2719,6 +2769,7 @@ Create your own quiz now:`;
         const incorrectEmojis = ['🤔', '😟', '🤨', '🤦‍♂️', '❌'];
 
         document.querySelectorAll('.option').forEach((optionDiv, i) => {
+            optionDiv.className = 'option'; // Reset classes
             if (answer.status === 'answered') {
                 optionDiv.classList.add('disabled');
 
@@ -2738,11 +2789,13 @@ Create your own quiz now:`;
                     }
                     userChoiceEmoji.classList.add('visible');
                 }
+            } else if (i === selectedOptionIndex) {
+                 optionDiv.classList.add('selected');
             }
         });
         elements.explanationContainer.classList.toggle('hidden', answer.status !== 'answered');
     }
-    
+
     function updateQuizActions() {
         elements.quizActions.innerHTML = '';
         const primaryActions = document.createElement('div');
@@ -2774,30 +2827,44 @@ Create your own quiz now:`;
             checkBtn.addEventListener('click', checkAnswer);
             primaryActions.appendChild(checkBtn);
         } else {
-            const nextBtn = document.createElement('button');
-            nextBtn.id = 'next-question-btn';
-            nextBtn.className = 'btn';
-            nextBtn.textContent = 'Next ➡️';
-            nextBtn.disabled = currentQuestionIndex === originalQuizData.length - 1;
-            nextBtn.addEventListener('click', () => loadQuestion(currentQuestionIndex + 1));
-            primaryActions.appendChild(nextBtn);
+            if (currentQuestionIndex === originalQuizData.length - 1) {
+                // This is the last question and it has been answered
+                const viewResultsBtn = document.createElement('button');
+                viewResultsBtn.id = 'view-results-btn';
+                viewResultsBtn.className = 'btn';
+                viewResultsBtn.style.backgroundColor = 'var(--correct-color)';
+                viewResultsBtn.textContent = 'Finish & See Results 🏆';
+                viewResultsBtn.addEventListener('click', forceSubmitQuiz);
+                primaryActions.appendChild(viewResultsBtn);
+            } else {
+                const nextBtn = document.createElement('button');
+                nextBtn.id = 'next-question-btn';
+                nextBtn.className = 'btn';
+                nextBtn.textContent = 'Next ➡️';
+                nextBtn.addEventListener('click', () => loadQuestion(currentQuestionIndex + 1));
+                primaryActions.appendChild(nextBtn);
+            }
         }
 
         const submitBtn = document.createElement('button');
         submitBtn.id = 'submit-quiz-btn';
         submitBtn.className = 'btn btn-danger btn-full-width';
         submitBtn.textContent = 'Submit Quiz & See Results';
-        submitBtn.addEventListener('click', forceSubmitQuiz);
+        submitBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to end the quiz now? All unanswered questions will be marked as skipped.')) {
+                forceSubmitQuiz();
+            }
+        });
         finalActions.appendChild(submitBtn);
 
         elements.quizActions.appendChild(primaryActions);
         elements.quizActions.appendChild(finalActions);
     }
-    
+
     function handleBookmark(){bookmarkedQuestions.has(currentQuestionIndex)?bookmarkedQuestions.delete(currentQuestionIndex):bookmarkedQuestions.add(currentQuestionIndex);elements.bookmarkBtn.classList.toggle('bookmarked')}
     function handleSkip(){if(userAnswers[currentQuestionIndex].status==='unseen'){userAnswers[currentQuestionIndex].status='skipped'}if(currentQuestionIndex<originalQuizData.length-1){loadQuestion(currentQuestionIndex+1)}else{const firstUnanswered=userAnswers.findIndex(ans=>ans.status!=='answered');if(firstUnanswered!==-1)loadQuestion(firstUnanswered);else forceSubmitQuiz()}}
-    function forceSubmitQuiz(){if(confirm('Are you sure you want to end the quiz now? All unanswered questions will be marked as skipped.')){if(timerId) clearInterval(timerId);const pressureTextEl = document.getElementById('pressure-text-animation');if(pressureTextEl) pressureTextEl.classList.add('hidden');elements.pressureModeToggleBtn.classList.remove('hidden');userAnswers.forEach((answer,index)=>{if(answer.status==='unseen')userAnswers[index].status='skipped'});showResults()}}
-    
+    function forceSubmitQuiz(){if(timerId) clearInterval(timerId);const pressureTextEl = document.getElementById('pressure-text-animation');if(pressureTextEl) pressureTextEl.classList.add('hidden');elements.pressureModeToggleBtn.classList.remove('hidden');userAnswers.forEach((answer,index)=>{if(answer.status==='unseen')userAnswers[index].status='skipped'});showResults()}
+
     function selectOption(index){
         if(userAnswers[currentQuestionIndex].status==='answered')return;
         optionClickSound.play();
@@ -2816,9 +2883,14 @@ Create your own quiz now:`;
         } else {
             showSadReaction();
         }
-        updateQuestionUI(originalQuizData[currentQuestionIndex]);updateOptionsAndExplanationState();updateQuizActions();
+        // No need to call updateQuestionUI, just update the state of options
+        updateOptionsAndExplanationState();
+        updateQuizActions();
+        if (window.MathJax) {
+            MathJax.typesetPromise([elements.explanationContainer]);
+        }
     }
-    
+
     function animateCountUp(el, end, duration = 1000) {
         let start = 0;
         const final = parseInt(end, 10);
@@ -2834,11 +2906,11 @@ Create your own quiz now:`;
         };
         window.requestAnimationFrame(step);
     }
-    
+
     function showResults(){
         showScreen('results');
         if(timerId) clearInterval(timerId);
-        
+
         const totalQuestions = originalQuizData.length;
         const correctCount = userAnswers.filter(ans => ans.isCorrect).length;
         const incorrectCount = userAnswers.filter(ans => ans.status === 'answered' && !ans.isCorrect).length;
@@ -2847,7 +2919,7 @@ Create your own quiz now:`;
         let remark=percentage>=90?"Excellent!":percentage>=75?"Great Job!":percentage>=50?"Good Effort!":"Needs Improvement";
         const timeDiff=Math.round(((new Date())-quizStartTime)/1000);
         const timeTaken=`${String(Math.floor(timeDiff/60)).padStart(2,'0')}:${String(timeDiff%60).padStart(2,'0')}`;
-        
+
         elements.scoreSummary.textContent=`You scored ${correctCount} out of ${totalQuestions}!`;
         setTimeout(() => { elements.scoreSummary.classList.add('visible'); }, 100);
 
@@ -2864,14 +2936,19 @@ Create your own quiz now:`;
                 <div class="legend-item"><span class="legend-color-box" style="background-color: var(--incorrect-color);"></span>Incorrect: <span class="count-up" data-value="${incorrectCount}">0</span></div>
                 <div class="legend-item"><span class="legend-color-box" style="background-color: var(--skipped-color);"></span>Skipped: <span class="count-up" data-value="${skippedCount}">0</span></div>
             </div>`;
-        
-        elements.quizSummaryDetails.innerHTML=`<div class="summary-item"><span class="summary-label">Performance</span><span class="summary-value remark">${remark}</span></div><div class="summary-item"><span class="summary-label">Score</span><span class="summary-value">${correctCount} / ${totalQuestions} (${percentage.toFixed(0)}%)</span></div><div class="summary-item"><span class="summary-label">Topic</span><span class="summary-value">${quizMetaData.topic || ''}</span></div><div class="summary-item"><span class="summary-label">Subject</span><span class="summary-value">${quizMetaData.subject || ''}</span></div><div class="summary-item"><span class="summary-label">Time Taken</span><span class="summary-value">${timeTaken}</span></div><div class="summary-item"><span class="summary-label">Difficulty</span><span class="summary-value">${originalQuizData[0]?.difficulty||'N/A'}</span></div>`;
-        
+
+        elements.quizSummaryDetails.innerHTML=`<div class="summary-item"><span class="summary-label">Performance</span><span class="summary-value remark">${remark}</span></div><div class="summary-item"><span class="summary-label">Score</span><span class="summary-value">${correctCount} / ${totalQuestions} (${percentage.toFixed(0)}%)</span></div><div class="summary-item"><span class="summary-label">Topic</span><span class="summary-value">${quizMetaData.topic || ''}</span></div><div class="summary-item"><span class="summary-label">Subject</span><span class="summary-value">${quizMetaData.subject || ''}</span></div><div class="summary-item"><span class="summary-label">Time Taken</span><span class="summary-value">${timeTaken}</span></div><div class="summary-item"><span class="summary-label">Difficulty</span><span class="summary-value">${quizMetaData.difficulty||'N/A'}</span></div>`;
+
         document.querySelectorAll('.count-up').forEach(el => {
             animateCountUp(el, el.dataset.value);
         });
 
-        elements.resultsReview.innerHTML=originalQuizData.map((q,i)=>{const answer=userAnswers[i];const optionsHtml=q.options.map((opt,oi)=>{let classes='result-option';if(answer.status==='answered'&&oi===answer.selected)classes+=' user-selected';if(oi===q.correctAnswerIndex)classes+=' correct-answer';return`<li class="${classes}">${opt}</li>`}).join('');return`<div class="result-item"><p class="result-question"><strong>Q${i + 1}:</strong> ${q.question.replace(/<[^>]*>/g, '')}<span class="bookmark-indicator ${bookmarkedQuestions.has(i)?'visible':''}">⭐</span></p><ul class="result-options-list">${optionsHtml}</ul><div class="result-explanation"><h5>Explanation</h5><p>${q.explanation.replace(/<[^>]*>/g, '')}</p></div></div>`}).join('')}
+        elements.resultsReview.innerHTML=originalQuizData.map((q,i)=>{const answer=userAnswers[i];const optionsHtml=q.options.map((opt,oi)=>{let classes='result-option';if(answer.status==='answered'&&oi===answer.selected)classes+=' user-selected';if(oi===q.correctAnswerIndex)classes+=' correct-answer';return`<li class="${classes}">${opt}</li>`}).join('');return`<div class="result-item"><p class="result-question"><strong>Q${i + 1}:</strong> ${q.question.replace(/<[^>]*>/g, '')}<span class="bookmark-indicator ${bookmarkedQuestions.has(i)?'visible':''}">⭐</span></p><ul class="result-options-list">${optionsHtml}</ul><div class="result-explanation"><h5>Explanation</h5><p>${q.explanation.replace(/<[^>]*>/g, '')}</p></div></div>`}).join('');
+
+        if (window.MathJax) {
+            MathJax.typesetPromise([elements.resultsScreen]);
+        }
+    }
 });
 </script>
   <!-- Help Me Button -->
@@ -2934,15 +3011,15 @@ Create your own quiz now:`;
     <i>(चरण 2: क्विज़ का विवरण भरें - प्रश्नों की संख्या, विषय, भाषा, कठिनाई, परीक्षा और प्रश्न प्रारूप जैसे विवरण भरें)</i></p>
 
     <h3>Step 3: Generate Prompt & Open AI</h3>
-    <p>Click the big "Generate Prompt & Open AI" button. This automatically copies the instructions for the AI and opens the Gemini website in a new tab.<br>
-    <i>(चरण 3: 'Generate Prompt & Open AI' बटन पर क्लिक करें - यह AI के लिए निर्देश अपने आप कॉपी कर लेगा और एक नए टैब में Gemini वेबसाइट खोल देगा)</i></p>
+    <p>Click the big "Start 🚀" button. This automatically copies the instructions for the AI and opens the Gemini website in a new tab.<br>
+    <i>(चरण 3: 'Start 🚀' बटन पर क्लिक करें - यह AI के लिए निर्देश अपने आप कॉपी कर लेगा और एक नए टैब में Gemini वेबसाइट खोल देगा)</i></p>
 
     <h3>Step 4: Use the AI (Gemini)</h3>
     <p>In the Gemini website, just paste the prompt into the message box and send it. Wait for the AI to generate all the questions.<br>
     <i>(चरण 4: AI (Gemini) का उपयोग करें - Gemini वेबसाइट में, बस प्रॉम्प्ट को मैसेज बॉक्स में पेस्ट करें और भेजें। AI द्वारा सभी प्रश्न बनाने तक प्रतीक्षा करें)</i></p>
 
     <h3>Step 5: Copy AI's Response</h3>
-    <p>After the questions are generated, copy the entire response. There are two ways to copy from Gemini: 
+    <p>After the questions are generated, copy the entire response. There are two ways to copy from Gemini:
     <br>1) Click the copy icon (like a clipboard 📋) below the answer.
     <br>2) Click the three dots (...) at the top-right of the response and select 'Copy'.<br>
     <i>(चरण 5: AI की प्रतिक्रिया कॉपी करें - प्रश्न बन जाने के बाद, पूरी प्रतिक्रिया कॉपी करें। Gemini से कॉपी करने के 2 तरीके हैं:
@@ -3020,147 +3097,5 @@ Create your own quiz now:`;
           }, 15000); // 15 seconds
         });
       </script>
-  <!-- HOW TO USE POPUP START -->
-<div id="howToUsePopup" class="popup-overlay">
-  <div class="popup-box">
-    <button class="popup-close" onclick="closePopup()">✖</button>
-    <h2>How to use this website?</h2>
-    <p>
-      There are 4 methods to generate a quiz:<br>
-      1. From PDF of notes or NCERT books OR any other book) <br>
-      2. From any text <br>
-      3. From any topic   <br>
-      4. From image of notes/question
-    </p>
-    <p>
-      Click on your desired section to start unlimited quiz practice.<br><br>
-      A <b>How to use</b> button is available in each step (right side and bottom) 
-      to guide first-time users.<br>
-      Please use the <b>How to use</b> button in case of any difficulty. 
-      It will show a step-wise guide.
-    </p>
-    <button class="popup-gotit" onclick="closePopup()">Got It</button>
-  </div>
-</div>
-
-<style>
-  /* POPUP CSS */
-  .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-  }
-
-  .popup-box {
-    background: #fff;
-    padding: 20px;
-    max-width: 500px;
-    width: 90%;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    position: relative;
-    text-align: left;
-    animation: fadeIn 0.3s ease-in-out;
-  }
-
-  @keyframes fadeIn {
-    from {opacity: 0; transform: scale(0.9);}
-    to {opacity: 1; transform: scale(1);}
-  }
-
-  .popup-close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: transparent;
-    border: none;
-    font-size: 22px;
-    cursor: pointer;
-    color: #333;
-  }
-
-  .popup-gotit {
-    margin-top: 15px;
-    padding: 10px 20px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-
-  .popup-gotit:hover {
-    background: #0056b3;
-  }
-
-  @media screen and (max-width: 768px) {
-    .popup-box {
-      font-size: 14px;
-    }
-    .popup-close {
-      font-size: 18px;
-    }
-  }
-</style>
-
-<script>
-  // Set a cookie
-  function setCookie(name, value, days) {
-    const d = new Date();
-    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
-    const expires = "expires=" + d.toUTCString();
-    document.cookie = name + "=" + value + ";" + expires + ";path=/";
-  }
-
-  // Get a cookie
-  function getCookie(name) {
-    const cname = name + "=";
-    const decodedCookie = decodeURIComponent(document.cookie);
-    const ca = decodedCookie.split(';');
-    for (let i = 0; i < ca.length; i++) {
-      let c = ca[i].trim();
-      if (c.indexOf(cname) === 0) {
-        return c.substring(cname.length, c.length);
-      }
-    }
-    return "";
-  }
-
-  // Show popup if cookie is not set
-  function checkPopup() {
-    if (!getCookie("popupShown")) {
-      document.getElementById('howToUsePopup').style.display = 'flex';
-    }
-  }
-
-  // Close popup and set cookie
-  function closePopup() {
-    document.getElementById('howToUsePopup').style.display = 'none';
-    setCookie("popupShown", "true", 1); // Hide for 1 day
-    startWebsite();
-  }
-
-  // Placeholder for website functionality
-  function startWebsite() {
-    console.log("Website main functionality started...");
-    // Add your quiz start or home page code here
-  }
-
-  // Check popup on page load
-  window.addEventListener('load', checkPopup);
-</script>
-<!-- HOW TO USE POPUP END -->
-</body>
-</html>
-
-
 </body>
 </html>
