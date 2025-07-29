@@ -1087,7 +1087,7 @@
                 <button id="join-game-btn" class="btn btn-secondary btn-full-width">Join Study Room</button>
             </div>
         </div>
-        <button class="btn btn-secondary back-to-main-menu-btn" style="margin-top: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;">&larr; Back to Main Menu</button>
+        <button class="btn btn-secondary back-to-main-menu-btn fire-animation" style="margin-top: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;">&larr; Back to Main Menu</button>
     </div>
 
     <!-- Step 2: Room Lobby/Waiting Screen -->
@@ -1115,7 +1115,7 @@
             <button id="host-generate-quiz-btn" class="btn btn-primary btn-full-width">✨ Create Quiz for the Room</button>
         </div>
 
-        <button class="btn btn-danger back-to-main-menu-btn" style="margin-top: 2rem;">Leave Room</button>
+        <button class="btn btn-danger back-to-main-menu-btn fire-animation" style="margin-top: 2rem;">Leave Room</button>
     </div>
 </div>
 
@@ -1338,7 +1338,7 @@
         <span id="host-decision-timer">20</span>
         <div id="host-decision-actions" class="modal-actions">
             <button id="restart-multiplayer-quiz-btn" class="btn" style="background-color: var(--multiplayer-accent);">🔄 Start New Quiz</button>
-            <button id="end-room-btn" class="btn btn-danger">🚪 End Room for All</button>
+            <button id="end-room-btn" class="btn btn-danger fire-animation">🚪 End Room for All</button>
         </div>
     </div>
 </div>
@@ -1850,8 +1850,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let pressureTextCounter = 1;
 
     // --- Sound Effects ---
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAE=');
-    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8_');
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAE=');
+    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//_');
 
     // --- INITIALIZATION ---
     async function init() {
@@ -2358,10 +2358,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let prompt = `You are an expert quiz creator for competitive exams. Your task is to generate a high-quality quiz based on the user's strict specifications. Adherence to all instructions is critical.
 
-**WARNING: CRITICAL INSTRUCTIONS**
-1.  **PLAIN TEXT ONLY:** Your entire output must be in plain text. NO MARKDOWN (like #, **, etc.). NO JSON. NO CODE BLOCKS. Failure to do this will break the application.
-2.  **EXAM STANDARD:** You MUST generate all questions at the standard and level of the specified 'Target Exam'. This is the most important rule.
-3.  **CRITICAL MATHJAX FORMATTING:** This is the most important formatting rule. ALL mathematical or scientific notation—including single variables, numbers, fractions, and simple comparisons—MUST be enclosed in \\( ... \\) to ensure they render correctly. Failure to do this for even a simple fraction will break the user's display.
+**CRITICAL INSTRUCTIONS - FOLLOW THESE OR THE OUTPUT IS USELESS:**
+1.  **SPEED IS ESSENTIAL:** Generate the entire list of questions in a single, fast pass. Do NOT re-check, review, or refine your output. Generate it correctly the first time.
+2.  **PLAIN TEXT ONLY:** Your entire output must be in 100% plain text. NO MARKDOWN (like #, **, etc.). NO JSON. NO CODE BLOCKS. Just text.
+3.  **ONE BY ONE OUTPUT:** Generate the questions sequentially. Complete question 1, then question 2, and so on. Do not generate all questions simultaneously.
+4.  **CRITICAL MATHJAX FORMATTING:** This is the most important formatting rule. ALL mathematical or scientific notation—including single variables, numbers, fractions, and simple comparisons—MUST be enclosed in \\( ... \\) to ensure they render correctly. Failure to do this for even a simple fraction will break the user's display.
     -   **WRONG:** The formula is E=mc^2.
     -   **CORRECT:** The formula is \\(E=mc^2\\).
     -   **WRONG:** The fraction is 1/2.
@@ -2369,6 +2370,7 @@ document.addEventListener('DOMContentLoaded', () => {
     -   **WRONG:** ...where x > 5...
     -   **CORRECT:** ...where \\(x > 5\\)...
     This applies to everything that is not plain descriptive text.
+5.  **ALWAYS INCLUDE A COPY BUTTON:** At the absolute end of your entire response, you MUST include a line of plain text that says: \`[Copy Quiz Text]\`. This is a critical fallback for users. Do not forget this button.
 ---
 
 **QUIZ GENERATION PARAMETERS**
@@ -2396,7 +2398,7 @@ ${sourceText}
 ${selectedFormatExample}
 ---
 
-Now, generate the quiz. Re-read all instructions. Failure to adhere to the formatting and content relevance guidelines will result in an incorrect output.
+Now, generate the quiz. Re-read all instructions. Failure to adhere to the formatting and content relevance guidelines will result in an incorrect output. Generate quickly and correctly in one pass.
 `;
 
         promptForGemini = prompt;
@@ -2822,12 +2824,14 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
     }
 
     // --- MULTIPLAYER LOBBY LOGIC (FIREBASE) ---
+    // UPDATED AND CORRECTED FUNCTION
     async function checkForHostRejoin() {
         const hostData = JSON.parse(localStorage.getItem(HOST_DATA_KEY));
         if (hostData && hostData.isHost) {
             showLoading("Rejoining your room as host...");
             const roomRef = ref(db, `rooms/${hostData.roomCode}`);
             const snapshot = await get(roomRef);
+
             if (snapshot.exists() && snapshot.val().hostId === hostData.userId) {
                 isHost = true;
                 currentRoomCode = hostData.roomCode;
@@ -2835,10 +2839,19 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
                 sessionStorage.setItem('currentRoomCode', currentRoomCode);
                 
                 const participantRef = ref(db, `rooms/${currentRoomCode}/participants/${currentUserId}`);
-                await update(participantRef, { isOnline: true });
+                
+                // --- NEW: Send an explicit "I'm back" signal ---
+                // This update ensures all listeners get a fresh 'roomData' object with the host online
+                // and the status confirmed as 'waiting'.
+                await update(roomRef, {
+                    [`participants/${currentUserId}/isOnline`]: true,
+                    status: 'waiting' // Re-assert the status
+                });
+                // --- END OF NEW SIGNAL ---
+
                 onDisconnect(participantRef).update({ isOnline: false });
                 
-                const roomData = snapshot.val();
+                const roomData = (await get(roomRef)).val(); // Get the fresh data after our update
                 
                 if (hostData.awaitingQuizPaste && roomData.status === 'waiting') {
                     listenToRoomChanges(currentRoomCode); 
@@ -2867,12 +2880,14 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
                 } else if (roomData.status === 'finished') {
                     showResults(); 
                 } else {
+                    // Default to listening to the room changes if no other state matches
                     listenToRoomChanges(currentRoomCode);
                 }
                 
                 hideLoading();
                 return true;
             } else {
+                // The room doesn't exist or the host ID doesn't match, so clear the stale data.
                 localStorage.removeItem(HOST_DATA_KEY);
                 hideLoading();
             }
@@ -3047,35 +3062,60 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
         });
     }
 
+    // UPDATED AND CORRECTED FUNCTION
     function updateLobbyUI(roomData) {
         if (!roomData || elements.roomLobby.classList.contains('hidden')) return;
 
-        const hostData = roomData.participants ? roomData.participants[roomData.hostId] : null;
+        const hostId = roomData.hostId;
+        const hostData = (roomData.participants && hostId) ? roomData.participants[hostId] : null;
+
+        // --- NEW LOGIC TO HANDLE HOST ONLINE/OFFLINE STATUS ---
         if (hostData && !hostData.isOnline) {
+            // Host is confirmed to be offline
             elements.waitingMessage.textContent = "The host seems to be offline. Waiting for them to return...";
-            elements.waitingMessage.style.color = "orange";
+            elements.waitingMessage.style.color = "orange"; // Use a warning color
+            if (isHost) {
+                // If the current user is the host, but their status is offline, hide their controls
+                elements.hostControls.classList.add('hidden');
+            }
         } else {
+            // Host is online or data is not yet available (default state)
             elements.waitingMessage.textContent = isHost ? "" : "Waiting for the host to start the game...";
-            elements.waitingMessage.style.color = "";
+            elements.waitingMessage.style.color = ""; // Reset to default color
         }
-        
+        // --- END OF NEW LOGIC ---
+
         elements.roomCodeDisplay.textContent = currentRoomCode;
         elements.roomTopicDisplay.textContent = roomData.topic || 'Waiting for host to create quiz...';
         elements.roomTimeLimitDisplay.textContent = roomData.timeLimit ? `${roomData.timeLimit / 60} Minutes` : 'Not set';
-        elements.hostControls.classList.toggle('hidden', !isHost);
+        
+        // Toggle host controls based on if the user is the host AND if the host is online
+        elements.hostControls.classList.toggle('hidden', !isHost || (hostData && !hostData.isOnline));
         elements.waitingMessage.classList.toggle('hidden', isHost);
 
         const participants = roomData.participants || {};
-        const participantCount = Object.keys(participants).length;
+        // Filter out participants who might be marked as offline but haven't been removed yet
+        const onlineParticipants = Object.keys(participants).filter(uid => participants[uid].isOnline);
+        const participantCount = onlineParticipants.length;
         elements.participantCount.textContent = `${participantCount}/${MAX_PARTICIPANTS}`;
 
         elements.participantList.innerHTML = '';
-        Object.values(participants).forEach(p => {
-            const li = document.createElement('li');
-            const isCurrentUser = p.uid === currentUserId;
-            const isTheHost = p.uid === roomData.hostId;
+        Object.keys(participants).forEach(uid => {
+            const p = participants[uid];
+            const isCurrentUser = uid === currentUserId;
+            const isTheHost = uid === roomData.hostId;
+            
+            // Use a clearer online/offline indicator
             const onlineIndicator = p.isOnline ? '🟢' : '⚪️';
+            
+            const li = document.createElement('li');
             li.innerHTML = `${onlineIndicator} ${isTheHost ? '👑' : '👤'} ${p.name} ${isCurrentUser ? '(You)' : ''}`;
+            
+            // Make offline users appear greyed out
+            if (!p.isOnline) {
+                li.style.opacity = '0.6';
+            }
+            
             elements.participantList.appendChild(li);
         });
     }
@@ -3894,7 +3934,7 @@ Create your own quiz now:`;
                 roomStatusUnsubscribe = onValue(statusRef, (snapshot) => {
                     if (snapshot.val() === 'finished') {
                         showResults(); 
-                        if (roomStatusUnsubscribe) { roomStatusUnsubscribe(); roomStatusUnsubscribe = null; }
+                        if (roomStatusUnsubscribe) { roomStatusUnsubscribe = null; }
                     }
                 });
             }
@@ -3965,7 +4005,7 @@ Create your own quiz now:`;
             const leaveBtn = document.createElement('button');
             leaveBtn.id = 'multiplayer-leave-btn';
             leaveBtn.textContent = '🚪 Leave Room';
-            leaveBtn.className = 'btn btn-secondary';
+            leaveBtn.className = 'btn btn-secondary fire-animation';
             leaveBtn.addEventListener('click', () => leaveRoom(true, isHost));
             elements.shareWhatsappBtn.insertAdjacentElement('afterend', leaveBtn);
         } else {
