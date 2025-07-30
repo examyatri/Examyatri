@@ -863,10 +863,10 @@
                 <span class="card-icon">📝</span><h4>Generate from Topic</h4><p>Provide a topic and generate quiz.</p>
             </div>
             <div class="creation-option-card" id="select-from-text">
-                <span class="card-icon">📋</span><h4>Generate from Text</h4><p>Paste text/formula(physics,math) to create questions.</p>
+                <span class="card-icon">📋</span><h4>Generate from Text</h4><p>Paste text/ formula (physics,math) to create questions.</p>
             </div>
             <div class="creation-option-card" id="select-from-image">
-                <span class="card-icon">🖼️</span><h4>Generate from Image</h4><p>Use images of notes/any book/any Question for a quiz.</p>
+                <span class="card-icon">🖼️</span><h4>Generate from Image</h4><p>Use images of notes/ any book/ any Question for a quiz.</p>
             </div>
             <div class="creation-option-card" id="select-from-pdf">
                 <span class="card-icon">📄</span><h4>Generate from PDF</h4><p>Upload a PDF to create a quiz.</p>
@@ -4021,7 +4021,7 @@ Create your own quiz now:`;
     function showHostDecisionModal() {
         if(elements.hostDecisionModalOverlay.classList.contains('hidden')) {
             elements.hostDecisionModalOverlay.classList.remove('hidden');
-            let countdown = 20;
+            let countdown = 2;
             elements.hostDecisionTimer.textContent = countdown;
             
             hostDecisionInterval = setInterval(() => {
@@ -4034,8 +4034,8 @@ Create your own quiz now:`;
 
             hostDecisionTimeout = setTimeout(() => {
                 clearInterval(hostDecisionInterval);
-                endRoomForAll(true); // Auto-end after 20 seconds
-            }, 20000);
+                endRoomForAll(true); // Auto-end after 2 seconds
+            }, 2000);
         }
     }
 
