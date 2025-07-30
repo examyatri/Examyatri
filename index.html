@@ -863,13 +863,13 @@
                 <span class="card-icon">📝</span><h4>Generate from Topic</h4><p>Provide a topic and generate quiz.</p>
             </div>
             <div class="creation-option-card" id="select-from-text">
-                <span class="card-icon">📋</span><h4>Generate from Text</h4><p>Paste text/formula(physics,math) to create questions.</p>
+                <span class="card-icon">📋</span><h4>Generate from Text</h4><p>Paste text/ formula (physics, math) to create questions on that formula.</p>
             </div>
             <div class="creation-option-card" id="select-from-image">
-                <span class="card-icon">🖼️</span><h4>Generate from Image</h4><p>Use images of notes/any book/any Question for a quiz.</p>
+                <span class="card-icon">🖼️</span><h4>Generate from Image</h4><p>Use images of notes/ any book/ any Question (to create similar question) for a quiz.</p>
             </div>
             <div class="creation-option-card" id="select-from-pdf">
-                <span class="card-icon">📄</span><h4>Generate from PDF</h4><p>Upload a PDF to create a quiz.</p>
+                <span class="card-icon">📄</span><h4>Generate from PDF</h4><p>Upload a PDF to create a question from each line of that pdf.</p>
             </div>
             <!-- NEW: Practice with Friends Card -->
             <div class="creation-option-card" id="select-multiplayer">
@@ -916,9 +916,9 @@
                   <span class="guide-help-text">How to use</span>
               </div>
             </div>
-            <div class="input-group"><label for="prompt-subject-text" class="input-label">Subject Area (Required)</label><input type="text" id="prompt-subject-text" class="input-field" placeholder="e.g., Physics, Literature" required></div>
+            <div class="input-group"><label for="prompt-subject-text" class="input-label">Subject (Required)</label><input type="text" id="prompt-subject-text" class="input-field" placeholder="e.g., Physics, Literature" required></div>
             <div class="input-group"><label for="prompt-num-questions-text" class="input-label">Number of Questions</label><input type="number" id="prompt-num-questions-text" class="input-field" placeholder="e.g., 5" min="1" max="50"></div>
-            <div class="input-group"><label for="prompt-instructions-text" class="input-label">Specific Instructions (Optional)</label><input type="text" id="prompt-instructions-text" class="input-field" placeholder="e.g., Generate similar questions on the above formula."></div>
+            <div class="input-group"><label for="prompt-instructions-text" class="input-label">Specific Instructions ( generate question on above topic )</label><input type="text" id="prompt-instructions-text" class="input-field" placeholder="e.g., Generate questions on the above formula."></div>
             <div class="input-group"><label for="prompt-language-text" class="input-label">Quiz Language</label><select id="prompt-language-text" class="input-field"><option value="English" selected>English</option><option value="Hindi">Hindi</option><option value="Spanish">Spanish</option><option value="French">French</option><option value="German">German</option></select></div>
             <div class="input-group"><label for="prompt-difficulty-text" class="input-label">Difficulty Level</label><select id="prompt-difficulty-text" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
             <div class="input-group"><label for="question-format-select-text" class="input-label">Question Format</label><select id="question-format-select-text" class="input-field"></select></div>
@@ -973,9 +973,9 @@
                   </div>
                 </div>
                 <div class="input-group hidden"><label for="source-text-image" class="input-label">Extracted Text</label><textarea id="source-text-image"></textarea></div>
-                <div class="input-group"><label for="prompt-subject-image" class="input-label">Subject Area (Optional)</label><input type="text" id="prompt-subject-image" class="input-field" placeholder="e.g., Biology from textbook page"></div>
+                <div class="input-group"><label for="prompt-subject-image" class="input-label">Subject (Optional)</label><input type="text" id="prompt-subject-image" class="input-field" placeholder="e.g., Biology/ Physics/ Geography"></div>
                 <div class="input-group"><label for="prompt-num-questions-image" class="input-label">Number of Questions</label><input type="number" id="prompt-num-questions-image" class="input-field" placeholder="e.g., 5" min="1" max="50"></div>
-                <div class="input-group"><label for="prompt-instructions-image" class="input-label">Specific Instructions (Optional)</label><input type="text" id="prompt-instructions-image" class="input-field" placeholder="e.g., Generate new questions on Photosynthesis"></div>
+                <div class="input-group"><label for="prompt-instructions-image" class="input-label">Specific Instructions (Generate Question on above topic)</label><input type="text" id="prompt-instructions-image" class="input-field" placeholder="e.g., Generate Question on above formula"></div>
                 <div class="input-group"><label for="prompt-language-image" class="input-label">Quiz Language</label><select id="prompt-language-image" class="input-field"><option value="English" selected>English</option><option value="Hindi">Hindi</option><option value="Spanish">Spanish</option><option value="French">French</option><option value="German">German</option></select></div>
                 <div class="input-group"><label for="prompt-difficulty-image" class="input-label">Difficulty Level</label><select id="prompt-difficulty-image" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
                 <div class="input-group"><label for="question-format-select-image" class="input-label">Question Format</label><select id="question-format-select-image" class="input-field"></select></div>
