@@ -4262,6 +4262,30 @@ Create your own quiz now:`;
           }, 15000); // 15 seconds
         });
       </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const allOption = document.getElementById('pdf-page-option-all');
+    const rangeOption = document.getElementById('pdf-page-option-range');
+    const rangeSelector = document.getElementById('pdf-page-range-selector');
+
+    function isMultiplayerPDFActive() {
+      const multiplayerContainer = document.getElementById('multiplayer-lobby');
+      return multiplayerContainer && !multiplayerContainer.classList.contains('hidden');
+    }
+
+    allOption.addEventListener('change', () => {
+      if (isMultiplayerPDFActive()) {
+        rangeSelector.classList.add('hidden');
+      }
+    });
+
+    rangeOption.addEventListener('change', () => {
+      if (isMultiplayerPDFActive()) {
+        rangeSelector.classList.remove('hidden');
+      }
+    });
+  });
+</script>
 
 </body>
 </html>
