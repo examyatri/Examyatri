@@ -863,10 +863,10 @@
                 <span class="card-icon">📝</span><h4>Generate from Topic</h4><p>Provide a topic and generate quiz.</p>
             </div>
             <div class="creation-option-card" id="select-from-text">
-                <span class="card-icon">📋</span><h4>Generate from Text</h4><p>Paste text/ formula (physics,math) to create questions.</p>
+                <span class="card-icon">📋</span><h4>Generate from Text</h4><p>Paste text/formula(physics,math) to create questions.</p>
             </div>
             <div class="creation-option-card" id="select-from-image">
-                <span class="card-icon">🖼️</span><h4>Generate from Image</h4><p>Use images of notes/ any book/ any Question for a quiz.</p>
+                <span class="card-icon">🖼️</span><h4>Generate from Image</h4><p>Use images of notes/any book/any Question for a quiz.</p>
             </div>
             <div class="creation-option-card" id="select-from-pdf">
                 <span class="card-icon">📄</span><h4>Generate from PDF</h4><p>Upload a PDF to create a quiz.</p>
@@ -1844,17 +1844,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let hostDecisionTimeout = null;
     let hostDecisionInterval = null;
 
+    // --- NEW: Session ready flag to prevent race conditions ---
+    let isSessionReady = false;
 
     // --- Pressure Mode State ---
     let isShakeReminderEnabled = true; // Enabled by default
     let pressureTextCounter = 1;
 
     // --- Sound Effects ---
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAE=');
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAE=');
     const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//_');
 
     // --- INITIALIZATION ---
     async function init() {
+        // MODIFIED: Set session ready flag to false initially
+        isSessionReady = false;
+
         applyInitialTheme();
         populateSharedElements();
         setupAudio();
@@ -1866,7 +1871,13 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const hostRejoined = await checkForHostRejoin();
             if (hostRejoined) {
-                // Host rejoin logic is complete, so we exit init.
+                // MODIFIED: Host rejoin logic is complete, mark session as ready and check for paste
+                isSessionReady = true; 
+                const hostData = JSON.parse(localStorage.getItem(HOST_DATA_KEY) || '{}');
+                // Check if user is already back on the tab and waiting to paste
+                if (!document.hidden && hostData.awaitingQuizPaste) {
+                    await handleClipboardPermission();
+                }
                 return;
             }
         } catch (error) {
@@ -1890,6 +1901,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             showScreen('manualGenerator');
         }
+
+        // MODIFIED: Mark session as ready for all non-rejoin scenarios
+        isSessionReady = true;
     }
 
     function setupAudio() {
@@ -2255,6 +2269,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     async function handleVisibilityChange() {
+        // MODIFIED: Add guard clause to prevent running before session is ready
+        if (!isSessionReady) {
+            return;
+        }
+        
         const isAwaitingPaste = sessionStorage.getItem('promptGeneratedForSolo') === 'true' || 
                               (JSON.parse(localStorage.getItem(HOST_DATA_KEY) || '{}')).awaitingQuizPaste;
 
@@ -4021,7 +4040,7 @@ Create your own quiz now:`;
     function showHostDecisionModal() {
         if(elements.hostDecisionModalOverlay.classList.contains('hidden')) {
             elements.hostDecisionModalOverlay.classList.remove('hidden');
-            let countdown = 2;
+            let countdown = 20;
             elements.hostDecisionTimer.textContent = countdown;
             
             hostDecisionInterval = setInterval(() => {
@@ -4034,8 +4053,8 @@ Create your own quiz now:`;
 
             hostDecisionTimeout = setTimeout(() => {
                 clearInterval(hostDecisionInterval);
-                endRoomForAll(true); // Auto-end after 2 seconds
-            }, 2000);
+                endRoomForAll(true); // Auto-end after 20 seconds
+            }, 20000);
         }
     }
 
