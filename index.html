@@ -4040,7 +4040,7 @@ Create your own quiz now:`;
     function showHostDecisionModal() {
         if(elements.hostDecisionModalOverlay.classList.contains('hidden')) {
             elements.hostDecisionModalOverlay.classList.remove('hidden');
-            let countdown = 20;
+            let countdown = 1;
             elements.hostDecisionTimer.textContent = countdown;
             
             hostDecisionInterval = setInterval(() => {
@@ -4053,8 +4053,8 @@ Create your own quiz now:`;
 
             hostDecisionTimeout = setTimeout(() => {
                 clearInterval(hostDecisionInterval);
-                endRoomForAll(true); // Auto-end after 20 seconds
-            }, 20000);
+                endRoomForAll(true); // Auto-end after 1 seconds
+            }, 1000);
         }
     }
 
