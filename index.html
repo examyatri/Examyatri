@@ -4019,45 +4019,13 @@ Create your own quiz now:`;
     
     // --- HOST POST-QUIZ DECISION LOGIC ---
     function showHostDecisionModal() {
-        if(elements.hostDecisionModalOverlay.classList.contains('hidden')) {
-            elements.hostDecisionModalOverlay.classList.remove('hidden');
-            let countdown = 20;
-            elements.hostDecisionTimer.textContent = countdown;
-            
-            hostDecisionInterval = setInterval(() => {
-                countdown--;
-                elements.hostDecisionTimer.textContent = countdown;
-                 if (countdown <= 0) {
-                    clearInterval(hostDecisionInterval);
-                }
-            }, 1000);
+  // Automatically end the quiz for all after 15 seconds
+  setTimeout(() => {
+    endRoomForAll(true); // Ends room for host and all participants
+  }, 15000); // 15 seconds
+}
 
-            hostDecisionTimeout = setTimeout(() => {
-                clearInterval(hostDecisionInterval);
-                endRoomForAll(true); // Auto-end after 20 seconds
-            }, 20000);
-        }
-    }
-
-    function clearHostDecisionTimers() {
-        clearTimeout(hostDecisionTimeout);
-        clearInterval(hostDecisionInterval);
-        hostDecisionTimeout = null;
-        hostDecisionInterval = null;
-        elements.hostDecisionModalOverlay.classList.add('hidden');
-    }
-
-    function handleHostDecisionEnd() {
-        clearHostDecisionTimers();
-        endRoomForAll();
-    }
-    
-    function handleHostDecisionRestart() {
-        clearHostDecisionTimers();
-        startNewMultiplayerQuiz();
-    }
-    
-    async function endRoomForAll(isAutoEnd = false) {
+      async function endRoomForAll(isAutoEnd = false) {
         if (!isHost || !currentRoomCode) return;
         if (!isAutoEnd && !confirm("Are you sure you want to end this room for everyone?")) return;
         
