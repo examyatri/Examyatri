@@ -364,6 +364,24 @@
     #skip-question-btn { background-color: var(--skipped-color); color: #212529;}
     #skip-question-btn:hover:not(:disabled) { background-color: #e0a800; }
 
+    /* NEW: Ice Button Animation */
+    @keyframes ice-effect {
+        0% { box-shadow: inset 0 0 10px rgba(255,255,255,0.4), 0 0 5px #6DD5FA, 0 0 10px #6DD5FA; }
+        50% { box-shadow: inset 0 0 20px rgba(255,255,255,0.8), 0 0 10px #FFFFFF, 0 0 20px #6DD5FA; }
+        100% { box-shadow: inset 0 0 10px rgba(255,255,255,0.4), 0 0 5px #6DD5FA, 0 0 10px #6DD5FA; }
+    }
+    .btn-ice {
+        background: linear-gradient(45deg, #6DD5FA, #FFFFFF, #6DD5FA);
+        background-size: 200% 200%;
+        color: #004085;
+        border: 2px solid #FFFFFF;
+        animation: ice-effect 2.5s infinite ease-in-out;
+    }
+     .btn-ice:hover:not(:disabled) {
+        transform: translateY(-2px) scale(1.02);
+        color: #002752;
+    }
+
     .exam-buttons-container, .ai-platform-selector { display: flex; flex-wrap: wrap; gap: 8px; }
     .ai-platform-selector { justify-content: center; margin-top: 10px; }
     .exam-btn, .ai-platform-btn { background-color: var(--component-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 6px 14px; font-size: 0.85em; min-width: auto; margin: 0; flex-grow: 1; }
@@ -450,6 +468,12 @@
     body.dark-mode .result-option.correct-answer { background-color: #1c3c24; }
     .result-explanation { margin-top: 1rem; padding: 1rem; background-color: var(--primary-bg); border-left: 4px solid var(--accent-color); border-radius: 5px; font-size: 0.95em; }
     .result-explanation h5 { margin-top: 0; }
+    #hard-reset-container {
+        text-align: center;
+        margin-bottom: 2rem;
+        border-top: 1px dashed var(--border-color);
+        padding-top: 2rem;
+    }
     .share-buttons { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; justify-content: center; align-items: center;}
     .share-buttons-row { display: flex; gap: 10px; justify-content: center; width: 100%; flex-wrap: wrap; }
     #results-page-telegram-opener { width: 100%; max-width: 400px; }
@@ -1166,7 +1190,7 @@
         <div class="input-label-group">
             <label for="quiz-data-input" class="input-label">Paste AI response here</label>
         </div>
-        <textarea id="quiz-data-input" placeholder="I'll try to paste and start automatically when you return to this tab. If that doesn't work, just click into this box."></textarea>
+        <textarea id="quiz-data-input" placeholder="Paste the entire quiz text from the AI here. When you are ready, click the button below."></textarea>
     </div>
     <button id="start-manual-quiz-btn" class="btn btn-full-width">Parse & Start Quiz! 🧠</button>
 </div>
@@ -1219,6 +1243,12 @@
         <div id="score-performance-chart-container"></div>
         <div id="quiz-summary-details"></div>
     </div>
+
+    <!-- NEW: Hard Reset Button -->
+    <div id="hard-reset-container">
+        <button id="hard-reset-btn" class="btn btn-ice">❄️ Go to Home Page & Reset ❄️</button>
+    </div>
+
     <div class="share-buttons">
         <div class="share-buttons-row">
             <button id="share-pdf-btn" class="btn">📄 Download PDF</button>
@@ -1629,6 +1659,7 @@ document.addEventListener('DOMContentLoaded', () => {
         scorePerformanceChartContainer: document.getElementById('score-performance-chart-container'),
         quizSummaryDetails: document.getElementById('quiz-summary-details'),
         resultsReview: document.getElementById('results-review'),
+        hardResetBtn: document.getElementById('hard-reset-btn'),
         sharePdfBtn: document.getElementById('share-pdf-btn'),
         copyBookmarksBtn: document.getElementById('copy-bookmarks-btn'),
         copyAllBtn: document.getElementById('copy-all-btn'),
@@ -1853,11 +1884,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Sound Effects ---
     const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAE=');
-    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//_');
+    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//_');
 
     // --- INITIALIZATION ---
     async function init() {
-        // MODIFIED: Set session ready flag to false initially
         isSessionReady = false;
 
         applyInitialTheme();
@@ -1871,22 +1901,15 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const hostRejoined = await checkForHostRejoin();
             if (hostRejoined) {
-                // MODIFIED: Host rejoin logic is complete, mark session as ready and check for paste
-                isSessionReady = true; 
-                const hostData = JSON.parse(localStorage.getItem(HOST_DATA_KEY) || '{}');
-                // Check if user is already back on the tab and waiting to paste
-                if (!document.hidden && hostData.awaitingQuizPaste) {
-                    await handleClipboardPermission();
-                }
-                return;
+                isSessionReady = true;
+                return; // Host rejoin logic handles the entire startup flow
             }
         } catch (error) {
             console.error("Error during host rejoin check:", error);
-            // If rejoin fails, clear potentially corrupted state and proceed.
-            localStorage.removeItem(HOST_DATA_KEY);
+            localStorage.removeItem(HOST_DATA_KEY); // Clear potentially corrupted state
         }
 
-
+        // Standard startup flow if not rejoining as a host
         loadFormState();
         loadScrollPosition();
         loadPressureModeSettings();
@@ -1897,12 +1920,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Active solo quiz session takes precedence.
         } else if (sessionStorage.getItem('promptGeneratedForSolo') === 'true') {
             showScreen('paste');
-            handleClipboardPermission();
+            handleClipboardPermission(); // For solo players, auto-paste is fine
         } else {
             showScreen('manualGenerator');
         }
 
-        // MODIFIED: Mark session as ready for all non-rejoin scenarios
         isSessionReady = true;
     }
 
@@ -2070,7 +2092,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 handleExamSelection(event);
                 return;
             }
-            // *** CORRECTED: PDF extract button listener now delegated ***
             if (event.target.matches('#extract-text-pdf-btn') || event.target.closest('#host-extract-text-pdf-btn')) {
                  runPdfExtraction();
                  return;
@@ -2085,7 +2106,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (event.target.matches('#pdf-file-input, #host-pdf-file-input')) {
                 handlePdfSelection(event);
             }
-            // *** CORRECTED: PDF page range radio button listener now delegated ***
             if (event.target.matches('input[name*="pdf-page-option"]')) {
                 const radio = event.target;
                 const workflowContainer = radio.closest('div[id*="-generator-workflow"], div[id*="-container-wrapper"]');
@@ -2106,6 +2126,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Quiz and Results
         elements.startManualQuizBtn.addEventListener('click', startManualQuiz);
+        elements.hardResetBtn.addEventListener('click', handleHardReset);
         elements.sharePdfBtn.addEventListener('click', generatePDF);
         elements.copyBookmarksBtn.addEventListener('click', () => copyQuizContent(true));
         elements.copyAllBtn.addEventListener('click', () => copyQuizContent(false));
@@ -2124,7 +2145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // The onDisconnect handler for Firebase will manage leaving the room
         });
 
-        // Clipboard Permission & Automation
+        // Clipboard Permission & Automation (for solo players)
         elements.grantClipboardBtn.addEventListener('click', requestClipboardAndPaste);
         elements.denyClipboardBtn.addEventListener('click', () => {
             elements.clipboardPermissionModalOverlay.classList.add('hidden');
@@ -2188,7 +2209,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- SESSION MANAGEMENT (Quiz-in-progress ONLY) ---
     async function saveQuizState() {
         if (quizData.length === 0 || elements.quizPlayerContainer.classList.contains('hidden') || currentRoomCode) {
-            // Do not save local state if in a multiplayer room
              await dbHelper.set(QUIZ_STATE_KEY, null);
              return;
         }
@@ -2225,7 +2245,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- CLIPBOARD PERMISSION & AUTOMATION ---
     async function handleClipboardPermission() {
-        if (!navigator.clipboard || !navigator.permissions) return;
+        if (!navigator.clipboard || !navigator.permissions || isHost) return; // Disable for hosts
         try {
             const permissionStatus = await navigator.permissions.query({ name: "clipboard-read" });
             if (permissionStatus.state === "granted") {
@@ -2240,11 +2260,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function requestClipboardAndPaste() {
         elements.clipboardPermissionModalOverlay.classList.add('hidden');
-        await tryAutoPasteOnReturn(true); // `true` forces the browser prompt
+        await tryAutoPasteOnReturn(true);
     }
 
     async function tryAutoPasteOnReturn(forcePrompt = false) {
-        if (!forcePrompt && document.hidden) return;
+        if (isHost || (!forcePrompt && document.hidden)) return; // Disable for hosts
         try {
             const text = await navigator.clipboard.readText();
             if (text && text.trim() && (text.includes("Question:") || text.includes("Correct Answer:"))) {
@@ -2265,7 +2285,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function tryAutoPasteOnFocus() {
-        if(elements.quizDataInput.value.trim() !== '') return;
+        if(isHost || elements.quizDataInput.value.trim() !== '') return; // Disable for hosts
         try {
             const permissionStatus = await navigator.permissions.query({ name: "clipboard-read" });
             if (permissionStatus.state === "granted") {
@@ -2276,15 +2296,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     async function handleVisibilityChange() {
-        // MODIFIED: Add guard clause to prevent running before session is ready
-        if (!isSessionReady) {
-            return;
-        }
+        if (!isSessionReady) return;
         
-        const isAwaitingPaste = sessionStorage.getItem('promptGeneratedForSolo') === 'true' || 
-                              (JSON.parse(localStorage.getItem(HOST_DATA_KEY) || '{}')).awaitingQuizPaste;
+        // This function will now primarily handle rejoining logic.
+        // It checks if the user is a host upon returning to the tab.
+        const hostData = JSON.parse(localStorage.getItem(HOST_DATA_KEY) || '{}');
+        if (!document.hidden && hostData.isHost && !currentRoomCode) {
+            await checkForHostRejoin();
+        }
 
-        if (!document.hidden && isAwaitingPaste) {
+        // Auto-paste logic is now only for solo players.
+        const isAwaitingSoloPaste = sessionStorage.getItem('promptGeneratedForSolo') === 'true';
+        if (!document.hidden && isAwaitingSoloPaste && !isHost) {
             await handleClipboardPermission();
         }
     }
@@ -2342,44 +2365,14 @@ document.addEventListener('DOMContentLoaded', () => {
             instructions: getInputValue(`#${isForMultiplayer ? 'host-' : ''}prompt-instructions-${sourceType}`),
         };
 
-        // --- VALIDATION ---
-        if (sourceType === 'topic' && !source.topic) {
-            alert('Please enter a Quiz Topic.'); return;
-        }
-        if ((sourceType === 'topic' || sourceType === 'text') && !source.subject) {
-            alert('Please enter a Subject Area.'); return;
-        }
-        if ((sourceType === 'text' || sourceType === 'image' || sourceType === 'pdf') && !sourceText) {
-             alert('The source text is empty. Please provide content to generate questions from.'); return;
-        }
-        if (!source.numQuestions) {
-            alert('Please specify the number of questions.'); return;
-        }
+        if (sourceType === 'topic' && !source.topic) { alert('Please enter a Quiz Topic.'); return; }
+        if ((sourceType === 'topic' || sourceType === 'text') && !source.subject) { alert('Please enter a Subject Area.'); return; }
+        if ((sourceType === 'text' || sourceType === 'image' || sourceType === 'pdf') && !sourceText) { alert('The source text is empty. Please provide content to generate questions from.'); return; }
+        if (!source.numQuestions) { alert('Please specify the number of questions.'); return; }
 
-        // --- PROMPT GENERATION ---
-        const FORMAT_EXAMPLES = {
-            'mcq': `1. Multiple Choice Questions\nQuestion: What is the capital of France?\nOptions:\na) Berlin\nb) Madrid\nc) Paris\nd) Rome\nCorrect Answer: c) Paris\nExplanation: Paris is the capital and most populous city of France.`,
-            'statement': `1. Statement-Based Questions\nQuestion: Consider the following statements regarding the Earth:\n* The Earth is the third planet from the Sun.\n* The Earth is the largest of the terrestrial planets.\nWhich of the above statements are correct?\nOptions:\na) 1 only\nb) 2 only\nc) Both 1 and 2\nd) Neither 1 nor 2\nCorrect Answer: c) Both 1 and 2\nExplanation: Both statements are factually correct.`,
-            'assertion-reason': `1. Assertion-Reason Based Questions\nAssertion (A): A rainbow is seen in the sky after a rainfall.\nReason (R): Water droplets in the atmosphere act as small prisms.\nOptions:\na) Both A and R are true and R is the correct explanation of A.\nb) Both A and R are true but R is not the correct explanation of A.\nc) A is true but R is false.\nd) A is false but R is true.\nCorrect Answer: a) Both A and R are true and R is the correct explanation of A.\nExplanation: The water droplets disperse sunlight into its constituent colors, forming a rainbow.`,
-            'true-false': `1. True/False Questions\nQuestion: The planet Mars is also known as the Red Planet.\nOptions:\na) True\nb) False\nCorrect Answer: a) True\nExplanation: Mars has a reddish appearance due to iron oxide (rust) on its surface.`,
-            'math-physics': `1. Maths, Physics, or Other Questions\nQuestion: What is the derivative of \\(x^3\\) with respect to x?\nOptions:\na) \\(3x\\)\nb) \\(x^2\\)\nc) \\(3x^2\\)\nd) \\(\\frac{x^4}{4}\\)\nCorrect Answer: c) \\(3x^2\\)\nExplanation: Using the power rule for differentiation, \\(\\frac{d}{dx}(x^n) = nx^{n-1}\\).`,
-            'fill-blank': `1. Fill-in-the-Blank Questions\nQuestion: The powerhouse of the cell is the ___.\nOptions:\na) Nucleus\nb) Ribosome\nc) Mitochondrion\nd) Cytoplasm\nCorrect Answer: c) Mitochondrion\nExplanation: The mitochondrion generates most of the cell's supply of adenosine triphosphate (ATP), used as a source of chemical energy.`,
-        };
-
-        let selectedFormatExample;
-        if (source.formatKey === 'mix') {
-             selectedFormatExample = Object.values(FORMAT_EXAMPLES).join('\n---\n');
-        } else {
-             selectedFormatExample = FORMAT_EXAMPLES[source.formatKey] || FORMAT_EXAMPLES['mcq'];
-        }
-
-        let sourceMaterialInstruction;
-        if (sourceType === 'pdf') {
-            sourceMaterialInstruction = 'You must ONLY use information present in the source text provided below. **Do not use any external knowledge.** All questions, options, and explanations must be derived directly and exclusively from the provided text.';
-        } else { // topic, text, image
-            sourceMaterialInstruction = 'You MUST use your own extensive knowledge base to create original, high-quality questions. If source text is provided, use it for context and inspiration, but create new questions that match the specified exam level.';
-        }
-
+        const FORMAT_EXAMPLES = { 'mcq': `1. Multiple Choice Questions\nQuestion: What is the capital of France?\nOptions:\na) Berlin\nb) Madrid\nc) Paris\nd) Rome\nCorrect Answer: c) Paris\nExplanation: Paris is the capital and most populous city of France.`, 'statement': `1. Statement-Based Questions\nQuestion: Consider the following statements regarding the Earth:\n* The Earth is the third planet from the Sun.\n* The Earth is the largest of the terrestrial planets.\nWhich of the above statements are correct?\nOptions:\na) 1 only\nb) 2 only\nc) Both 1 and 2\nd) Neither 1 nor 2\nCorrect Answer: c) Both 1 and 2\nExplanation: Both statements are factually correct.`, 'assertion-reason': `1. Assertion-Reason Based Questions\nAssertion (A): A rainbow is seen in the sky after a rainfall.\nReason (R): Water droplets in the atmosphere act as small prisms.\nOptions:\na) Both A and R are true and R is the correct explanation of A.\nb) Both A and R are true but R is not the correct explanation of A.\nc) A is true but R is false.\nd) A is false but R is true.\nCorrect Answer: a) Both A and R are true and R is the correct explanation of A.\nExplanation: The water droplets disperse sunlight into its constituent colors, forming a rainbow.`, 'true-false': `1. True/False Questions\nQuestion: The planet Mars is also known as the Red Planet.\nOptions:\na) True\nb) False\nCorrect Answer: a) True\nExplanation: Mars has a reddish appearance due to iron oxide (rust) on its surface.`, 'math-physics': `1. Maths, Physics, or Other Questions\nQuestion: What is the derivative of \\(x^3\\) with respect to x?\nOptions:\na) \\(3x\\)\nb) \\(x^2\\)\nc) \\(3x^2\\)\nd) \\(\\frac{x^4}{4}\\)\nCorrect Answer: c) \\(3x^2\\)\nExplanation: Using the power rule for differentiation, \\(\\frac{d}{dx}(x^n) = nx^{n-1}\\).`, 'fill-blank': `1. Fill-in-the-Blank Questions\nQuestion: The powerhouse of the cell is the ___.\nOptions:\na) Nucleus\nb) Ribosome\nc) Mitochondrion\nd) Cytoplasm\nCorrect Answer: c) Mitochondrion\nExplanation: The mitochondrion generates most of the cell's supply of adenosine triphosphate (ATP), used as a source of chemical energy.`, };
+        let selectedFormatExample = (source.formatKey === 'mix') ? Object.values(FORMAT_EXAMPLES).join('\n---\n') : (FORMAT_EXAMPLES[source.formatKey] || FORMAT_EXAMPLES['mcq']);
+        let sourceMaterialInstruction = (sourceType === 'pdf') ? 'You must ONLY use information present in the source text provided below. **Do not use any external knowledge.** All questions, options, and explanations must be derived directly and exclusively from the provided text.' : 'You MUST use your own extensive knowledge base to create original, high-quality questions. If source text is provided, use it for context and inspiration, but create new questions that match the specified exam level.';
         let examInstruction = "The 'Target Exam' parameter is the most important instruction. You must generate questions that are **strictly relevant to the syllabus, question pattern, and difficulty level of the specified exam.** For example, if the exam is 'IIT-JEE', the questions must be of that specific engineering entrance exam level, involving complex problem-solving. If it is 'NEET', the questions must be based on the NEET syllabus (Physics, Chemistry, Biology). If it is 'UPSC', the questions must be analytical and based on the civil services syllabus. **This is a strict requirement.**";
 
         let prompt = `You are an expert quiz creator for competitive exams. Your task is to generate a high-quality quiz based on the user's strict specifications. Adherence to all instructions is critical.
@@ -2436,7 +2429,7 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
 
         if (isForMultiplayer) {
             const hostData = JSON.parse(localStorage.getItem(HOST_DATA_KEY) || '{}');
-            hostData.awaitingQuizPaste = true;
+            hostData.awaitingQuizPaste = true; // Set the flag for when host returns
             localStorage.setItem(HOST_DATA_KEY, JSON.stringify(hostData));
         } else {
             sessionStorage.setItem('promptGeneratedForSolo', 'true');
@@ -2446,7 +2439,7 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
     }
 
     async function executePostPromptActions(prompt) {
-        const isForMultiplayer = !!JSON.parse(localStorage.getItem(HOST_DATA_KEY));
+        const isForMultiplayer = !!JSON.parse(localStorage.getItem(HOST_DATA_KEY) || '{}');
 
         if (!isForMultiplayer) {
             clearFormState();
@@ -2478,7 +2471,6 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
         }
     }
 
-    // *** FIXED: Updated function to work with event delegation ***
     function handleExamSelection(event) {
         event.preventDefault();
         const clickedBtn = event.target.closest('.exam-btn');
@@ -2851,7 +2843,6 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
     }
 
     // --- MULTIPLAYER LOBBY LOGIC (FIREBASE) ---
-    // UPDATED AND CORRECTED FUNCTION
     async function checkForHostRejoin() {
         const hostData = JSON.parse(localStorage.getItem(HOST_DATA_KEY));
         if (hostData && hostData.isHost) {
@@ -2860,34 +2851,25 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
             const snapshot = await get(roomRef);
 
             if (snapshot.exists() && snapshot.val().hostId === hostData.userId) {
+                // The room exists and this user is the host. Re-establish the session.
                 isHost = true;
                 currentRoomCode = hostData.roomCode;
                 currentUserId = hostData.userId;
-                sessionStorage.setItem('currentRoomCode', currentRoomCode);
                 
+                // Set presence and onDisconnect handler
                 const participantRef = ref(db, `rooms/${currentRoomCode}/participants/${currentUserId}`);
-                
-                // --- NEW: Send an explicit "I'm back" signal ---
-                // This update ensures all listeners get a fresh 'roomData' object with the host online
-                // and the status confirmed as 'waiting'.
-                await update(roomRef, {
-                    [`participants/${currentUserId}/isOnline`]: true,
-                    status: 'waiting' // Re-assert the status
-                });
-                // --- END OF NEW SIGNAL ---
-
+                await update(participantRef, { isOnline: true });
                 onDisconnect(participantRef).update({ isOnline: false });
                 
-                const roomData = (await get(roomRef)).val(); // Get the fresh data after our update
-                
-                if (hostData.awaitingQuizPaste && roomData.status === 'waiting') {
-                    listenToRoomChanges(currentRoomCode); 
-                    showHostPasteScreen();
-                    hideLoading();
-                    return true;
-                }
+                listenToRoomChanges(currentRoomCode);
 
-                if (roomData.status === 'active') {
+                const roomData = snapshot.val();
+
+                // *** NEW LOGIC: Check if host needs to paste the quiz ***
+                if (hostData.awaitingQuizPaste && roomData.status === 'waiting') {
+                    showHostPasteScreen();
+                } else if (roomData.status === 'active') {
+                    // Rejoin quiz in progress
                     quizData = roomData.quiz.questions;
                     originalQuizData = JSON.parse(JSON.stringify(quizData));
                     userAnswers = (roomData.answers && roomData.answers[currentUserId]) ? roomData.answers[currentUserId] : originalQuizData.map(() => ({ selected: null, isCorrect: null, status: 'unseen' }));
@@ -2901,32 +2883,27 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
                     showScreen('player');
                     const firstUnanswered = userAnswers.findIndex(a => a.status !== 'answered');
                     loadQuestion(firstUnanswered !== -1 ? firstUnanswered : 0);
-                    if (isHost) {
-                        listenForSubmissions();
-                    }
+                    listenForSubmissions();
                 } else if (roomData.status === 'finished') {
                     showResults(); 
-                } else {
-                    // Default to listening to the room changes if no other state matches
-                    listenToRoomChanges(currentRoomCode);
                 }
                 
                 hideLoading();
-                return true;
+                return true; // Indicate successful rejoin
             } else {
                 // The room doesn't exist or the host ID doesn't match, so clear the stale data.
                 localStorage.removeItem(HOST_DATA_KEY);
                 hideLoading();
             }
         }
-        return false;
+        return false; // Not a host or couldn't rejoin
     }
     
     function showHostPasteScreen() {
         showScreen('paste');
         elements.pasteContainerTagline.textContent = "Host - Final Step";
-        elements.pasteContainerMessage.textContent = "Paste the generated quiz text below to start the quiz for everyone in the room.";
-        handleClipboardPermission();
+        elements.pasteContainerMessage.textContent = "You have returned. Paste the generated quiz text below to start the quiz for everyone in the room.";
+        elements.quizDataInput.placeholder = "Paste the entire quiz text from the AI here. When you are ready, click the button below.";
     }
 
     function generateRoomCode() {
@@ -2967,15 +2944,15 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
             await set(roomRef, roomData);
             onDisconnect(participantRef).update({ isOnline: false });
 
+            // Save host data to local storage for session persistence
             const hostSessionData = {
                 roomCode: currentRoomCode,
                 userId: currentUserId,
                 isHost: true,
-                awaitingQuizPaste: false
+                awaitingQuizPaste: false // Initially false
             };
             localStorage.setItem(HOST_DATA_KEY, JSON.stringify(hostSessionData));
             
-            sessionStorage.setItem('currentRoomCode', currentRoomCode);
             hideLoading();
             listenToRoomChanges(currentRoomCode);
         } catch (error) {
@@ -3012,7 +2989,7 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
                 return;
             }
 
-            const numParticipants = Object.keys(roomData.participants || {}).length;
+            const numParticipants = Object.values(roomData.participants || {}).filter(p => p.isOnline).length;
             if (numParticipants >= MAX_PARTICIPANTS) {
                 elements.roomFullNotification.classList.remove('hidden');
                 setTimeout(() => elements.roomFullNotification.classList.add('hidden'), 3000);
@@ -3027,7 +3004,6 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
             await set(participantRef, { name: playerName, joinedAt: serverTimestamp(), isOnline: true });
             onDisconnect(participantRef).update({ isOnline: false });
             
-            sessionStorage.setItem('currentRoomCode', currentRoomCode);
             hideLoading();
             listenToRoomChanges(currentRoomCode);
 
@@ -3045,10 +3021,6 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
 
         const roomRef = ref(db, `rooms/${roomCode}`);
         
-        if (isHost) {
-            elements.hostGenerateQuizBtn.disabled = true;
-        }
-
         if (roomUnsubscribe) roomUnsubscribe();
         roomUnsubscribe = onValue(roomRef, (snapshot) => {
             if (!snapshot.exists()) {
@@ -3061,10 +3033,12 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
 
             const roomData = snapshot.val();
             
+            // Ensure this client is marked as online
             const participantRef = ref(db, `rooms/${currentRoomCode}/participants/${currentUserId}`);
             update(participantRef, { isOnline: true });
             
             if (roomData.status === 'active' && (!quizData || quizData.length === 0)) {
+                // Quiz is starting for the first time for this client
                 quizData = roomData.quiz.questions;
                 originalQuizData = JSON.parse(JSON.stringify(quizData));
                 quizMetaData = {
@@ -3082,46 +3056,27 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
             } else if (roomData.status === 'finished' && elements.resultsScreen.classList.contains('hidden')) {
                  showResults();
             }
-
-            if (isHost) {
-                elements.hostGenerateQuizBtn.disabled = false;
-            }
         });
     }
 
-    // UPDATED AND CORRECTED FUNCTION
     function updateLobbyUI(roomData) {
         if (!roomData || elements.roomLobby.classList.contains('hidden')) return;
-
-        const hostId = roomData.hostId;
-        const hostData = (roomData.participants && hostId) ? roomData.participants[hostId] : null;
-
-        // --- NEW LOGIC TO HANDLE HOST ONLINE/OFFLINE STATUS ---
-        if (hostData && !hostData.isOnline) {
-            // Host is confirmed to be offline
-            elements.waitingMessage.textContent = "The host seems to be offline. Waiting for them to return...";
-            elements.waitingMessage.style.color = "orange"; // Use a warning color
-            if (isHost) {
-                // If the current user is the host, but their status is offline, hide their controls
-                elements.hostControls.classList.add('hidden');
-            }
-        } else {
-            // Host is online or data is not yet available (default state)
-            elements.waitingMessage.textContent = isHost ? "" : "Waiting for the host to start the game...";
-            elements.waitingMessage.style.color = ""; // Reset to default color
-        }
-        // --- END OF NEW LOGIC ---
 
         elements.roomCodeDisplay.textContent = currentRoomCode;
         elements.roomTopicDisplay.textContent = roomData.topic || 'Waiting for host to create quiz...';
         elements.roomTimeLimitDisplay.textContent = roomData.timeLimit ? `${roomData.timeLimit / 60} Minutes` : 'Not set';
         
-        // Toggle host controls based on if the user is the host AND if the host is online
-        elements.hostControls.classList.toggle('hidden', !isHost || (hostData && !hostData.isOnline));
-        elements.waitingMessage.classList.toggle('hidden', isHost);
+        // **MODIFIED LOGIC**
+        if (isHost) {
+            elements.hostControls.classList.remove('hidden');
+            elements.waitingMessage.textContent = "You are the host. Create a quiz when you're ready.";
+        } else {
+            elements.hostControls.classList.add('hidden');
+            // This message is now static for players, providing a clearer experience.
+            elements.waitingMessage.textContent = "Waiting for the host to create and start the quiz...";
+        }
 
         const participants = roomData.participants || {};
-        // Filter out participants who might be marked as offline but haven't been removed yet
         const onlineParticipants = Object.keys(participants).filter(uid => participants[uid].isOnline);
         const participantCount = onlineParticipants.length;
         elements.participantCount.textContent = `${participantCount}/${MAX_PARTICIPANTS}`;
@@ -3129,20 +3084,13 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
         elements.participantList.innerHTML = '';
         Object.keys(participants).forEach(uid => {
             const p = participants[uid];
+            if (!p.isOnline) return; // Don't show offline participants
+
             const isCurrentUser = uid === currentUserId;
             const isTheHost = uid === roomData.hostId;
             
-            // Use a clearer online/offline indicator
-            const onlineIndicator = p.isOnline ? '🟢' : '⚪️';
-            
             const li = document.createElement('li');
-            li.innerHTML = `${onlineIndicator} ${isTheHost ? '👑' : '👤'} ${p.name} ${isCurrentUser ? '(You)' : ''}`;
-            
-            // Make offline users appear greyed out
-            if (!p.isOnline) {
-                li.style.opacity = '0.6';
-            }
-            
+            li.innerHTML = `${isTheHost ? '👑' : '👤'} ${p.name} ${isCurrentUser ? '(You)' : ''}`;
             elements.participantList.appendChild(li);
         });
     }
@@ -3170,8 +3118,6 @@ Now, generate the quiz. Re-read all instructions. Failure to adhere to the forma
         quizData = []; 
         originalQuizData = [];
         userAnswers = [];
-        sessionStorage.removeItem('currentRoomCode');
-        sessionStorage.removeItem('promptGeneratedForHost');
         
         if (wasHost) {
            localStorage.removeItem(HOST_DATA_KEY);
@@ -3249,7 +3195,6 @@ Create quizzes from topics, text, images, or PDFs, and challenge friends!`;
         elements.hostGeneratorWorkflowContainerWrapper.classList.remove('hidden');
     }
 
-    // --- === NEW GUARANTEED SOLUTION IMPLEMENTATION === ---
     function startManualQuiz() {
         const text = elements.quizDataInput.value.trim();
         if (!text) {
@@ -3257,9 +3202,7 @@ Create quizzes from topics, text, images, or PDFs, and challenge friends!`;
             return;
         }
 
-        const isForMultiplayer = !!currentRoomCode;
         sessionStorage.removeItem('promptGeneratedForSolo');
-        sessionStorage.removeItem('promptGeneratedForHost');
 
         const parsedQuestions = transformParsedData(parseQuizText(text));
 
@@ -3273,25 +3216,16 @@ Create quizzes from topics, text, images, or PDFs, and challenge friends!`;
             alert(`Quiz Validation Failed:\n\n${validation.error}`);
             return;
         }
-
-        // --- SOLO QUIZ PATH ---
-        if (!isForMultiplayer) {
-            quizData = parsedQuestions;
-            originalQuizData = JSON.parse(JSON.stringify(quizData));
-            showScreen('player');
-            startQuiz();
-            return;
-        }
-
-        // --- MULTIPLAYER HOST PATH ---
+        
+        // --- This function now handles both solo and multiplayer starts ---
         if (isHost && currentRoomCode) {
+            // *** HOST'S MULTIPLAYER START LOGIC ***
             showLoading("Broadcasting quiz to the room...");
 
+            // Update local storage to show quiz is no longer pending paste
             const hostData = JSON.parse(localStorage.getItem(HOST_DATA_KEY) || '{}');
-            if (hostData.awaitingQuizPaste) {
-                hostData.awaitingQuizPaste = false;
-                localStorage.setItem(HOST_DATA_KEY, JSON.stringify(hostData));
-            }
+            hostData.awaitingQuizPaste = false;
+            localStorage.setItem(HOST_DATA_KEY, JSON.stringify(hostData));
 
             const quizPayload = {
                 questions: parsedQuestions,
@@ -3299,6 +3233,7 @@ Create quizzes from topics, text, images, or PDFs, and challenge friends!`;
                 difficulty: quizMetaData.difficulty,
             };
 
+            // Prepare a single update operation for Firebase
             const roomUpdates = {
                 [`/rooms/${currentRoomCode}/quiz`]: quizPayload,
                 [`/rooms/${currentRoomCode}/status`]: 'active',
@@ -3306,17 +3241,18 @@ Create quizzes from topics, text, images, or PDFs, and challenge friends!`;
                 [`/rooms/${currentRoomCode}/subject`]: quizMetaData.subject,
             };
             
-            // This now uses a direct success/failure check instead of relying on the listener.
-            update(ref(db), roomUpdates).then(() => {
-                console.log("Host: Broadcast to Firebase successful.");
-                // The host's own listener will pick up this change and start the quiz.
-                // No further action is needed here, as the listener is the single source of truth.
-                // The loading screen will be hidden by the listener callback.
-            }).catch(error => {
+            // Atomically update Firebase. The `onValue` listener will handle the UI transition.
+            update(ref(db), roomUpdates).catch(error => {
                 console.error("HOST FAILED TO BROADCAST QUIZ:", error);
                 hideLoading();
-                alert("Critical Error: Could not broadcast the quiz to the room due to a database error. Please try creating a new room.");
+                alert("Critical Error: Could not start the quiz due to a database error. Please try creating a new room.");
             });
+        } else {
+            // --- SOLO QUIZ START LOGIC (unchanged) ---
+            quizData = parsedQuestions;
+            originalQuizData = JSON.parse(JSON.stringify(quizData));
+            showScreen('player');
+            startQuiz();
         }
     }
 
@@ -3407,6 +3343,51 @@ Create quizzes from topics, text, images, or PDFs, and challenge friends!`;
 
 
     // --- UTILITY & RESULTS FUNCTIONS ---
+    async function handleHardReset() {
+        const confirmation = confirm(
+            "⚠️ Are you sure you want to reset everything? This will delete all your current quiz data, session information, and multiplayer room data (if applicable). This action cannot be undone."
+        );
+
+        if (!confirmation) {
+            return;
+        }
+
+        showLoading('Resetting all data...');
+
+        // 1. Clear local browser storage
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // 2. Clear IndexedDB
+        try {
+            await dbHelper.clear();
+        } catch (error) {
+            console.error("Could not clear IndexedDB:", error);
+        }
+
+        // 3. Clear Firebase data if in a room
+        if (currentRoomCode && currentUserId) {
+            try {
+                if (isHost) {
+                    // Host removes the entire room
+                    await remove(ref(db, `rooms/${currentRoomCode}`));
+                } else {
+                    // Player removes only themselves
+                    const participantRef = ref(db, `rooms/${currentRoomCode}/participants/${currentUserId}`);
+                    onDisconnect(participantRef).cancel(); // Cancel the disconnect hook
+                    await remove(participantRef);
+                }
+            } catch (error) {
+                console.error("Failed to clear Firebase data:", error);
+                // Continue with the reset regardless of Firebase failure
+            }
+        }
+        
+        // 4. Force a reload to return to the initial state
+        window.location.reload();
+    }
+
+
     async function restartQuiz() {
         if(currentRoomCode) {
             await leaveRoom(true, isHost);
@@ -3725,7 +3706,7 @@ Create your own quiz now:`;
             }
 
             const roomData = roomSnapshot.val();
-            const currentParticipantIds = Object.keys(roomData.participants || {});
+            const currentParticipantIds = Object.keys(roomData.participants || {}).filter(uid => roomData.participants[uid].isOnline);
             const answersData = snapshot.val() || {};
             const answeredParticipantIds = Object.keys(answersData);
             
@@ -3888,7 +3869,7 @@ Create your own quiz now:`;
             showLoading("Submitting your answers...");
             const answersRef = ref(db, `rooms/${currentRoomCode}/answers/${currentUserId}`);
             await set(answersRef, userAnswers);
-            showResults();
+            showResults(); // Go to results, but it will show "waiting" message until all submitted
             hideLoading();
         } else {
             showResults();
@@ -3943,7 +3924,7 @@ Create your own quiz now:`;
         let isQuizFinishedForAll = false;
 
         if (currentRoomCode) {
-            showLoading("Fetching results...");
+            showLoading("Fetching final results...");
             const roomRef = ref(db, `rooms/${currentRoomCode}`);
             const roomSnapshot = await get(roomRef);
             const roomData = roomSnapshot.val() || {};
@@ -3960,8 +3941,8 @@ Create your own quiz now:`;
                 const statusRef = ref(db, `rooms/${currentRoomCode}/status`);
                 roomStatusUnsubscribe = onValue(statusRef, (snapshot) => {
                     if (snapshot.val() === 'finished') {
-                        showResults(); 
                         if (roomStatusUnsubscribe) { roomStatusUnsubscribe = null; }
+                        showResults(); 
                     }
                 });
             }
@@ -3974,7 +3955,7 @@ Create your own quiz now:`;
             isQuizFinishedForAll = true; 
         }
 
-        elements.scoreSummary.innerHTML = '🏆 Quiz Results 🏆';
+        elements.scoreSummary.innerHTML = '';
         elements.scoreSummary.classList.add('visible');
 
         if (isQuizFinishedForAll) {
@@ -3982,17 +3963,13 @@ Create your own quiz now:`;
                 const answers = allUsersAnswers[uid] || [];
                 const correctCount = answers.filter(ans => ans && ans.isCorrect).length;
                 const totalAnswered = answers.filter(ans => ans && ans.status === 'answered').length;
-                const percentage = totalAnswered > 0 ? (correctCount / totalAnswered) * 100 : 0;
                 return {
                     uid: uid,
                     name: roomParticipants[uid] ? roomParticipants[uid].name : 'Unknown Player',
                     score: correctCount,
                     total: originalQuizData.length,
-                    percentage: percentage.toFixed(0)
                 };
-            });
-
-            userScores.sort((a, b) => b.score - a.score);
+            }).sort((a, b) => b.score - a.score);
 
             elements.scoreSummary.innerHTML = currentRoomCode ? '🏆 Final Leaderboard 🏆' : '🏆 Quiz Results 🏆';
             elements.scorePerformanceChartContainer.innerHTML = `
@@ -4006,9 +3983,7 @@ Create your own quiz now:`;
                 </ul>`;
             
              if (isHost && !hostDecisionTimeout) {
-                hostDecisionTimeout = setTimeout(() => {
-                    showHostDecisionModal();
-                }, 15000);
+                hostDecisionTimeout = setTimeout(showHostDecisionModal, 15000);
             }
 
         } else {
@@ -4049,7 +4024,7 @@ Create your own quiz now:`;
     function showHostDecisionModal() {
         if(elements.hostDecisionModalOverlay.classList.contains('hidden')) {
             elements.hostDecisionModalOverlay.classList.remove('hidden');
-            let countdown = 1;
+            let countdown = 20;
             elements.hostDecisionTimer.textContent = countdown;
             
             hostDecisionInterval = setInterval(() => {
@@ -4062,8 +4037,8 @@ Create your own quiz now:`;
 
             hostDecisionTimeout = setTimeout(() => {
                 clearInterval(hostDecisionInterval);
-                endRoomForAll(true); // Auto-end after 1 seconds
-            }, 1000);
+                endRoomForAll(true); // Auto-end after 20 seconds
+            }, 20000);
         }
     }
 
@@ -4115,6 +4090,7 @@ Create your own quiz now:`;
         try {
             await update(ref(db, `rooms/${currentRoomCode}`), roomUpdates);
             hideLoading();
+            // The onValue listener will handle UI update to lobby, then we open the generation view
             openHostQuizGenerationView();
         } catch (error) {
             console.error("Error resetting room:", error);
