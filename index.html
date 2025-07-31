@@ -1246,7 +1246,7 @@
 
     <!-- NEW: Hard Reset Button -->
     <div id="hard-reset-container">
-        <button id="hard-reset-btn" class="btn btn-ice">❄️ Go Back to Home Page ❄️</button>
+        <button id="hard-reset-btn" class="btn btn-ice">❄️ Go to Home Page & Reset ❄️</button>
     </div>
 
     <div class="share-buttons">
@@ -1897,12 +1897,16 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUserId = getSessionUserId();
 
         await dbHelper.init();
+        
+        // SETUP EVENT LISTENERS EARLY!
+        // This ensures all buttons are functional, even during a host rejoin flow.
+        setupEventListeners();
 
         try {
             const hostRejoined = await checkForHostRejoin();
             if (hostRejoined) {
                 isSessionReady = true;
-                return; // Host rejoin logic handles the entire startup flow
+                return; // Host rejoin logic handles the screen display, and listeners are already set.
             }
         } catch (error) {
             console.error("Error during host rejoin check:", error);
@@ -1913,7 +1917,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loadFormState();
         loadScrollPosition();
         loadPressureModeSettings();
-        setupEventListeners();
 
         const quizRestored = await loadQuizState();
         if (quizRestored) {
