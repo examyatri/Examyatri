@@ -774,14 +774,14 @@
 <!-- ======================================= -->
 <div class="container" id="main-container">
     <div class="header">
-        <span class="header-branding">✍️ <strong>EXAMYATRI</strong> - <span class="tagline">Practice with Friends</span></span>
+        <span class="header-branding">✍️ <strong>EXAMYATRI</strong> - <span class="tagline">One Plateform. All Exam</span></span>
         <button id="theme-toggle-btn" title="Toggle Dark/Light Mode">🌙</button>
     </div>
 
     <!-- ===== NEW: MODE SELECTION (SINGLE/MULTI) ===== -->
     <div id="mode-selection-container">
-        <h2>Welcome to Examyatri!</h2>
-        <p>Choose your practice mode below.</p>
+        <h2>❤️Generate Topicwise, Chapterwise, Subjectwise Mock Test/ Quiz❤️</h2>
+        <p>Completely FREE</p>
         <div class="mode-options">
             <div class="mode-option-card" id="select-single-player-btn">
                 <span class="card-icon">👤</span>
@@ -790,7 +790,7 @@
             </div>
             <div class="mode-option-card" id="select-multiplayer-btn">
                 <span class="card-icon">👥</span>
-                <h3>Multiplayer</h3>
+                <h3>Multiplayer/ Prectice With Frinds</h3>
                 <p>Create a room or join a friend's to practice together.</p>
             </div>
         </div>
@@ -838,13 +838,13 @@
                 <span class="card-icon">📝</span><h4>Generate from Topic</h4><p>Provide a topic to generate questions.</p>
             </div>
             <div class="creation-option-card" id="select-from-text">
-                <span class="card-icon">📋</span><h4>Generate from Text</h4><p>Paste text/formula to create questions.</p>
+                <span class="card-icon">📋</span><h4>Generate from Text</h4><p>Paste text/ formula ( Maths,Physics )to create questions.</p>
             </div>
             <div class="creation-option-card" id="select-from-image">
-                <span class="card-icon">🖼️</span><h4>Generate from Image</h4><p>Use images of notes or questions.</p>
+                <span class="card-icon">🖼️</span><h4>Generate from Image</h4><p>Use images of notes / PYQs and generate similar question.</p>
             </div>
             <div class="creation-option-card" id="select-from-pdf">
-                <span class="card-icon">📄</span><h4>Generate from PDF</h4><p>Upload a PDF to create questions.</p>
+                <span class="card-icon">📄</span><h4>Generate from PDF</h4><p>Upload a PDF to create questions from each line .</p>
             </div>
              <button class="btn btn-secondary back-to-mode-selection-btn" style="grid-column: 1 / -1; margin-top: 1rem;">← Back to Main Menu</button>
         </div>
@@ -860,7 +860,7 @@
             </div>
             <div class="input-group"><label for="prompt-topic" class="input-label">Primary Topic (Required)</label><input type="text" id="prompt-topic" class="input-field" placeholder="e.g., The Solar System, World War II"></div>
             <div class="input-group"><label for="prompt-num-questions-topic" class="input-label">Number of Questions</label><input type="number" id="prompt-num-questions-topic" class="input-field" placeholder="e.g., 10" min="1" max="50"></div>
-            <div class="input-group"><label for="prompt-subject-topic" class="input-label">Subject Area (Optional)</label><input type="text" id="prompt-subject-topic" class="input-field" placeholder="e.g., Science, History"></div>
+            <div class="input-group"><label for="prompt-subject-topic" class="input-label">Subject/ instruction e.g. generate question on this topic(Optional)</label><input type="text" id="prompt-subject-topic" class="input-field" placeholder="e.g., Science, maths"></div>
             <div class="input-group"><label for="prompt-language-topic" class="input-label">Language</label><select id="prompt-language-topic" class="input-field"><option value="English" selected>English</option><option value="Hindi">Hindi</option><option value="Spanish">Spanish</option><option value="French">French</option><option value="German">German</option></select></div>
             <div class="input-group"><label for="prompt-difficulty-topic" class="input-label">Difficulty Level</label><select id="prompt-difficulty-topic" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
             <div class="input-group"><label class="input-label">Target Exam (Required)</label><div class="exam-buttons-container"></div><input type="text" class="prompt-exam-other input-field hidden" placeholder="Enter Other exam name" style="margin-top: 10px;"></div>
@@ -871,7 +871,7 @@
         <!-- WORKFLOW 2: From Text -->
         <div id="text-generator-workflow" class="hidden">
             <div class="step-header-container">
-              <h3 class="step-header">Step 1: Provide Your Text</h3>
+              <h3 class="step-header">Step 1: Provide Your Text / Formula</h3>
               <div class="guide-container">
                   <button class="btn guide-btn" data-guide-id="text-step1" title="Show Guide">💁</button>
                   <span class="guide-help-text">How to use</span>
@@ -886,7 +886,7 @@
               </div>
             </div>
             <div class="input-group"><label for="prompt-num-questions-text" class="input-label">Number of Questions</label><input type="number" id="prompt-num-questions-text" class="input-field" placeholder="e.g., 5" min="1" max="50"></div>
-            <div class="input-group"><label for="prompt-subject-text" class="input-label">Subject/Instruction</label><input type="text" id="prompt-subject-text" class="input-field" placeholder="e.g., Generate questions on the above formula"></div>
+            <div class="input-group"><label for="prompt-subject-text" class="input-label">Subject/Instruction e.g. generate quiz on this formula</label><input type="text" id="prompt-subject-text" class="input-field" placeholder="e.g., Generate questions on this topic"></div>
             <div class="input-group"><label for="prompt-language-text" class="input-label">Language</label><select id="prompt-language-text" class="input-field"><option value="English" selected>English</option><option value="Hindi">Hindi</option><option value="Spanish">Spanish</option><option value="French">French</option><option value="German">German</option></select></div>
             <div class="input-group"><label for="prompt-difficulty-text" class="input-label">Difficulty Level</label><select id="prompt-difficulty-text" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
             <div class="input-group"><label class="input-label">Target Exam (Required)</label><div class="exam-buttons-container"></div><input type="text" class="prompt-exam-other input-field hidden" placeholder="Enter other exam name" style="margin-top: 10px;"></div>
@@ -931,7 +931,7 @@
                 </div>
                 <textarea id="source-text-image" style="display: none;"></textarea>
                 <div class="input-group"><label for="prompt-num-questions-image" class="input-label">Number of Questions</label><input type="number" id="prompt-num-questions-image" class="input-field" placeholder="e.g., 5" min="1" max="50"></div>
-                <div class="input-group"><label for="prompt-topic-image" class="input-label">Topic/Instruction</label><input type="text" id="prompt-topic-image" class="input-field" placeholder="e.g., Photosynthesis, The Mughal Empire"></div>
+                <div class="input-group"><label for="prompt-topic-image" class="input-label">Topic/Instruction e.g generate similar question</label><input type="text" id="prompt-topic-image" class="input-field" placeholder="e.g., Photosynthesis, Generate question on this topic"></div>
                 <div class="input-group"><label for="prompt-subject-image" class="input-label">Subject Area (Optional)</label><input type="text" id="prompt-subject-image" class="input-field" placeholder="e.g., Biology from textbook page"></div>
                 <div class="input-group"><label for="prompt-language-image" class="input-label">Language</label><select id="prompt-language-image" class="input-field"><option value="English" selected>English</option><option value="Hindi">Hindi</option><option value="Spanish">Spanish</option><option value="French">French</option><option value="German">German</option></select></div>
                 <div class="input-group"><label for="prompt-difficulty-image" class="input-label">Difficulty Level</label><select id="prompt-difficulty-image" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
