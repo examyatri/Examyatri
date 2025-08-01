@@ -1223,9 +1223,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'mix': { name: 'Mixed Format' }
     };
 
-    // --- UPDATED LEGACY_FORMAT_TEXT ---
-    // This text is used to generate the prompt for the AI.
-    const LEGACY_FORMAT_TEXT = `1. Multiple Choice Questions
+    // --- UPDATED LEGACY_FORMAT_TEXT & INDIVIDUAL EXAMPLES ---
+    const MCQ_EXAMPLE = `1. Multiple Choice Questions
 Question: What is the capital of France?
 Options:
 a) Berlin
@@ -1233,9 +1232,9 @@ b) Madrid
 c) Paris
 d) Rome
 Correct Answer: c
-Explanation: Paris is the capital and most populous city of France.
+Explanation: Paris is the capital and most populous city of France.`;
 
-2. Assertion-Reason Based Questions
+    const AR_EXAMPLE = `1. Assertion-Reason Based Questions
 Assertion (A): The sun appears yellow from Earth.
 Reason (R): The Earth's atmosphere scatters shorter wavelength blue light more than longer wavelength yellow and red light.
 Options:
@@ -1244,9 +1243,9 @@ b) Both A and R are true but R is not the correct explanation of A.
 c) A is true but R is false.
 d) A is false but R is true.
 Correct Answer: a
-Explanation: This phenomenon is known as Rayleigh scattering.
+Explanation: This phenomenon is known as Rayleigh scattering.`;
 
-3. Statement-Based Questions
+    const STATEMENT_EXAMPLE = `1. Statement-Based Questions
 Question: Consider the following statements regarding photosynthesis:
 * Photosynthesis primarily occurs in the chloroplasts of plant cells.
 * Oxygen is released as a byproduct during photosynthesis.
@@ -1258,9 +1257,9 @@ b) 2 and 3 only
 c) 1 and 3 only
 d) 1, 2, and 3
 Correct Answer: d
-Explanation: All three statements are correct.
+Explanation: All three statements are correct.`;
 
-4. Maths, Physics, or Other Questions
+    const MATH_EXAMPLE = `1. Maths, Physics, or Other Questions
 Question: What is the value of the integral of 3x^2, i.e., \\( \\int 3x^2 \\,dx \\)?
 Options:
 a) \\( 3x^3 + C \\)
@@ -1269,6 +1268,28 @@ c) \\( 6x + C \\)
 d) \\( \\frac{1}{3}x^3 + C \\)
 Correct Answer: b
 Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) is \\( x^3 + C \\). C is the constant of integration. For math symbols, you MUST use LaTeX format enclosed in \\( ... \\) delimiters.`;
+
+    const TF_EXAMPLE = `1. True/False Questions
+Question: The Earth is the fourth planet from the Sun.
+Options:
+a) True
+b) False
+Correct Answer: b
+Explanation: The Earth is the third planet from the Sun. Mars is the fourth.`;
+
+    const FILL_BLANK_EXAMPLE = `1. Fill-in-the-Blank Questions
+Question: The powerhouse of the cell is the __________.
+Options:
+a) Nucleus
+b) Ribosome
+c) Mitochondrion
+d) Endoplasmic Reticulum
+Correct Answer: c
+Explanation: The mitochondrion is responsible for generating most of the cell's supply of adenosine triphosphate (ATP), used as a source of chemical energy.`;
+
+    // This is used for the 'mix' format option.
+    const LEGACY_FORMAT_TEXT = [MCQ_EXAMPLE, AR_EXAMPLE, STATEMENT_EXAMPLE, MATH_EXAMPLE, TF_EXAMPLE, FILL_BLANK_EXAMPLE].join('\n\n');
+
 
     const commonGuideAfterInput = `<div class="guide-step"><strong>Step 2: Fill Question Details</strong><p>Fill in the details like Number of Questions, Subject, Language, Difficulty, Exam, and Question Format.</p><p class="hindi-text">(चरण 2: क्विज़ का विवरण भरें - प्रश्नों की संख्या, विषय, भाषा, कठिनाई, परीक्षा और प्रश्न प्रारूप जैसे विवरण भरें।)</p></div><div class="guide-step"><strong>Step 3: Generate Prompt & Open AI</strong><p>Click the big "Start 🚀" button. This automatically copies the instructions for the AI and opens the Gemini website in a new tab.</p><p class="hindi-text">(चरण 3: 'Start 🚀' बटन पर क्लिक करें - यह AI के लिए निर्देश अपने आप कॉपी कर लेगा और एक नए टैब में Gemini वेबसाइट खोल देगा।)</p></div><div class="guide-step"><strong>Step 4: Use the AI (Gemini)</strong><p>In the Gemini website, just paste the prompt into the message box and send it. Wait for the AI to generate all the questions.</p><p class="hindi-text">(चरण 4: AI (Gemini) का उपयोग करें - Gemini वेबसाइट में, बस प्रॉम्प्ट को मैसेज बॉक्स में पेस्ट करें और भेजें। AI द्वारा सभी प्रश्न बनाने तक प्रतीक्षा करें।)</p></div><div class="guide-step"><strong>Step 5: Copy AI's Response</strong><p>After the questions are generated, copy the entire response. There are two ways to copy from Gemini: 1) Click the copy icon (like a clipboard 📋) below the answer. 2) Click the three dots (...) at the top-right of the response and select 'Copy'.</p><p class="hindi-text">(चरण 5: AI की प्रतिक्रिया कॉपी करें - प्रश्न बन जाने के बाद, पूरी प्रतिक्रिया कॉपी करें। Gemini से कॉपी करने के 2 तरीके हैं: 1) उत्तर के नीचे कॉपी आइकन (📋) पर क्लिक करें। 2) प्रतिक्रिया के ऊपर-दाईं ओर तीन डॉट्स (...) पर क्लिक करें और 'कॉपी करें' चुनें।)</p></div><div class="guide-step"><strong>Step 6: Return to Examyatri</strong><p>You have two choices: 1) Simply switch tabs from Gemini back to examyatri. 2) On mobile, you can press your phone's 'Back' navigation button twice. The questions will be created automatically!</p><p class="hindi-text">(चरण 6: Examyatri पर वापस आएं - आपके पास 2 विकल्प हैं: 1) बस Gemini से Gemini टैब पर वापस स्विच करें। 2) मोबाइल पर, आप अपने फोन का 'बैक' नेविगेशन बटन दो बार दबा सकते हैं। क्विज़ अपने आप बन जाएगा!)</p></div>`;
 
@@ -1435,8 +1456,8 @@ Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) 
 
     let isShakeReminderEnabled = true;
     let pressureTextCounter = 1;
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAE=');
-    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
+    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
     
     // --- INITIALIZATION ---
     async function init() {
@@ -1849,10 +1870,16 @@ Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) 
             }
         });
         
+        // --- MODIFIED CODE TO RENDER EXPLANATION WITH MATHJAX ---
         if (question.explanation) {
             elements.mpExplanationContainer.innerHTML = `<h4>Explanation</h4><p>${question.explanation}</p>`;
             elements.mpExplanationContainer.classList.remove('hidden');
+            // Ensure MathJax re-renders the new content
+            if (window.MathJax) {
+                MathJax.typesetPromise([elements.mpExplanationContainer]);
+            }
         }
+        // --- END OF MODIFICATION ---
     }
 
     function selectMultiplayerOption(index) {
@@ -2289,6 +2316,42 @@ Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) 
         if (sourceType === 'topic' && !topic) { alert('Please enter a Primary Topic.'); return; }
         if ((sourceType !== 'topic' && !sourceText) || !numQuestions) { alert('Please ensure you have provided source material and the number of questions.'); return; }
         if (!exam) { alert("Please select a target exam before generating questions."); return; }
+        
+        let formatInstruction = "";
+        let sampleFormat = "";
+
+        switch (formatKey) {
+            case 'mcq':
+                formatInstruction = "You MUST generate ONLY Multiple Choice (MCQ) questions.";
+                sampleFormat = MCQ_EXAMPLE;
+                break;
+            case 'statement':
+                formatInstruction = "You MUST generate ONLY Statement-Based questions.";
+                sampleFormat = STATEMENT_EXAMPLE;
+                break;
+            case 'assertion-reason':
+                formatInstruction = "You MUST generate ONLY Assertion-Reason questions.";
+                sampleFormat = AR_EXAMPLE;
+                break;
+            case 'math-physics':
+                 formatInstruction = "You MUST generate ONLY Math, Physics, or other formula-based questions using LaTeX for symbols.";
+                 sampleFormat = MATH_EXAMPLE;
+                break;
+            case 'true-false':
+                 formatInstruction = "You MUST generate ONLY True/False questions.";
+                 sampleFormat = TF_EXAMPLE;
+                break;
+            case 'fill-blank':
+                 formatInstruction = "You MUST generate ONLY Fill-in-the-Blank style questions.";
+                 sampleFormat = FILL_BLANK_EXAMPLE;
+                break;
+            case 'mix':
+            default:
+                formatInstruction = "Generate a mix of question formats based on the examples provided.";
+                sampleFormat = LEGACY_FORMAT_TEXT;
+                break;
+        }
+
 
         let prompt = `You are an expert at generating high-quality assessment questions in plain text format. Your responses must be very fast and precise.
 
@@ -2299,6 +2362,7 @@ CRITICAL INSTRUCTIONS (MUST be followed):
 4.  **Completeness:** Each question MUST have a question, all options, a single correct answer letter, and a detailed explanation.
 5.  **Math/Physics Symbols:** Use valid LaTeX for all formulas. Enclose all inline math with \\( ... \\) delimiters (e.g., \\(x^2\\)) and all display math with \\[ ... \\]. DO NOT use $ or $$.
 6.  **Terminology:** Use the term "questions" or "assessment". DO NOT use the word "quiz".
+7.  **Format Adherence:** ${formatInstruction}
 
 --- ASSESSMENT PARAMETERS ---
 *   **Number of Questions:** ${numQuestions}
@@ -2322,7 +2386,7 @@ CRITICAL INSTRUCTIONS (MUST be followed):
         prompt += `
 
 --- REQUIRED QUESTION SAMPLE FORMAT (Follow Strictly) ---
-${LEGACY_FORMAT_TEXT}
+${sampleFormat}
 -------------------------------------------------------
 `;
 
@@ -2443,6 +2507,8 @@ Now, generate the questions based on all the instructions above.`;
             if (headerText.includes('Assertion-Reason')) data.type = 'Assertion-Reason';
             else if (headerText.includes('Statement-Based')) data.type = 'Statement';
             else if (headerText.includes('Maths, Physics, or Other')) data.type = 'Maths';
+            else if (headerText.includes('True/False')) data.type = 'True/False';
+            else if (headerText.includes('Fill-in-the-Blank')) data.type = 'Fill-in-the-Blank';
             else data.type = 'MCQ';
 
             // Regex for standard questions
@@ -2516,7 +2582,7 @@ Now, generate the questions based on all the instructions above.`;
     function startQuiz(){ showScreen('player'); quizStartTime=new Date(); currentQuestionIndex=0; userAnswers=quizData.map((q, i)=>({selected:null,isCorrect:null,status:'unseen', startTime: null, endTime: null})); bookmarkedQuestions.clear(); originalQuizData=JSON.parse(JSON.stringify(quizData)); loadQuestion(0); }
     function loadQuestion(index){ if(index<0||index>=originalQuizData.length)return; currentQuestionIndex=index;selectedOptionIndex=null; const question=originalQuizData[currentQuestionIndex]; const answer=userAnswers[currentQuestionIndex]; elements.congratsAnimationContainer.innerHTML = ''; if (!clapSound.paused) { clapSound.pause(); clapSound.currentTime = 0; } pressureTextCounter = 1; const pressureTextEl = document.getElementById('pressure-text-animation'); if(pressureTextEl) pressureTextEl.classList.add('hidden'); document.getElementById('pressure-mode-toggle-btn').classList.remove('hidden'); if(answer.status==='answered'){ clearInterval(timerId); elements.timerText.textContent="--:--"; Object.values(elements.faces).forEach(face=>face.classList.remove('visible')) } else { resetAndStartQuestionTimer() } updateQuestionUI(question); updateOptionsAndExplanationState(); updateQuizActions(); if (window.MathJax) MathJax.typesetPromise([elements.quizPlayerContainer]); }
     function updateQuestionUI(q){ elements.questionTopic.textContent=quizMetaData.topic || ""; elements.progress.textContent=`Question ${currentQuestionIndex+1} / ${originalQuizData.length}`; elements.questionText.innerHTML=q.question.replace(/\n/g, '<br>'); elements.bookmarkBtn.classList.toggle('bookmarked',bookmarkedQuestions.has(currentQuestionIndex)); elements.statementsList.innerHTML=q.statements?.map(stmt=>`<p>• ${stmt}</p>`).join('')||''; elements.optionsContainer.innerHTML=''; q.options.forEach((optionText,i)=>{ const optionDiv=document.createElement('div'); optionDiv.className='option'; optionDiv.dataset.index=i; optionDiv.innerHTML=`<span class="option-text">${optionText}</span><div class="option-feedback"><span class="user-choice-emoji"></span><span class="feedback-icon"></span></div>`; elements.optionsContainer.appendChild(optionDiv); }); }
-    function updateOptionsAndExplanationState() { const answer = userAnswers[currentQuestionIndex]; const question = originalQuizData[currentQuestionIndex]; const correctEmojis = ['🥳', '🎉', '🤩', '👍', '💯']; const incorrectEmojis = ['🤔', '😟', '🤨', '🤦‍♂️', '❌']; document.querySelectorAll('.option').forEach((optionDiv, i) => { if (answer.status === 'answered') { optionDiv.classList.add('disabled'); if (i === question.correctAnswerIndex) { optionDiv.classList.add('correct'); optionDiv.querySelector('.feedback-icon').textContent = '✔️'; } if (i === answer.selected) { const userChoiceEmoji = optionDiv.querySelector('.user-choice-emoji'); if (answer.isCorrect) userChoiceEmoji.textContent = correctEmojis[Math.floor(Math.random() * correctEmojis.length)]; else { optionDiv.classList.add('incorrect'); optionDiv.querySelector('.feedback-icon').textContent = '❌'; userChoiceEmoji.textContent = incorrectEmojis[Math.floor(Math.random() * incorrectEmojis.length)]; } userChoiceEmoji.classList.add('visible'); } } }); const isAnswered = answer.status === 'answered'; elements.explanationContainer.classList.toggle('hidden', !isAnswered); if (isAnswered) { elements.explanationText.innerHTML = `<p>${question.explanation}</p>`; } }
+    function updateOptionsAndExplanationState() { const answer = userAnswers[currentQuestionIndex]; const question = originalQuizData[currentQuestionIndex]; const correctEmojis = ['🥳', '🎉', '🤩', '👍', '💯']; const incorrectEmojis = ['🤔', '😟', '🤨', '🤦‍♂️', '❌']; document.querySelectorAll('.option').forEach((optionDiv, i) => { if (answer.status === 'answered') { optionDiv.classList.add('disabled'); if (i === question.correctAnswerIndex) { optionDiv.classList.add('correct'); optionDiv.querySelector('.feedback-icon').textContent = '✔️'; } if (i === answer.selected) { const userChoiceEmoji = optionDiv.querySelector('.user-choice-emoji'); if (answer.isCorrect) userChoiceEmoji.textContent = correctEmojis[Math.floor(Math.random() * correctEmojis.length)]; else { optionDiv.classList.add('incorrect'); optionDiv.querySelector('.feedback-icon').textContent = '❌'; userChoiceEmoji.textContent = incorrectEmojis[Math.floor(Math.random() * incorrectEmojis.length)]; } userChoiceEmoji.classList.add('visible'); } } }); const isAnswered = answer.status === 'answered'; elements.explanationContainer.classList.toggle('hidden', !isAnswered); if (isAnswered) { elements.explanationText.innerHTML = question.explanation; } }
     function updateQuizActions() { elements.quizActions.innerHTML = ''; const prevBtn = document.createElement('button'); prevBtn.id = 'prev-question-btn'; prevBtn.className = 'btn btn-secondary quiz-actions-top-left'; prevBtn.textContent = '⬅️ Previous'; prevBtn.disabled = currentQuestionIndex === 0; elements.quizActions.appendChild(prevBtn); if (userAnswers[currentQuestionIndex].status !== 'answered') { const checkBtn = document.createElement('button'); checkBtn.id = 'check-answer-btn'; checkBtn.className = 'btn quiz-actions-top-right'; checkBtn.textContent = 'Check Answer ✅'; checkBtn.disabled = selectedOptionIndex === null; elements.quizActions.appendChild(checkBtn); const skipBtn = document.createElement('button'); skipBtn.id = 'skip-question-btn'; skipBtn.className = 'btn quiz-actions-bottom-left'; skipBtn.textContent = 'Skip ➡️'; elements.quizActions.appendChild(skipBtn); } else { const nextBtn = document.createElement('button'); nextBtn.id = 'next-question-btn'; nextBtn.className = 'btn quiz-actions-bottom-left'; nextBtn.textContent = 'Next ➡️'; nextBtn.disabled = currentQuestionIndex === originalQuizData.length - 1; elements.quizActions.appendChild(nextBtn); } const submitBtn = document.createElement('button'); submitBtn.id = 'submit-quiz-btn'; submitBtn.className = 'btn btn-danger quiz-actions-bottom-right'; submitBtn.textContent = 'Submit'; elements.quizActions.appendChild(submitBtn); }
     function handleBookmark(){bookmarkedQuestions.has(currentQuestionIndex)?bookmarkedQuestions.delete(currentQuestionIndex):bookmarkedQuestions.add(currentQuestionIndex);elements.bookmarkBtn.classList.toggle('bookmarked')}
     function handleSkip(){if(userAnswers[currentQuestionIndex].status==='unseen')userAnswers[currentQuestionIndex].status='skipped';if(currentQuestionIndex<originalQuizData.length-1)loadQuestion(currentQuestionIndex+1);else{const firstUnanswered=userAnswers.findIndex(ans=>ans.status!=='answered');if(firstUnanswered!==-1)loadQuestion(firstUnanswered);else forceSubmitQuiz()}}
