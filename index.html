@@ -15,11 +15,18 @@
 
   gtag('config', 'G-1HGZL93811');
 </script>
-  <!-- ADDED: MathJax for Math/Physics Formula Rendering -->
+  <!-- ADDED: MathJax for Math/Physics Formula Rendering (CORRECTED CONFIG) -->
 <script>
-  MathJax = {
+  window.MathJax = {
     tex: {
-      inlineMath: [['\\\\(', '\\\\)'], ['$', '$']] // Support for \(...\) and $...$ delimiters
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true
+    },
+    options: {
+      ignoreHtmlClass: 'tex2jax_ignore',
+      processHtmlClass: 'tex2jax_process'
     },
     svg: {
       fontCache: 'global'
@@ -824,7 +831,7 @@
         </div>
         <div class="input-group">
             <label for="room-code-input" class="input-label">Room Code</label>
-            <input type="text" id="room-code-input" class="input-field" placeholder="Enter the 6-digit code" maxlength="6">
+            <input type="text" id="room-code-input" class="input-field" placeholder="Enter the 6-digit code" maxlength="6" inputmode="numeric" pattern="[0-9]*">
         </div>
         <button id="submit-join-room-btn" class="btn btn-full-width btn-success">Join Room</button>
          <button class="btn btn-secondary back-to-multiplayer-selection-btn" style="margin-top: 1rem;">← Back</button>
@@ -1216,6 +1223,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'mix': { name: 'Mixed Format' }
     };
 
+    // --- UPDATED LEGACY_FORMAT_TEXT ---
+    // This text is used to generate the prompt for the AI.
     const LEGACY_FORMAT_TEXT = `1. Multiple Choice Questions
 Question: What is the capital of France?
 Options:
@@ -1223,7 +1232,7 @@ a) Berlin
 b) Madrid
 c) Paris
 d) Rome
-Correct Answer: c) Paris
+Correct Answer: c
 Explanation: Paris is the capital and most populous city of France.
 
 2. Assertion-Reason Based Questions
@@ -1234,7 +1243,7 @@ a) Both A and R are true and R is the correct explanation of A.
 b) Both A and R are true but R is not the correct explanation of A.
 c) A is true but R is false.
 d) A is false but R is true.
-Correct Answer: a) Both A and R are true and R is the correct explanation of A.
+Correct Answer: a
 Explanation: This phenomenon is known as Rayleigh scattering.
 
 3. Statement-Based Questions
@@ -1248,7 +1257,7 @@ a) 1 and 2 only
 b) 2 and 3 only
 c) 1 and 3 only
 d) 1, 2, and 3
-Correct Answer: d) 1, 2, and 3
+Correct Answer: d
 Explanation: All three statements are correct.
 
 4. Maths, Physics, or Other Questions
@@ -1258,8 +1267,8 @@ a) \\( 3x^3 + C \\)
 b) \\( x^3 + C \\)
 c) \\( 6x + C \\)
 d) \\( \\frac{1}{3}x^3 + C \\)
-Correct Answer: b) \\( x^3 + C \\)
-Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) is \\( x^3 \\). C is the constant of integration. For math symbols, you MUST use LaTeX format enclosed in \\( ... \\) delimiters.`;
+Correct Answer: b
+Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) is \\( x^3 + C \\). C is the constant of integration. For math symbols, you MUST use LaTeX format enclosed in \\( ... \\) delimiters.`;
 
     const commonGuideAfterInput = `<div class="guide-step"><strong>Step 2: Fill Question Details</strong><p>Fill in the details like Number of Questions, Subject, Language, Difficulty, Exam, and Question Format.</p><p class="hindi-text">(चरण 2: क्विज़ का विवरण भरें - प्रश्नों की संख्या, विषय, भाषा, कठिनाई, परीक्षा और प्रश्न प्रारूप जैसे विवरण भरें।)</p></div><div class="guide-step"><strong>Step 3: Generate Prompt & Open AI</strong><p>Click the big "Start 🚀" button. This automatically copies the instructions for the AI and opens the Gemini website in a new tab.</p><p class="hindi-text">(चरण 3: 'Start 🚀' बटन पर क्लिक करें - यह AI के लिए निर्देश अपने आप कॉपी कर लेगा और एक नए टैब में Gemini वेबसाइट खोल देगा।)</p></div><div class="guide-step"><strong>Step 4: Use the AI (Gemini)</strong><p>In the Gemini website, just paste the prompt into the message box and send it. Wait for the AI to generate all the questions.</p><p class="hindi-text">(चरण 4: AI (Gemini) का उपयोग करें - Gemini वेबसाइट में, बस प्रॉम्प्ट को मैसेज बॉक्स में पेस्ट करें और भेजें। AI द्वारा सभी प्रश्न बनाने तक प्रतीक्षा करें।)</p></div><div class="guide-step"><strong>Step 5: Copy AI's Response</strong><p>After the questions are generated, copy the entire response. There are two ways to copy from Gemini: 1) Click the copy icon (like a clipboard 📋) below the answer. 2) Click the three dots (...) at the top-right of the response and select 'Copy'.</p><p class="hindi-text">(चरण 5: AI की प्रतिक्रिया कॉपी करें - प्रश्न बन जाने के बाद, पूरी प्रतिक्रिया कॉपी करें। Gemini से कॉपी करने के 2 तरीके हैं: 1) उत्तर के नीचे कॉपी आइकन (📋) पर क्लिक करें। 2) प्रतिक्रिया के ऊपर-दाईं ओर तीन डॉट्स (...) पर क्लिक करें और 'कॉपी करें' चुनें।)</p></div><div class="guide-step"><strong>Step 6: Return to Examyatri</strong><p>You have two choices: 1) Simply switch tabs from Gemini back to examyatri. 2) On mobile, you can press your phone's 'Back' navigation button twice. The questions will be created automatically!</p><p class="hindi-text">(चरण 6: Examyatri पर वापस आएं - आपके पास 2 विकल्प हैं: 1) बस Gemini से Gemini टैब पर वापस स्विच करें। 2) मोबाइल पर, आप अपने फोन का 'बैक' नेविगेशन बटन दो बार दबा सकते हैं। क्विज़ अपने आप बन जाएगा!)</p></div>`;
 
@@ -1426,8 +1435,8 @@ Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) 
 
     let isShakeReminderEnabled = true;
     let pressureTextCounter = 1;
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAE=');
-    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//-BAAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAE=');
+    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
     
     // --- INITIALIZATION ---
     async function init() {
@@ -1515,7 +1524,7 @@ Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) 
             if (effectiveId === 'submit-join-room-btn') { handleJoinRoom(); return; }
             if (effectiveId === 'generate-code-btn') { handleGenerateCode(); return; }
             if (effectiveId === 'start-game-btn') { handleStartGame(); return; }
-            if (effectiveId === 'share-code-whatsapp-btn') { const text = `Join my Examyatri room! 🚀\n\nRoom Code: *${currentRoomCode}*\n\nClick the link to join: ${window.location.href}`; window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank'); return; }
+            if (effectiveId === 'share-code-whatsapp-btn') { const text = `Join my Examyatri room! 🚀\n\nRoom Code: \`${currentRoomCode}\`\n\nClick the link to join: ${window.location.href}`; window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank'); return; }
 
             // --- Generator Creation Method Selection ---
             if (effectiveId === 'select-from-topic') { showWorkflow('topic'); return; }
@@ -1630,7 +1639,7 @@ Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) 
     // --- MULTIPLAYER LOGIC ---
     async function handleJoinRoom() {
         const playerName = elements.playerNameJoinInput.value.trim();
-        const roomCode = elements.roomCodeInput.value.trim().toUpperCase();
+        const roomCode = elements.roomCodeInput.value.trim();
         if (!playerName || !roomCode) { alert('Please fill in all fields.'); return; }
         
         const { db, ref, get, set, push } = window.firebase;
@@ -1658,7 +1667,8 @@ Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) 
         if (!quizText) { alert('Error: Question text not found. Please go back and create the questions.'); return; }
 
         isHost = true;
-        currentRoomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        // UPDATED: Generate a 6-digit numeric code
+        currentRoomCode = Math.floor(100000 + Math.random() * 900000).toString();
         
         const { db, ref, set, push, serverTimestamp } = window.firebase;
         const playersRef = ref(db, `rooms/${currentRoomCode}/players`);
@@ -2269,6 +2279,7 @@ Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) 
     async function handleVisibilityChange() { if (!document.hidden && sessionStorage.getItem('promptGenerated') === 'true') await handleClipboardPermission(); }
     function showFlowchartGuide(guideId) { const guideContent = GUIDE_DATA[guideId]; if (guideContent) { elements.flowchartModalTitle.textContent = guideContent.title; elements.flowchartModalContent.innerHTML = guideContent.content; elements.flowchartModalOverlay.classList.remove('hidden'); } else { console.error('No guide found for ID:', guideId); } }
     
+    // --- UPDATED PROMPT GENERATION ---
     function generatePrompt(source, sourceType) {
         const { numQuestions, topic, subject, difficulty, language, formatKey, exam } = source;
         const sourceText = sourceType === 'pdf' ? elements.sourceTextPdf.value.trim() :
@@ -2284,9 +2295,10 @@ Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) 
 CRITICAL INSTRUCTIONS (MUST be followed):
 1.  **Output Format:** Provide the entire response as a single block of plain text. DO NOT use Markdown, JSON, code blocks, or any other formatting.
 2.  **Question Structure:** STRICTLY follow the sample format provided below for every single question.
-3.  **Completeness:** Each question MUST have a question, all options, a single correct answer, and a detailed explanation.
-4.  **Math/Physics Symbols:** Use MathJax format for all mathematical symbols and equations, enclosing them in \\( ... \\) delimiters.
-5.  **Terminology:** Use the term "questions" or "assessment". DO NOT use the word "quiz".
+3.  **Correct Answer Line:** The 'Correct Answer:' line MUST contain ONLY the letter of the correct option (e.g., "Correct Answer: c"). DO NOT include the text of the answer.
+4.  **Completeness:** Each question MUST have a question, all options, a single correct answer letter, and a detailed explanation.
+5.  **Math/Physics Symbols:** Use valid LaTeX for all formulas. Enclose all inline math with \\( ... \\) delimiters (e.g., \\(x^2\\)) and all display math with \\[ ... \\]. DO NOT use $ or $$.
+6.  **Terminology:** Use the term "questions" or "assessment". DO NOT use the word "quiz".
 
 --- ASSESSMENT PARAMETERS ---
 *   **Number of Questions:** ${numQuestions}
@@ -2331,12 +2343,42 @@ Now, generate the questions based on all the instructions above.`;
 
     async function executePostPromptActions(prompt) { clearFormState(); try { await copyTextToClipboard(prompt); } catch {} sessionStorage.setItem('promptGenerated', 'true'); sessionStorage.setItem('gameMode', gameMode); showScreen('paste'); openAiWithFallback(); }
     function openAiWithFallback() { const aiWindow = window.open('https://gemini.google.com', '_blank'); if (!aiWindow || aiWindow.closed || typeof aiWindow.closed === 'undefined') { showPasteNotification('⚠️ Popup blocked! Click the link to open manually.'); elements.aiLinkFallback.classList.remove('hidden'); } else { elements.aiLinkFallback.classList.add('hidden'); } }
-    function generateTopicPrompt() { quizMetaData = { topic: document.getElementById('prompt-topic').value.trim(), subject: document.getElementById('prompt-subject-topic').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-topic').value || 5, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-topic').value, language: document.getElementById('prompt-language-topic').value, formatKey: document.getElementById('question-format-select-topic').value, exam: (selectedExam === 'Custom') ? elements.topicGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'topic'); }
-    function generateTextPrompt() { quizMetaData = { topic: '', subject: document.getElementById('prompt-subject-text').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-text').value, topic: '', subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-text').value, language: document.getElementById('prompt-language-text').value, formatKey: document.getElementById('question-format-select-text').value, exam: (selectedExam === 'Custom') ? elements.textGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'text'); }
-    function generateImagePrompt() { quizMetaData = { topic: document.getElementById('prompt-topic-image').value.trim(), subject: document.getElementById('prompt-subject-image').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-image').value, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-image').value, language: document.getElementById('prompt-language-image').value, formatKey: document.getElementById('question-format-select-image').value, exam: (selectedExam === 'Custom') ? elements.imageGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'image'); }
-    function generatePdfPrompt() { quizMetaData = { topic: document.getElementById('prompt-topic-pdf').value.trim(), subject: document.getElementById('prompt-subject-pdf').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-pdf').value, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-pdf').value, language: document.getElementById('prompt-language-pdf').value, formatKey: document.getElementById('question-format-select-pdf').value, exam: (selectedExam === 'Custom') ? elements.pdfGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'pdf'); }
+    function generateTopicPrompt() { quizMetaData = { topic: document.getElementById('prompt-topic').value.trim(), subject: document.getElementById('prompt-subject-topic').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-topic').value || 5, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-topic').value, language: document.getElementById('prompt-language-topic').value, formatKey: document.getElementById('question-format-select-topic').value, exam: (selectedExam === 'Other') ? elements.topicGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'topic'); }
+    function generateTextPrompt() { quizMetaData = { topic: '', subject: document.getElementById('prompt-subject-text').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-text').value, topic: '', subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-text').value, language: document.getElementById('prompt-language-text').value, formatKey: document.getElementById('question-format-select-text').value, exam: (selectedExam === 'Other') ? elements.textGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'text'); }
+    function generateImagePrompt() { quizMetaData = { topic: document.getElementById('prompt-topic-image').value.trim(), subject: document.getElementById('prompt-subject-image').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-image').value, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-image').value, language: document.getElementById('prompt-language-image').value, formatKey: document.getElementById('question-format-select-image').value, exam: (selectedExam === 'Other') ? elements.imageGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'image'); }
+    function generatePdfPrompt() { quizMetaData = { topic: document.getElementById('prompt-topic-pdf').value.trim(), subject: document.getElementById('prompt-subject-pdf').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-pdf').value, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-pdf').value, language: document.getElementById('prompt-language-pdf').value, formatKey: document.getElementById('question-format-select-pdf').value, exam: (selectedExam === 'Other') ? elements.pdfGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'pdf'); }
     function setupAllExamSelectors() { document.querySelectorAll('.exam-buttons-container').forEach(container => { const inputField = container.nextElementSibling; populateExamButtons(container, inputField); }); }
-    function populateExamButtons(container, inputField) { const exams = ["JEE", "NEET", "BANK", "RRB", "NEET PG", "CTET", "State PSC", "Police","UPSSSC", "CUET", "UPSC", "SSC", "CBSE", "Other"]; container.innerHTML = exams.map(exam => `<button class="btn exam-btn" data-exam-name="${exam}">${exam}</button>`).join(''); container.addEventListener('click', e => { if (e.target.classList.contains('exam-btn')) { const clickedBtn = e.target; const examName = clickedBtn.dataset.examName; container.querySelectorAll('.exam-btn').forEach(btn => btn.classList.remove('active')); clickedBtn.classList.add('active'); selectedExam = examName; if (inputField) { inputField.classList.toggle('hidden', examName !== 'Custom'); if (examName === 'Custom') { selectedExam = inputField.value.trim(); inputField.focus(); } else { inputField.value = ''; } } } }); if (inputField) { inputField.addEventListener('input', () => { if (selectedExam === 'Custom' || container.querySelector('.exam-btn.active')?.dataset.examName === 'Custom') { selectedExam = inputField.value.trim(); } }); } }
+    
+    // FIX: This function now correctly handles the "Other" button.
+    function populateExamButtons(container, inputField) { 
+        const exams = ["JEE", "NEET", "BANK", "RRB", "NEET PG", "CTET", "State PSC", "Police","UPSSSC", "CUET", "UPSC", "SSC", "CBSE", "Other"]; 
+        container.innerHTML = exams.map(exam => `<button class="btn exam-btn" data-exam-name="${exam}">${exam}</button>`).join(''); 
+        container.addEventListener('click', e => { 
+            if (e.target.classList.contains('exam-btn')) { 
+                const clickedBtn = e.target; 
+                const examName = clickedBtn.dataset.examName; 
+                container.querySelectorAll('.exam-btn').forEach(btn => btn.classList.remove('active')); 
+                clickedBtn.classList.add('active'); 
+                selectedExam = examName; 
+                if (inputField) { 
+                    inputField.classList.toggle('hidden', examName !== 'Other'); 
+                    if (examName === 'Other') { 
+                        selectedExam = inputField.value.trim(); 
+                        inputField.focus(); 
+                    } else { 
+                        inputField.value = ''; 
+                    } 
+                } 
+            } 
+        }); 
+        if (inputField) { 
+            inputField.addEventListener('input', () => { 
+                if (container.querySelector('.exam-btn.active')?.dataset.examName === 'Other') { 
+                    selectedExam = inputField.value.trim(); 
+                } 
+            }); 
+        } 
+    }
     
     function handlePdfSelection(event) { pdfFile = event.target.files[0]; if (pdfFile) { elements.pdfFileName.textContent = pdfFile.name; elements.pdfOptionsContainer.classList.remove('hidden'); elements.pdfQuizDefinitionArea.classList.add('hidden'); elements.pdfStatus.textContent = ''; } }
     
@@ -2377,13 +2419,56 @@ Now, generate the questions based on all the instructions above.`;
     async function handleImageSelection(event) { const newFiles = Array.from(event.target.files); if (newFiles.length === 0) return; imageFiles = []; elements.sourceTextImage.value = ''; elements.imageQuizDefinitionArea.classList.add('hidden'); elements.ocrStatus.textContent = ''; updateImagePreviews(); processAndExtractAllImages(newFiles); event.target.value = ''; }
     function addImageFile(file) { imageFiles.push({ originalFile: file, id: `img_${Date.now()}_${Math.random()}`, croppedFile: null, previewUrl: null, }); updateImagePreviews(); }
     function updateImagePreviews() { elements.imagePreviewContainer.innerHTML = ''; imageFiles.forEach(imgFile => { const fileForPreview = imgFile.croppedFile || imgFile.originalFile; if(imgFile.previewUrl) URL.revokeObjectURL(imgFile.previewUrl); imgFile.previewUrl = URL.createObjectURL(fileForPreview); const wrapper = document.createElement('div'); wrapper.className = 'img-preview-wrapper'; wrapper.innerHTML = `<div class="img-container"><img src="${imgFile.previewUrl}" alt="Image preview"></div><div class="img-preview-actions"><button class="img-preview-btn crop-btn" data-id="${imgFile.id}" title="Crop">✂️</button><button class="img-preview-btn remove-btn" data-id="${imgFile.id}" title="Remove">🗑️</button></div>`; elements.imagePreviewContainer.appendChild(wrapper); }); }
-    function removeImage(idToRemove) { const indexToRemove = imageFiles.findIndex(f => f.id === idToRemove); if (indexToRemove > -1) { if (imageFiles[indexToRemove].previewUrl) URL.revokeObjectURL(imageFiles[indexToRemove].previewUrl); imageFiles.splice(indexToRemove, 1); updateImagePreviews(); const remainingFiles = imageFiles.map(f => f.croppedFile || f.originalFile); processAndExtractAllImages(remainingFiles); } }
+    function removeImage(idToRemove) { const indexToRemove = imageFiles.findIndex(f => f.id === idToRemove); if (indexToRemove > -1) { if (imageFiles[indexToRemove].previewUrl) URL.revokeObjectURL(imageFiles[indexToRemove].previewUrl); imageFiles.splice(indexToRemove, 1); updateImagePreviews(); const remainingFiles = imageFiles.map(f => f.croppedFile || f.originalFile); showLoading("Re-extracting text from cropped image..."); processAndExtractAllImages(remainingFiles); } }
     function openCropModal(imageId) { const imgFile = imageFiles.find(f => f.id === imageId); if (!imgFile) return; currentEditingImageId = imageId; const fileToCrop = imgFile.croppedFile || imgFile.originalFile; elements.imageToCrop.src = URL.createObjectURL(fileToCrop); elements.cropModalOverlay.classList.remove('hidden'); elements.imageToCrop.onload = () => { if (cropper) cropper.destroy(); cropper = new Cropper(elements.imageToCrop, { aspectRatio: NaN, viewMode: 1, background: false, autoCropArea: 0.9, }); }; }
     function closeCropModal() { if(cropper) cropper.destroy(); cropper = null; currentEditingImageId = null; elements.cropModalOverlay.classList.add('hidden'); }
     function saveCrop() { if (!cropper || !currentEditingImageId) return; cropper.getCroppedCanvas({ minWidth: 256, maxWidth: 4096, imageSmoothingQuality: 'high' }).toBlob((blob) => { const imgFile = imageFiles.find(f => f.id === currentEditingImageId); if(imgFile) { imgFile.croppedFile = blob; updateImagePreviews(); const currentFiles = imageFiles.map(f => f.croppedFile || f.originalFile); showLoading("Re-extracting text from cropped image..."); processAndExtractAllImages(currentFiles); } closeCropModal(); }); }
     function validateParsedData(questions) { for (let i = 0; i < questions.length; i++) { const q = questions[i]; const qNum = i + 1; if (!q.question || q.question.trim() === '') return { isValid: false, error: `Question ${qNum} is missing its main text.` }; if (!q.options || q.options.length < 2) return { isValid: false, error: `Question ${qNum} has fewer than two options.` }; if (typeof q.correctAnswerIndex !== 'number' || q.correctAnswerIndex < 0 || q.correctAnswerIndex >= q.options.length) return { isValid: false, error: `Could not find a valid correct answer for Question ${qNum}. Check the 'Correct Answer' line.` }; if (!q.explanation || q.explanation.trim() === '') return { isValid: false, error: `Question ${qNum} is missing its explanation.` }; } return { isValid: true }; }
     function transformParsedData_Legacy(parsedQuestions) { return parsedQuestions.map(q => { if (!q) return null; const cleanedOptions = q.options.map(opt => opt.replace(/^[a-zA-Z]\)\s*/, '').trim()); const correctAnswerIndex = q.options.findIndex(opt => opt.trim().toLowerCase().startsWith(q.answer.toLowerCase() + ')')); if (correctAnswerIndex === -1) { console.error("Could not find correct answer for question:", q); return null; } let finalQuestionText = q.question; let statements = []; if (q.type === 'Statement' || q.question.includes('*')) { const parts = q.question.split(/Which of the above statements are correct\?/i); if (parts.length > 1) { finalQuestionText = `Which of the above statements are correct?`; statements = parts[0].split('*').map(s => s.trim()).filter(s => s); } } else if (q.type === 'Assertion-Reason') { finalQuestionText = q.question.replace(/<br>/g, '\n'); } return { question: finalQuestionText, options: cleanedOptions, correctAnswerIndex: correctAnswerIndex, explanation: q.explanation, statements: statements, image: null, }; }).filter(Boolean); }
-    function parseQuizText_Legacy(text) { if (!text || !text.trim()) return []; const questionBlocks = text.trim().split(/\n(?=\d+\.\s)/); return questionBlocks.map(block => { const fullBlock = block.trim(); const headerMatch = fullBlock.match(/^\d+\.\s(.*?Questions)/); if (!headerMatch) return null; let data = { type: 'Unknown', question: '', options: [], answer: '', explanation: '' }; const headerText = headerMatch[1]; if (headerText.includes('Assertion-Reason')) data.type = 'Assertion-Reason'; else if (headerText.includes('Statement-Based')) data.type = 'Statement'; else if (headerText.includes('Maths, Physics, or Other')) data.type = 'Maths'; else data.type = 'MCQ'; const questionRegex = /Question:([\s\S]*?)Options:\n([\s\S]*?)Correct Answer:([\s\S]*?)(?:Explanation:([\s\S]*))?$/; const arRegex = /Assertion \(A\):([\s\S]*?)Reason \(R\):([\s\S]*?)Options:\n([\s\S]*?)Correct Answer:([\s\S]*?)(?:Explanation:([\s\S]*))?$/; const match = (data.type === 'Assertion-Reason') ? fullBlock.match(arRegex) : fullBlock.match(questionRegex); if (match) { if (data.type === 'Assertion-Reason') { data.question = `Assertion (A): ${match[1].trim()}\nReason (R): ${match[2].trim()}`; data.options = match[3].trim().split('\n').map(opt => opt.trim()); data.answer = match[4].trim().split(')')[0].trim(); data.explanation = (match[5] || 'No explanation provided.').trim(); } else { data.question = match[1].trim(); data.options = match[2].trim().split('\n').map(opt => opt.trim()); data.answer = match[3].trim().split(')')[0].trim(); data.explanation = (match[4] || 'No explanation provided.').trim(); } return data; } return null; }).filter(Boolean); }
+    
+    // --- UPDATED PARSING LOGIC ---
+    function parseQuizText_Legacy(text) {
+        if (!text || !text.trim()) return [];
+        // Split questions based on a number followed by a period at the start of a line.
+        const questionBlocks = text.trim().split(/\n(?=\d+\.\s)/);
+        
+        return questionBlocks.map(block => {
+            const fullBlock = block.trim();
+            // Match the header to determine the question type
+            const headerMatch = fullBlock.match(/^\d+\.\s(.*?Questions)/);
+            if (!headerMatch) return null;
+
+            let data = { type: 'Unknown', question: '', options: [], answer: '', explanation: '' };
+            const headerText = headerMatch[1];
+            if (headerText.includes('Assertion-Reason')) data.type = 'Assertion-Reason';
+            else if (headerText.includes('Statement-Based')) data.type = 'Statement';
+            else if (headerText.includes('Maths, Physics, or Other')) data.type = 'Maths';
+            else data.type = 'MCQ';
+
+            // Regex for standard questions
+            const questionRegex = /Question:([\s\S]*?)Options:\n([\s\S]*?)Correct Answer:([\s\S]*?)(?:Explanation:([\s\S]*))?$/;
+            // Regex for Assertion-Reason questions
+            const arRegex = /Assertion \(A\):([\s\S]*?)Reason \(R\):([\s\S]*?)Options:\n([\s\S]*?)Correct Answer:([\s\S]*?)(?:Explanation:([\s\S]*))?$/;
+
+            const match = (data.type === 'Assertion-Reason') ? fullBlock.match(arRegex) : fullBlock.match(questionRegex);
+
+            if (match) {
+                if (data.type === 'Assertion-Reason') {
+                    data.question = `Assertion (A): ${match[1].trim()}\nReason (R): ${match[2].trim()}`;
+                    data.options = match[3].trim().split('\n').map(opt => opt.trim());
+                    data.answer = match[4].trim().split(')')[0].trim(); // Get the letter before ')'
+                    data.explanation = (match[5] || 'No explanation provided.').trim();
+                } else {
+                    data.question = match[1].trim();
+                    data.options = match[2].trim().split('\n').map(opt => opt.trim());
+                    data.answer = match[3].trim().split(')')[0].trim(); // Get the letter before ')'
+                    data.explanation = (match[4] || 'No explanation provided.').trim();
+                }
+                return data;
+            }
+            return null;
+        }).filter(Boolean);
+    }
     async function restartQuiz() { clearFormState(); sessionStorage.removeItem('promptGenerated'); await dbHelper.clear(); window.location.reload(); }
     async function handleHardReset() {
         const confirmation = confirm("⚠️ WARNING! ⚠️\n\nAre you sure you want to go to the Home Page?\n\nThis will DELETE ALL your current data from this device and from any online game you are in. This action cannot be undone.");
@@ -2439,7 +2524,7 @@ Now, generate the questions based on all the instructions above.`;
     function selectOption(index){ if(userAnswers[currentQuestionIndex].status==='answered')return; optionClickSound.play(); selectedOptionIndex=index; document.querySelectorAll('.option').forEach((opt,i)=>opt.classList.toggle('selected',i===index)); const checkBtn = document.getElementById('check-answer-btn'); if(checkBtn) checkBtn.disabled=false; }
     function checkAnswer(){ if (selectedOptionIndex === null) return; const question=originalQuizData[currentQuestionIndex];const isCorrect=selectedOptionIndex===question.correctAnswerIndex;userAnswers[currentQuestionIndex]={selected:selectedOptionIndex,isCorrect:isCorrect,status:'answered'}; const pressureTextEl = document.getElementById('pressure-text-animation');if(pressureTextEl) pressureTextEl.classList.add('hidden');document.getElementById('pressure-mode-toggle-btn').classList.remove('hidden'); if(isCorrect) triggerCongratsAnimation(); else showSadReaction(); updateQuestionUI(originalQuizData[currentQuestionIndex]); updateOptionsAndExplanationState(); updateQuizActions(); if (window.MathJax) MathJax.typesetPromise([elements.quizPlayerContainer]); }
     function animateCountUp(el, end, duration = 1000) { let start = 0; const final = parseInt(end, 10); if (isNaN(final)) { el.textContent = end; return; } let startTimestamp = null; const step = (timestamp) => { if (!startTimestamp) startTimestamp = timestamp; const progress = Math.min((timestamp - startTimestamp) / duration, 1); el.textContent = Math.floor(progress * (final - start) + start); if (progress < 1) window.requestAnimationFrame(step); }; window.requestAnimationFrame(step); }
-    function showResults(){ showScreen('results'); if(timerId) clearInterval(timerId); const totalQuestions = originalQuizData.length; const correctCount = userAnswers.filter(ans => ans.isCorrect).length; const incorrectCount = userAnswers.filter(ans => ans.status === 'answered' && !ans.isCorrect).length; const skippedCount = totalQuestions - correctCount - incorrectCount; const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0; let remark=percentage>=90?"Excellent!":percentage>=75?"Great Job!":percentage>=50?"Good Effort!":"Needs Improvement"; const timeDiff=Math.round(((new Date())-quizStartTime)/1000); const timeTaken=`${String(Math.floor(timeDiff/60)).padStart(2,'0')}:${String(timeDiff%60).padStart(2,'0')}`; elements.scoreSummary.textContent=`You scored ${correctCount} out of ${totalQuestions}!`; setTimeout(() => { elements.scoreSummary.classList.add('visible'); }, 100); elements.scorePerformanceChartContainer.innerHTML = ''; elements.quizSummaryDetails.innerHTML=` <div class="summary-item"> <span class="summary-label">Status</span> <span class="summary-value remark">${remark}</span> </div> <div class="summary-item"> <span class="summary-label">Final Score</span> <span class="summary-value">${percentage.toFixed(1)}%</span> </div> <div class="summary-item"> <span class="summary-label">Correct Answers</span> <span class="summary-value" style="color: var(--correct-color);">${correctCount} / ${totalQuestions}</span> </div> <div class="summary-item"> <span class="summary-label">Incorrect Answers</span> <span class="summary-value" style="color: var(--incorrect-color);">${incorrectCount}</span> </div> <div class="summary-item"> <span class="summary-label">Skipped Questions</span> <span class="summary-value" style="color: var(--skipped-color);">${skippedCount}</span> </div> <div class="summary-item"> <span class="summary-label">Time Taken</span> <span class="summary-value">${timeTaken}</span> </div>`; document.querySelectorAll('.count-up').forEach(el => animateCountUp(el, el.dataset.value)); elements.resultsReview.innerHTML=originalQuizData.map((q,i)=>{const answer=userAnswers[i];const optionsHtml=q.options.map((opt,oi)=>{let classes='result-option';if(answer.status==='answered'&&oi===answer.selected)classes+=' user-selected';if(oi===q.correctAnswerIndex)classes+=' correct-answer';return`<li class="${classes}">${opt}</li>`}).join('');return`<div class="result-item"><p class="result-question"><strong>Q${i + 1}:</strong> ${q.question.replace(/<[^>]*>/g, '')}<span class="bookmark-indicator ${bookmarkedQuestions.has(i)?'visible':''}">⭐</span></p><ul class="result-options-list">${optionsHtml}</ul><div class="result-explanation"><h5>Explanation</h5><p>${q.explanation.replace(/<[^>]*>/g, '')}</p></div></div>`}).join(''); if (window.MathJax) MathJax.typesetPromise([elements.resultsScreen]); }
+    function showResults(){ showScreen('results'); if(timerId) clearInterval(timerId); const totalQuestions = originalQuizData.length; const correctCount = userAnswers.filter(ans => ans.isCorrect).length; const incorrectCount = userAnswers.filter(ans => ans.status === 'answered' && !ans.isCorrect).length; const skippedCount = totalQuestions - correctCount - incorrectCount; const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0; let remark=percentage>=90?"Excellent!":percentage>=75?"Great Job!":percentage>=50?"Good Effort!":"Needs Improvement"; const timeDiff=Math.round(((new Date())-quizStartTime)/1000); const timeTaken=`${String(Math.floor(timeDiff/60)).padStart(2,'0')}:${String(timeDiff%60).padStart(2,'0')}`; elements.scoreSummary.textContent=`You scored ${correctCount} out of ${totalQuestions}!`; setTimeout(() => { elements.scoreSummary.classList.add('visible'); }, 100); elements.scorePerformanceChartContainer.innerHTML = ''; elements.quizSummaryDetails.innerHTML=` <div class="summary-item"> <span class="summary-label">Status</span> <span class="summary-value remark">${remark}</span> </div> <div class="summary-item"> <span class="summary-label">Final Score</span> <span class="summary-value">${percentage.toFixed(1)}%</span> </div> <div class="summary-item"> <span class="summary-label">Correct Answers</span> <span class="summary-value" style="color: var(--correct-color);">${correctCount} / ${totalQuestions}</span> </div> <div class="summary-item"> <span class="summary-label">Incorrect Answers</span> <span class="summary-value" style="color: var(--incorrect-color);">${incorrectCount}</span> </div> <div class="summary-item"> <span class="summary-label">Skipped Questions</span> <span class="summary-value" style="color: var(--skipped-color);">${skippedCount}</span> </div> <div class="summary-item"> <span class="summary-label">Time Taken</span> <span class="summary-value">${timeTaken}</span> </div>`; document.querySelectorAll('.count-up').forEach(el => animateCountUp(el, el.dataset.value)); elements.resultsReview.innerHTML=originalQuizData.map((q,i)=>{const answer=userAnswers[i];const optionsHtml=q.options.map((opt,oi)=>{let classes='result-option';if(answer.status==='answered'&&oi===answer.selected)classes+=' user-selected';if(oi===q.correctAnswerIndex)classes+=' correct-answer';return`<li class="${classes}">${opt}</li>`}).join('');return`<div class="result-item"><p class="result-question"><strong>Q${i + 1}:</strong> ${q.question.replace(/<[^>]*>/g, '')}<span class="bookmark-indicator ${bookmarkedQuestions.has(i)?'visible':''}">⭐</span></p><ul class="result-options-list">${optionsHtml}</ul><div class="result-explanation"><h5>Explanation</h5><p>${q.explanation}</p></div></div>`}).join(''); if (window.MathJax) MathJax.typesetPromise([elements.resultsScreen]); }
 
 });
 </script>
