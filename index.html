@@ -855,8 +855,8 @@
             </div>
              <button class="btn btn-secondary back-to-mode-selection-btn" style="grid-column: 1 / -1; margin-top: 1rem;">← Back to Main Menu</button>
         </div>
-        <!-- All generator workflows (Topic, Text, Image, PDF) from file 67 exist here -->
-         <!-- WORKFLOW 1: From Topic -->
+
+        <!-- WORKFLOW 1: From Topic -->
         <div id="topic-generator-workflow" class="hidden">
             <div class="step-header-container">
               <h3 class="step-header">Step 1: Define Your Questions</h3>
@@ -923,7 +923,18 @@
               </div>
             </div>
             <p>Select your images. The system will automatically extract the text.</p>
+            
+            <div class="input-group">
+                <label for="ocr-language-select-image" class="input-label">Document Language</label>
+                <select id="ocr-language-select-image" class="input-field">
+                    <option value="eng" selected>English</option>
+                    <option value="hin">Hindi (हिन्दी)</option>
+                    <option value="eng+hin">Mix (English + Hindi)</option>
+                </select>
+            </div>
+
             <div id="image-input-area"><button id="select-images-btn" class="btn btn-secondary glowing">📂 Select Images</button><input type="file" id="image-file-input" multiple accept="image/*" class="hidden"></div>
+
             <div class="handwriting-toggle-group">
                 <label for="handwriting-toggle">
                     <input type="checkbox" id="handwriting-toggle"> This image contains handwriting
@@ -957,6 +968,16 @@
                   <span class="guide-help-text">How to use</span>
               </div>
             </div>
+            
+            <div class="input-group" id="pdf-ocr-language-container">
+                <label for="ocr-language-select-pdf" class="input-label">Document Language (for OCR)</label>
+                <select id="ocr-language-select-pdf" class="input-field">
+                    <option value="eng" selected>English</option>
+                    <option value="hin">Hindi (हिन्दी)</option>
+                    <option value="eng+hin">Mix (English + Hindi)</option>
+                </select>
+            </div>
+
             <div id="pdf-input-area">
                 <button id="select-pdf-btn" class="btn btn-secondary glowing">📂 Select PDF</button>
                 <input type="file" id="pdf-file-input" accept=".pdf" class="hidden">
@@ -965,8 +986,8 @@
             <div id="pdf-options-container" class="hidden fade-in-slide-up">
                 <div class="input-group">
                     <label class="input-label">Extraction Options</label>
-                    <label><input type="radio" name="pdf-page-option" id="pdf-page-option-all" value="all" checked> Extract All Pages</label><br>
-                    <label><input type="radio" name="pdf-page-option" id="pdf-page-option-range" value="range"> Extract Page Range</label>
+                    <label><input type="radio" name="pdf-page-option" id="pdf-page-option-all" value="all"> Extract All Pages</label><br>
+                    <label><input type="radio" name="pdf-page-option" id="pdf-page-option-range" value="range" checked> Extract Page Range</label>
                     <div id="pdf-page-range-selector" class="hidden" style="margin-top: 10px;">
                         <div class="page-range-container">
                             <label for="pdf-page-from">From:</label>
@@ -977,8 +998,9 @@
                     </div>
                 </div>
                 <div class="input-group">
-                    <label><input type="checkbox" id="pdf-force-ocr" checked> Force OCR (for scanned or image-based PDFs)</label>
+                    <label><input type="checkbox" id="pdf-force-ocr"> Force OCR (for scanned or image-based PDFs)</label>
                 </div>
+
                 <button id="extract-text-pdf-btn" class="btn btn-full-width glowing">🔍 Extract Text from PDF</button>
                 <div id="pdf-status"></div>
             </div>
@@ -1352,6 +1374,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         pdfOptionsContainer: document.getElementById('pdf-options-container'),
         pdfPageRangeSelector: document.getElementById('pdf-page-range-selector'),
         pdfForceOcrCheckbox: document.getElementById('pdf-force-ocr'),
+        pdfOcrLanguageContainer: document.getElementById('pdf-ocr-language-container'), // Added for the fix
         pdfStatus: document.getElementById('pdf-status'),
         pdfQuizDefinitionArea: document.getElementById('pdf-quiz-definition-area'),
         sourceTextPdf: document.getElementById('source-text-pdf'),
@@ -1443,8 +1466,10 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     let cropper = null;
     let currentEditingImageId = null;
     let selectedExam = '';
+    
+    // --- OCR State (FIX) ---
     let ocrWorker = null;
-    let isOcrEngineReady = false;
+    let currentOcrLang = null; // Tracks the language of the current ocrWorker instance
     let promptForGemini = null;
 
     // Multiplayer State
@@ -1456,8 +1481,8 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
     let isShakeReminderEnabled = true;
     let pressureTextCounter = 1;
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
-    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
+    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
     
     // --- INITIALIZATION ---
     async function init() {
@@ -1469,9 +1494,8 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         loadFormState();
         loadScrollPosition();
         loadPressureModeSettings();
-
-        // OCR ENHANCEMENT: Pre-load OCR engine on page load to reduce waiting time for the user.
-        initializeOcrEngine(); 
+        
+        document.getElementById('pdf-force-ocr').checked = true;
         
         await dbHelper.init();
         
@@ -1553,7 +1577,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             // --- Generator Creation Method Selection ---
             if (effectiveId === 'select-from-topic') { showWorkflow('topic'); return; }
             if (effectiveId === 'select-from-text') { showWorkflow('text'); return; }
-            // OCR ENHANCEMENT: The initializeOcrEngine() call is removed from here as it's now pre-loaded.
             if (effectiveId === 'select-from-image') { showWorkflow('image'); return; }
             if (effectiveId === 'select-from-pdf') { showWorkflow('pdf'); return; }
 
@@ -1619,7 +1642,20 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         // --- Other non-click event listeners ---
         elements.imageFileInput.addEventListener('change', handleImageSelection);
         elements.pdfFileInput.addEventListener('change', handlePdfSelection);
-        document.querySelectorAll('input[name="pdf-page-option"]').forEach(radio => radio.addEventListener('change', (e) => elements.pdfPageRangeSelector.classList.toggle('hidden', e.target.value !== 'range')));
+        elements.pdfForceOcrCheckbox.addEventListener('change', (e) => {
+             const langContainer = elements.pdfOcrLanguageContainer;
+             if(langContainer) {
+                langContainer.classList.toggle('hidden', !e.target.checked);
+             }
+        });
+
+        document.querySelectorAll('input[name="pdf-page-option"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const isRange = e.target.value === 'range';
+                elements.pdfPageRangeSelector.classList.toggle('hidden', !isRange);
+            });
+        });
+
         document.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('beforeunload', saveQuizState);
         elements.quizDataInput.addEventListener('focus', tryAutoPasteOnFocus);
@@ -1874,16 +1910,13 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             }
         });
         
-        // --- MODIFIED CODE TO RENDER EXPLANATION WITH MATHJAX ---
         if (question.explanation) {
             elements.mpExplanationContainer.innerHTML = `<h4>Explanation</h4><p>${question.explanation}</p>`;
             elements.mpExplanationContainer.classList.remove('hidden');
-            // Ensure MathJax re-renders the new content
             if (window.MathJax) {
                 MathJax.typesetPromise([elements.mpExplanationContainer]);
             }
         }
-        // --- END OF MODIFICATION ---
     }
 
     function selectMultiplayerOption(index) {
@@ -2154,33 +2187,47 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
 
     // --- OCR & Image/PDF Processing (UPGRADED) ---
-    async function initializeOcrEngine(statusEl = null) {
-        if (isOcrEngineReady) return;
-        
-        const updateStatus = (text) => {
-            if (statusEl) statusEl.textContent = text;
-            // Also log to console for background loading
-            console.log(`OCR Status: ${text}`);
-        };
+    async function getOcrWorker(lang, statusEl) {
+        // If we have a worker and the language is already correct, return it.
+        if (ocrWorker && currentOcrLang === lang) {
+            return ocrWorker;
+        }
 
-        updateStatus('Initializing OCR Engine (this happens once)...');
+        // If a worker exists but for a different language, terminate it.
+        if (ocrWorker) {
+            statusEl.textContent = 'Switching OCR language model...';
+            await ocrWorker.terminate();
+            ocrWorker = null;
+            currentOcrLang = null;
+        }
+
+        const langName = {
+            'eng': 'English',
+            'hin': 'Hindi',
+            'eng+hin': 'English+Hindi'
+        }[lang];
+
+        statusEl.textContent = `Initializing ${langName} OCR Engine (this happens once per language)...`;
         try {
-            // OCR ENHANCEMENT: Load both English and Hindi models for handwriting and font support.
-            ocrWorker = await Tesseract.createWorker('eng+hin', 1, {
+            ocrWorker = await Tesseract.createWorker(lang, 1, {
                 logger: m => {
                     if (m.status === 'recognizing text') {
                         const progress = (m.progress * 100).toFixed(0);
-                        updateStatus(`Recognizing Text... ${progress}%`);
+                        statusEl.textContent = `Recognizing Text... ${progress}%`;
                     } else if (m.status === 'loading language model') {
-                         updateStatus('Loading Language Model... (may take a moment on first load)');
+                         statusEl.textContent = `Loading ${langName} Model... (may take a moment on first load)`;
                     }
                 }
             });
-            isOcrEngineReady = true;
-            updateStatus('OCR Engine is ready.');
+            currentOcrLang = lang; // Set the current language
+            statusEl.textContent = `${langName} OCR Engine is ready.`;
+            return ocrWorker;
         } catch (error) {
             console.error("Failed to initialize OCR worker:", error);
-            updateStatus('Error: Could not initialize OCR engine.');
+            statusEl.textContent = `Error: Could not initialize ${langName} OCR engine.`;
+            ocrWorker = null;
+            currentOcrLang = null;
+            return null;
         }
     }
 
@@ -2189,13 +2236,12 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             hideLoading();
             return;
         }
-
-        // OCR ENHANCEMENT: Check if engine is ready, and provide feedback if it's still loading.
+        
         showLoading("Preparing OCR Engine...");
-        if (!isOcrEngineReady) {
-            await initializeOcrEngine(elements.ocrStatus);
-        }
-        if (!isOcrEngineReady) {
+        const selectedLang = document.getElementById('ocr-language-select-image').value;
+        const worker = await getOcrWorker(selectedLang, elements.ocrStatus);
+        
+        if (!worker) {
             hideLoading();
             alert("OCR Engine could not be started. Please check your internet connection and try again.");
             return;
@@ -2221,12 +2267,12 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
                 
                 const isHandwriting = elements.handwritingToggle.checked;
                 const psm = isHandwriting ? Tesseract.PSM.SINGLE_BLOCK : Tesseract.PSM.AUTO_OSD;
-                await ocrWorker.setParameters({
+                await worker.setParameters({
                     tessedit_pageseg_mode: psm,
                 });
 
                 elements.ocrStatus.textContent = `Analyzing Image Orientation (${i + 1}/${imageFiles.length})...`;
-                const { data } = await ocrWorker.recognize(fileToProcess, {}, {
+                const { data } = await worker.recognize(fileToProcess, {}, {
                     text: true 
                 });
                 
@@ -2252,13 +2298,12 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         if (!pdfFile) { alert("Please select a PDF file first."); return; }
         
         const useOcr = elements.pdfForceOcrCheckbox.checked;
+        let worker;
         if (useOcr) {
-            // OCR ENHANCEMENT: Check if engine is ready before proceeding.
             showLoading("Preparing OCR Engine...");
-            if (!isOcrEngineReady) {
-                await initializeOcrEngine(elements.pdfStatus);
-            }
-            if (!isOcrEngineReady) {
+            const selectedLang = document.getElementById('ocr-language-select-pdf').value;
+            worker = await getOcrWorker(selectedLang, elements.pdfStatus);
+            if (!worker) {
                 hideLoading();
                 alert("OCR Engine could not be started. Please check your internet connection and try again.");
                 return;
@@ -2280,7 +2325,9 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
                         endPage = parseInt(document.getElementById('pdf-page-to').value, 10) || pdfDoc.numPages;
                     }
                     elements.pdfStatus.textContent = `Processing pages ${startPage} to ${endPage}...`;
-                    const text = useOcr ? await extractPdfTextWithOcr(pdfDoc, startPage, endPage) : await extractPdfTextNative(pdfDoc, startPage, endPage);
+                    const text = useOcr 
+                        ? await extractPdfTextWithOcr(pdfDoc, startPage, endPage, worker) 
+                        : await extractPdfTextNative(pdfDoc, startPage, endPage);
                     elements.sourceTextPdf.value = text;
                     elements.pdfQuizDefinitionArea.classList.remove('hidden');
                     elements.pdfStatus.textContent = '✅ Text extracted successfully!';
@@ -2301,7 +2348,24 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
     // --- All other functions ---
     function showCreationSelector() { elements.manualGeneratorContainer.querySelectorAll('.hidden').forEach(el => el.classList.remove('hidden')); ['topic', 'text', 'image', 'pdf'].forEach(w => elements[w+'GeneratorWorkflow'].classList.add('hidden')); elements.creationMethodSelector.classList.remove('hidden'); elements.imageFormatGuide.classList.add('hidden'); }
-    function showWorkflow(workflowName) { elements.creationMethodSelector.classList.add('hidden'); document.querySelector('.back-to-mode-selection-btn').classList.add('hidden'); if (elements[workflowName+'GeneratorWorkflow']) { elements[workflowName+'GeneratorWorkflow'].classList.remove('hidden'); if (workflowName === 'image') { setTimeout(() => { elements.imageFormatGuide.classList.remove('hidden'); }, 50); } } }
+    
+    function showWorkflow(workflowName) {
+        elements.creationMethodSelector.classList.add('hidden');
+        document.querySelector('.back-to-mode-selection-btn').classList.add('hidden');
+        if (elements[workflowName + 'GeneratorWorkflow']) {
+            elements[workflowName + 'GeneratorWorkflow'].classList.remove('hidden');
+
+            if (workflowName === 'pdf') {
+                const ocrCheckbox = elements.pdfForceOcrCheckbox;
+                const langContainer = elements.pdfOcrLanguageContainer;
+                if (langContainer) {
+                    langContainer.classList.toggle('hidden', !ocrCheckbox.checked);
+                }
+                const rangeRadio = document.getElementById('pdf-page-option-range');
+                elements.pdfPageRangeSelector.classList.toggle('hidden', !rangeRadio.checked);
+            }
+        }
+    }
     
     function populateSharedElements() {
         const formatSelects = document.querySelectorAll('select[id^="question-format-select"]');
@@ -2433,32 +2497,42 @@ Now, generate the questions based on all the instructions above.`;
     function generateTextPrompt() { quizMetaData = { topic: '', subject: document.getElementById('prompt-subject-text').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-text').value, topic: '', subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-text').value, language: document.getElementById('prompt-language-text').value, formatKey: document.getElementById('question-format-select-text').value, exam: (selectedExam === 'Other') ? elements.textGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'text'); }
     function generateImagePrompt() { quizMetaData = { topic: document.getElementById('prompt-topic-image').value.trim(), subject: document.getElementById('prompt-subject-image').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-image').value, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-image').value, language: document.getElementById('prompt-language-image').value, formatKey: document.getElementById('question-format-select-image').value, exam: (selectedExam === 'Other') ? elements.imageGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'image'); }
     function generatePdfPrompt() { quizMetaData = { topic: document.getElementById('prompt-topic-pdf').value.trim(), subject: document.getElementById('prompt-subject-pdf').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-pdf').value, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-pdf').value, language: document.getElementById('prompt-language-pdf').value, formatKey: document.getElementById('question-format-select-pdf').value, exam: (selectedExam === 'Other') ? elements.pdfGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'pdf'); }
+    
     function setupAllExamSelectors() { document.querySelectorAll('.exam-buttons-container').forEach(container => { const inputField = container.nextElementSibling; populateExamButtons(container, inputField); }); }
     
-    // FIX: This function now correctly handles the "Other" button.
     function populateExamButtons(container, inputField) { 
         const exams = ["JEE", "NEET", "BANK", "RRB", "NEET PG", "CTET", "State PSC", "Police","UPSSSC", "CUET", "UPSC", "SSC", "CBSE", "Other"]; 
         container.innerHTML = exams.map(exam => `<button class="btn exam-btn" data-exam-name="${exam}">${exam}</button>`).join(''); 
+        
         container.addEventListener('click', e => { 
             if (e.target.classList.contains('exam-btn')) { 
                 const clickedBtn = e.target; 
                 const examName = clickedBtn.dataset.examName; 
+                
+                // Deactivate all buttons in this container
                 container.querySelectorAll('.exam-btn').forEach(btn => btn.classList.remove('active')); 
+                // Activate the clicked one
                 clickedBtn.classList.add('active'); 
+                
                 selectedExam = examName; 
-                if (inputField) { 
-                    inputField.classList.toggle('hidden', examName !== 'Other'); 
-                    if (examName === 'Other') { 
+                
+                // Handle the visibility of the 'Other' input field
+                if (inputField) {
+                    const isOther = (examName === 'Other');
+                    inputField.classList.toggle('hidden', !isOther);
+                    if (isOther) {
                         selectedExam = inputField.value.trim(); 
                         inputField.focus(); 
-                    } else { 
-                        inputField.value = ''; 
-                    } 
-                } 
+                    } else {
+                        inputField.value = '';
+                    }
+                }
             } 
         }); 
+
         if (inputField) { 
             inputField.addEventListener('input', () => { 
+                // Update selectedExam only if 'Other' is currently active
                 if (container.querySelector('.exam-btn.active')?.dataset.examName === 'Other') { 
                     selectedExam = inputField.value.trim(); 
                 } 
@@ -2466,11 +2540,20 @@ Now, generate the questions based on all the instructions above.`;
         } 
     }
     
-    function handlePdfSelection(event) { pdfFile = event.target.files[0]; if (pdfFile) { elements.pdfFileName.textContent = pdfFile.name; elements.pdfOptionsContainer.classList.remove('hidden'); elements.pdfQuizDefinitionArea.classList.add('hidden'); elements.pdfStatus.textContent = ''; } }
+    function handlePdfSelection(event) { 
+        pdfFile = event.target.files[0]; 
+        if (pdfFile) { 
+            elements.pdfFileName.textContent = pdfFile.name; 
+            elements.pdfOptionsContainer.classList.remove('hidden'); 
+            elements.pdfQuizDefinitionArea.classList.add('hidden'); 
+            elements.pdfStatus.textContent = '';
+            // Ensure the page range selector is visible by default as 'range' is checked
+            document.getElementById('pdf-page-range-selector').classList.remove('hidden');
+        } 
+    }
     
-    async function extractPdfTextWithOcr(pdfDoc, start, end) {
+    async function extractPdfTextWithOcr(pdfDoc, start, end, worker) {
         let fullText = '';
-        // OCR ENHANCEMENT: Increased scale for better accuracy on smaller fonts.
         const scale = 2.5;
 
         for (let i = start; i <= Math.min(end, pdfDoc.numPages); i++) {
@@ -2490,7 +2573,7 @@ Now, generate the questions based on all the instructions above.`;
 
             await page.render(renderContext).promise;
             
-            const { data: { text } } = await ocrWorker.recognize(canvas);
+            const { data: { text } } = await worker.recognize(canvas);
             fullText += text + '\n\n';
 
             canvas.width = 0;
