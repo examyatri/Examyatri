@@ -76,10 +76,38 @@
       align-items: center;
       min-height: 100vh;
       margin: 0;
-      padding: 20px;
+      /* MODIFIED: Added padding-top to prevent content from hiding behind the new fixed nav bar */
+      padding: 80px 20px 20px 20px;
       box-sizing: border-box;
       transition: background-color 0.3s, color 0.3s;
     }
+
+    /* --- NEW: Global Top Navigation Bar --- */
+    #global-nav-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: var(--secondary-bg);
+        box-shadow: 0 2px 10px var(--shadow-color);
+        z-index: 10000;
+        box-sizing: border-box;
+    }
+    #global-how-to-use-btn {
+        font-size: 0.9em;
+        padding: 8px 15px;
+        text-decoration: none; /* Remove underline from anchor tag */
+    }
+    #global-home-btn {
+        font-size: 0.9em;
+        padding: 8px 15px;
+        animation: aqua-glow 2s infinite ease-in-out;
+    }
+
 
     .container {
       width: 100%;
@@ -152,6 +180,33 @@
 
     @keyframes shake-horizontal { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
     .is-shaking { animation: shake-horizontal 0.8s cubic-bezier(.36,.07,.19,.97) both; }
+
+    @keyframes fade-out-and-shrink {
+      from {
+        opacity: 1;
+        transform: scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+    }
+
+    .container.fade-out-and-shrink {
+      animation: fade-out-and-shrink 1s ease-out forwards;
+    }
+
+    @keyframes aqua-glow {
+      0% {
+        box-shadow: 0 0 5px #007bff, 0 0 10px #007bff, 0 0 15px #00bfff, 0 0 20px #00bfff, inset 0 0 5px #00bfff;
+      }
+      50% {
+        box-shadow: 0 0 10px #007bff, 0 0 20px #007bff, 0 0 30px #00bfff, 0 0 40px #00bfff, inset 0 0 10px #00bfff;
+      }
+      100% {
+        box-shadow: 0 0 5px #007bff, 0 0 10px #007bff, 0 0 15px #00bfff, 0 0 20px #00bfff, inset 0 0 5px #00bfff;
+      }
+    }
 
 
     /* --- Loading Overlay --- */
@@ -764,7 +819,14 @@
 
   </style>
 </head>
-<body>
+<body class="dark-mode">
+
+<!-- NEW: Global Navigation Bar -->
+<div id="global-nav-bar" class="global-nav">
+    <button id="global-home-btn" class="btn btn-secondary">🏠 Home</button>
+    <a href="https://m.youtube.com/@ExamYatrimocktest/videos" target="_blank" id="global-how-to-use-btn" class="btn fire-animation">🔥 How to Use 🔥</a>
+</div>
+
 
 <div id="loading-overlay" class="hidden">
     <div class="spinner"></div>
@@ -1329,6 +1391,9 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     const SCROLL_POS_KEY = 'examyatriScrollPos';
 
     const elements = {
+        // NEW: Global Nav Bar
+        globalNavBar: document.getElementById('global-nav-bar'),
+
         // Main Containers
         mainContainer: document.getElementById('main-container'),
         loadingOverlay: document.getElementById('loading-overlay'),
@@ -1481,8 +1546,8 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
     let isShakeReminderEnabled = true;
     let pressureTextCounter = 1;
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
-    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
+    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
     
     // --- INITIALIZATION ---
     async function init() {
@@ -1533,6 +1598,13 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             mpPlayer: elements.multiplayerQuizPlayerContainer,
             mpResults: elements.multiplayerResultsContainer,
         };
+
+        // --- MODIFIED: Handle global nav visibility ---
+        const isQuizScreen = screenName === 'player' || screenName === 'mpPlayer';
+        if (elements.globalNavBar) {
+            elements.globalNavBar.classList.toggle('hidden', isQuizScreen);
+        }
+
         // Hide all page-level screens
         Object.values(screens).forEach(screen => {
             if (screen) screen.classList.add('hidden');
@@ -1559,6 +1631,9 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             // Use the closest button's ID if the target itself doesn't have one (e.g., clicking an icon inside a button)
             const effectiveId = closestButton ? closestButton.id : targetId;
             
+            // --- NEW: Global Nav Button ---
+            if (effectiveId === 'global-home-btn') { handleHardReset(); return; }
+
             // --- Navigation and Mode Selection ---
             if (effectiveId === 'select-single-player-btn') { gameMode = 'singlePlayer'; showScreen('manualGenerator'); return; }
             if (effectiveId === 'select-multiplayer-btn') { gameMode = 'multiplayer'; showScreen('multiplayerSelection'); return; }
@@ -2349,12 +2424,46 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     // --- All other functions ---
     function showCreationSelector() { elements.manualGeneratorContainer.querySelectorAll('.hidden').forEach(el => el.classList.remove('hidden')); ['topic', 'text', 'image', 'pdf'].forEach(w => elements[w+'GeneratorWorkflow'].classList.add('hidden')); elements.creationMethodSelector.classList.remove('hidden'); elements.imageFormatGuide.classList.add('hidden'); }
     
+    // START OF REPLACEMENT BLOCK 1
     function showWorkflow(workflowName) {
+        // Hide the main selection screen and other workflows
         elements.creationMethodSelector.classList.add('hidden');
         document.querySelector('.back-to-mode-selection-btn').classList.add('hidden');
-        if (elements[workflowName + 'GeneratorWorkflow']) {
-            elements[workflowName + 'GeneratorWorkflow'].classList.remove('hidden');
+        ['topic', 'text', 'image', 'pdf'].forEach(w => {
+            if (elements[w + 'GeneratorWorkflow']) {
+                elements[w + 'GeneratorWorkflow'].classList.add('hidden');
+            }
+        });
 
+        const workflowElement = elements[workflowName + 'GeneratorWorkflow'];
+        if (workflowElement) {
+            // Show the selected workflow
+            workflowElement.classList.remove('hidden');
+
+            // --- BEGIN CRITICAL UI SYNC LOGIC ---
+            // Find the UI elements *within the newly visible workflow*
+            const examButtonsContainer = workflowElement.querySelector('.exam-buttons-container');
+            const otherExamInput = workflowElement.querySelector('.prompt-exam-other');
+
+            if (examButtonsContainer) {
+                // Reset all buttons in this container
+                examButtonsContainer.querySelectorAll('.exam-btn').forEach(btn => btn.classList.remove('active'));
+
+                // Find the button that matches the global 'selectedExam' state
+                const btnToActivate = examButtonsContainer.querySelector(`.exam-btn[data-exam-name="${selectedExam}"]`);
+                if (btnToActivate) {
+                    btnToActivate.classList.add('active'); // Make it active
+                }
+            }
+
+            if (otherExamInput) {
+                // Show/hide the "Other" input based on the global state
+                const isOtherSelected = (selectedExam === 'Other');
+                otherExamInput.classList.toggle('hidden', !isOtherSelected);
+            }
+            // --- END CRITICAL UI SYNC LOGIC ---
+
+            // Keep the existing PDF-specific logic
             if (workflowName === 'pdf') {
                 const ocrCheckbox = elements.pdfForceOcrCheckbox;
                 const langContainer = elements.pdfOcrLanguageContainer;
@@ -2366,7 +2475,8 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             }
         }
     }
-    
+    // END OF REPLACEMENT BLOCK 1
+
     function populateSharedElements() {
         const formatSelects = document.querySelectorAll('select[id^="question-format-select"]');
         formatSelects.forEach(select => {
@@ -2458,7 +2568,7 @@ CRITICAL INSTRUCTIONS (MUST be followed):
 *   **Language:** ${language}
 *   **Question Format:** ${QUESTION_FORMATS[formatKey].name}
 *   **Target Exam:** ${exam}
-*   **Target Exam Instructions:** Generate questions that are relevant, and match the syllabus, question pattern, and difficulty level of the '${exam}' exam.
+*   **Target Exam Instructions:** Generate questions based on analysis of previous year questions that are relevant, and match the syllabus, question pattern, and difficulty level of the '${exam}' exam.
 
 --- SOURCE MATERIAL INSTRUCTIONS ---
 `;
@@ -2493,52 +2603,86 @@ Now, generate the questions based on all the instructions above.`;
 
     async function executePostPromptActions(prompt) { clearFormState(); try { await copyTextToClipboard(prompt); } catch {} sessionStorage.setItem('promptGenerated', 'true'); sessionStorage.setItem('gameMode', gameMode); showScreen('paste'); openAiWithFallback(); }
     function openAiWithFallback() { const aiWindow = window.open('https://gemini.google.com', '_blank'); if (!aiWindow || aiWindow.closed || typeof aiWindow.closed === 'undefined') { showPasteNotification('⚠️ Popup blocked! Click the link to open manually.'); elements.aiLinkFallback.classList.remove('hidden'); } else { elements.aiLinkFallback.classList.add('hidden'); } }
-    function generateTopicPrompt() { quizMetaData = { topic: document.getElementById('prompt-topic').value.trim(), subject: document.getElementById('prompt-subject-topic').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-topic').value || 5, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-topic').value, language: document.getElementById('prompt-language-topic').value, formatKey: document.getElementById('question-format-select-topic').value, exam: (selectedExam === 'Other') ? elements.topicGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'topic'); }
-    function generateTextPrompt() { quizMetaData = { topic: '', subject: document.getElementById('prompt-subject-text').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-text').value, topic: '', subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-text').value, language: document.getElementById('prompt-language-text').value, formatKey: document.getElementById('question-format-select-text').value, exam: (selectedExam === 'Other') ? elements.textGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'text'); }
-    function generateImagePrompt() { quizMetaData = { topic: document.getElementById('prompt-topic-image').value.trim(), subject: document.getElementById('prompt-subject-image').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-image').value, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-image').value, language: document.getElementById('prompt-language-image').value, formatKey: document.getElementById('question-format-select-image').value, exam: (selectedExam === 'Other') ? elements.imageGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'image'); }
-    function generatePdfPrompt() { quizMetaData = { topic: document.getElementById('prompt-topic-pdf').value.trim(), subject: document.getElementById('prompt-subject-pdf').value.trim() }; const source = { numQuestions: document.getElementById('prompt-num-questions-pdf').value, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-pdf').value, language: document.getElementById('prompt-language-pdf').value, formatKey: document.getElementById('question-format-select-pdf').value, exam: (selectedExam === 'Other') ? elements.pdfGeneratorWorkflow.querySelector('.prompt-exam-other').value.trim() : selectedExam, }; generatePrompt(source, 'pdf'); }
     
+    // START OF REPLACEMENT BLOCK 2
+    function generateTopicPrompt() {
+        quizMetaData = { topic: document.getElementById('prompt-topic').value.trim(), subject: document.getElementById('prompt-subject-topic').value.trim() };
+        const otherExamInput = elements.topicGeneratorWorkflow.querySelector('.prompt-exam-other');
+        const finalExam = (selectedExam === 'Other') ? otherExamInput.value.trim() : selectedExam;
+        const source = { numQuestions: document.getElementById('prompt-num-questions-topic').value || 5, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-topic').value, language: document.getElementById('prompt-language-topic').value, formatKey: document.getElementById('question-format-select-topic').value, exam: finalExam };
+        generatePrompt(source, 'topic');
+    }
+
+    function generateTextPrompt() {
+        quizMetaData = { topic: '', subject: document.getElementById('prompt-subject-text').value.trim() };
+        const otherExamInput = elements.textGeneratorWorkflow.querySelector('.prompt-exam-other');
+        const finalExam = (selectedExam === 'Other') ? otherExamInput.value.trim() : selectedExam;
+        const source = { numQuestions: document.getElementById('prompt-num-questions-text').value, topic: '', subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-text').value, language: document.getElementById('prompt-language-text').value, formatKey: document.getElementById('question-format-select-text').value, exam: finalExam };
+        generatePrompt(source, 'text');
+    }
+
+    function generateImagePrompt() {
+        quizMetaData = { topic: document.getElementById('prompt-topic-image').value.trim(), subject: document.getElementById('prompt-subject-image').value.trim() };
+        const otherExamInput = elements.imageGeneratorWorkflow.querySelector('.prompt-exam-other');
+        const finalExam = (selectedExam === 'Other') ? otherExamInput.value.trim() : selectedExam;
+        const source = { numQuestions: document.getElementById('prompt-num-questions-image').value, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-image').value, language: document.getElementById('prompt-language-image').value, formatKey: document.getElementById('question-format-select-image').value, exam: finalExam };
+        generatePrompt(source, 'image');
+    }
+
+    function generatePdfPrompt() {
+        quizMetaData = { topic: document.getElementById('prompt-topic-pdf').value.trim(), subject: document.getElementById('prompt-subject-pdf').value.trim() };
+        const otherExamInput = elements.pdfGeneratorWorkflow.querySelector('.prompt-exam-other');
+        const finalExam = (selectedExam === 'Other') ? otherExamInput.value.trim() : selectedExam;
+        const source = { numQuestions: document.getElementById('prompt-num-questions-pdf').value, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-pdf').value, language: document.getElementById('prompt-language-pdf').value, formatKey: document.getElementById('question-format-select-pdf').value, exam: finalExam };
+        generatePrompt(source, 'pdf');
+    }
+    // END OF REPLACEMENT BLOCK 2
+
     function setupAllExamSelectors() { document.querySelectorAll('.exam-buttons-container').forEach(container => { const inputField = container.nextElementSibling; populateExamButtons(container, inputField); }); }
     
-    function populateExamButtons(container, inputField) { 
-        const exams = ["JEE", "NEET", "BANK", "RRB", "NEET PG", "CTET", "State PSC", "Police","UPSSSC", "CUET", "UPSC", "SSC", "CBSE", "Other"]; 
-        container.innerHTML = exams.map(exam => `<button class="btn exam-btn" data-exam-name="${exam}">${exam}</button>`).join(''); 
-        
-        container.addEventListener('click', e => { 
-            if (e.target.classList.contains('exam-btn')) { 
-                const clickedBtn = e.target; 
-                const examName = clickedBtn.dataset.examName; 
-                
-                // Deactivate all buttons in this container
-                container.querySelectorAll('.exam-btn').forEach(btn => btn.classList.remove('active')); 
-                // Activate the clicked one
-                clickedBtn.classList.add('active'); 
-                
-                selectedExam = examName; 
-                
-                // Handle the visibility of the 'Other' input field
+    // START OF REPLACEMENT BLOCK 3
+    function populateExamButtons(container, inputField) {
+        const exams = ["JEE", "NEET", "BANK", "RRB", "NEET PG", "CTET", "State PSC", "Police", "UPSSSC", "CUET", "UPSC", "SSC", "CBSE", "Other"];
+        container.innerHTML = exams.map(exam => `<button class="btn exam-btn" data-exam-name="${exam}">${exam}</button>`).join('');
+
+        // This event listener now handles all logic correctly.
+        container.addEventListener('click', e => {
+            if (e.target.classList.contains('exam-btn')) {
+                const clickedBtn = e.target;
+                const examName = clickedBtn.dataset.examName;
+
+                // Deactivate all buttons within this specific container
+                container.querySelectorAll('.exam-btn').forEach(btn => btn.classList.remove('active'));
+                // Activate the one that was just clicked
+                clickedBtn.classList.add('active');
+
+                // Update the global state variable
+                selectedExam = examName;
+
+                // Correctly toggle the visibility of the inputField associated with THIS container
                 if (inputField) {
-                    const isOther = (examName === 'Other');
-                    inputField.classList.toggle('hidden', !isOther);
-                    if (isOther) {
-                        selectedExam = inputField.value.trim(); 
-                        inputField.focus(); 
-                    } else {
-                        inputField.value = '';
+                    const isOtherSelected = (examName === 'Other');
+                    inputField.classList.toggle('hidden', !isOtherSelected);
+                    if (isOtherSelected) {
+                        inputField.focus(); // Focus the input for better UX
                     }
                 }
-            } 
-        }); 
+                
+                // Save the state whenever a selection is made
+                saveFormState(); 
+            }
+        });
 
-        if (inputField) { 
-            inputField.addEventListener('input', () => { 
-                // Update selectedExam only if 'Other' is currently active
-                if (container.querySelector('.exam-btn.active')?.dataset.examName === 'Other') { 
-                    selectedExam = inputField.value.trim(); 
-                } 
-            }); 
-        } 
+        if (inputField) {
+            inputField.addEventListener('input', () => {
+                // This ensures that if the user types in the "Other" box, the state is saved.
+                if (selectedExam === 'Other') {
+                    saveFormState();
+                }
+            });
+        }
     }
+    // END OF REPLACEMENT BLOCK 3
     
     function handlePdfSelection(event) { 
         pdfFile = event.target.files[0]; 
@@ -2640,9 +2784,11 @@ Now, generate the questions based on all the instructions above.`;
     }
     async function restartQuiz() { clearFormState(); sessionStorage.removeItem('promptGenerated'); await dbHelper.clear(); window.location.reload(); }
     async function handleHardReset() {
-        const confirmation = confirm("⚠️ WARNING! ⚠️\n\nAre you sure you want to go to the Home Page?\n\nThis will DELETE ALL your current data from this device and from any online game you are in. This action cannot be undone.");
-        if (!confirmation) return;
-
+        // The confirmation dialog has been removed.
+        
+        // Add a class to the main container to trigger the fade-out animation.
+        elements.mainContainer.classList.add('fade-out-and-shrink');
+        
         showLoading("Deleting all data and returning home...");
 
         localStorage.clear();
@@ -2663,6 +2809,7 @@ Now, generate the questions based on all the instructions above.`;
             }
         }
         
+        // Wait for the animation to play before reloading the page.
         setTimeout(() => {
             window.location.reload();
         }, 1000);
@@ -2673,7 +2820,15 @@ Now, generate the questions based on all the instructions above.`;
     function showManualCopyModal(text) { elements.manualCopyTextarea.value = text; elements.manualCopyModalOverlay.classList.remove('hidden'); elements.manualCopyTextarea.select(); elements.manualCopyTextarea.focus(); }
     function showPasteNotification(message) { elements.pasteNotification.textContent=message;elements.pasteNotification.classList.add('show');setTimeout(()=>elements.pasteNotification.classList.remove('show'),3000)}
     function toggleTheme(){document.body.classList.toggle('dark-mode');const isDarkMode=document.body.classList.contains('dark-mode');localStorage.setItem('quizTheme',isDarkMode?'dark':'light');document.getElementById('theme-toggle-btn').textContent=isDarkMode?'☀️':'🌙'}
-    function applyInitialTheme(){if(localStorage.getItem('quizTheme')==='dark'){document.body.classList.add('dark-mode');document.getElementById('theme-toggle-btn').textContent='☀️'}}
+    function applyInitialTheme(){
+        // By default, the body has 'dark-mode'. We only remove it if the user explicitly chose light mode.
+        if(localStorage.getItem('quizTheme') === 'light'){
+            document.body.classList.remove('dark-mode');
+        }
+        // Set the button icon based on the final state.
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        document.getElementById('theme-toggle-btn').textContent = isDarkMode ? '☀️' : '🌙';
+    }
     function shareOnWhatsApp() { /* ... implementation from file 67 ... */ }
     function shareWebsite() { /* ... implementation from file 67 ... */ }
     async function openTelegramWithBookmarks() { /* ... implementation from file 67 ... */ }
@@ -2684,7 +2839,32 @@ Now, generate the questions based on all the instructions above.`;
     function resetAndStartQuestionTimer() { clearInterval(timerId); questionStartTime = new Date(); const emojiSequence = [elements.faces.happy, elements.faces.worried, elements.faces.sad, elements.faces.crying]; const updateTimerDisplay = () => { if (!questionStartTime) return; const elapsedTime = Math.round((new Date() - questionStartTime) / 1000); elements.timerText.textContent = `${String(Math.floor(elapsedTime / 60)).padStart(2, '0')}:${String(elapsedTime % 60).padStart(2, '0')}`; const emojiIntervalIndex = Math.floor(elapsedTime / 15); const currentEmoji = emojiSequence[emojiIntervalIndex % emojiSequence.length]; if (currentEmoji && !currentEmoji.classList.contains('visible')) { emojiSequence.forEach(face => face.classList.remove('visible')); currentEmoji.classList.add('visible'); } const pressureTextEl = document.getElementById('pressure-text-animation'); if (elapsedTime >= 45 && userAnswers[currentQuestionIndex].status !== 'answered') { if (isShakeReminderEnabled) { const checkBtn = document.getElementById('check-answer-btn'); if (checkBtn) checkBtn.classList.add('vibrating'); } if (pressureTextEl) { document.getElementById('pressure-mode-toggle-btn').classList.add('hidden'); pressureTextEl.classList.remove('hidden'); pressureTextEl.textContent = `Tik Tik ${pressureTextCounter}`; pressureTextCounter++; } } }; updateTimerDisplay(); timerId = setInterval(updateTimerDisplay, 1000); }
     function startQuiz(){ showScreen('player'); quizStartTime=new Date(); currentQuestionIndex=0; userAnswers=quizData.map((q, i)=>({selected:null,isCorrect:null,status:'unseen', startTime: null, endTime: null})); bookmarkedQuestions.clear(); originalQuizData=JSON.parse(JSON.stringify(quizData)); loadQuestion(0); }
     function loadQuestion(index){ if(index<0||index>=originalQuizData.length)return; currentQuestionIndex=index;selectedOptionIndex=null; const question=originalQuizData[currentQuestionIndex]; const answer=userAnswers[currentQuestionIndex]; elements.congratsAnimationContainer.innerHTML = ''; if (!clapSound.paused) { clapSound.pause(); clapSound.currentTime = 0; } pressureTextCounter = 1; const pressureTextEl = document.getElementById('pressure-text-animation'); if(pressureTextEl) pressureTextEl.classList.add('hidden'); document.getElementById('pressure-mode-toggle-btn').classList.remove('hidden'); if(answer.status==='answered'){ clearInterval(timerId); elements.timerText.textContent="--:--"; Object.values(elements.faces).forEach(face=>face.classList.remove('visible')) } else { resetAndStartQuestionTimer() } updateQuestionUI(question); updateOptionsAndExplanationState(); updateQuizActions(); if (window.MathJax) MathJax.typesetPromise([elements.quizPlayerContainer]); }
-    function updateQuestionUI(q){ elements.questionTopic.textContent=quizMetaData.topic || ""; elements.progress.textContent=`Question ${currentQuestionIndex+1} / ${originalQuizData.length}`; elements.questionText.innerHTML=q.question.replace(/\n/g, '<br>'); elements.bookmarkBtn.classList.toggle('bookmarked',bookmarkedQuestions.has(currentQuestionIndex)); elements.statementsList.innerHTML=q.statements?.map(stmt=>`<p>• ${stmt}</p>`).join('')||''; elements.optionsContainer.innerHTML=''; q.options.forEach((optionText,i)=>{ const optionDiv=document.createElement('div'); optionDiv.className='option'; optionDiv.dataset.index=i; optionDiv.innerHTML=`<span class="option-text">${optionText}</span><div class="option-feedback"><span class="user-choice-emoji"></span><span class="feedback-icon"></span></div>`; elements.optionsContainer.appendChild(optionDiv); }); }
+    
+    // =========================================================
+    // =============== FUNCTION WITH CORRECTION ================
+    // =========================================================
+    function updateQuestionUI(q) {
+        elements.questionTopic.textContent = quizMetaData.topic || "";
+        elements.progress.textContent = `Question ${currentQuestionIndex + 1} / ${originalQuizData.length}`;
+        elements.questionText.innerHTML = q.question.replace(/\n/g, '<br>');
+
+        // CORRECTED LINE: Used 'currentQuestionIndex' instead of the undefined variable 'i'.
+        elements.bookmarkBtn.classList.toggle('bookmarked', bookmarkedQuestions.has(currentQuestionIndex));
+        
+        elements.statementsList.innerHTML = q.statements?.map(stmt => `<p>• ${stmt}</p>`).join('') || '';
+        elements.optionsContainer.innerHTML = '';
+        q.options.forEach((optionText, i) => {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'option';
+            optionDiv.dataset.index = i;
+            optionDiv.innerHTML = `<span class="option-text">${optionText}</span><div class="option-feedback"><span class="user-choice-emoji"></span><span class="feedback-icon"></span></div>`;
+            elements.optionsContainer.appendChild(optionDiv);
+        });
+    }
+    // =========================================================
+    // =========================================================
+    // =========================================================
+
     function updateOptionsAndExplanationState() { const answer = userAnswers[currentQuestionIndex]; const question = originalQuizData[currentQuestionIndex]; const correctEmojis = ['🥳', '🎉', '🤩', '👍', '💯']; const incorrectEmojis = ['🤔', '😟', '🤨', '🤦‍♂️', '❌']; document.querySelectorAll('.option').forEach((optionDiv, i) => { if (answer.status === 'answered') { optionDiv.classList.add('disabled'); if (i === question.correctAnswerIndex) { optionDiv.classList.add('correct'); optionDiv.querySelector('.feedback-icon').textContent = '✔️'; } if (i === answer.selected) { const userChoiceEmoji = optionDiv.querySelector('.user-choice-emoji'); if (answer.isCorrect) userChoiceEmoji.textContent = correctEmojis[Math.floor(Math.random() * correctEmojis.length)]; else { optionDiv.classList.add('incorrect'); optionDiv.querySelector('.feedback-icon').textContent = '❌'; userChoiceEmoji.textContent = incorrectEmojis[Math.floor(Math.random() * incorrectEmojis.length)]; } userChoiceEmoji.classList.add('visible'); } } }); const isAnswered = answer.status === 'answered'; elements.explanationContainer.classList.toggle('hidden', !isAnswered); if (isAnswered) { elements.explanationText.innerHTML = question.explanation; } }
     function updateQuizActions() { elements.quizActions.innerHTML = ''; const prevBtn = document.createElement('button'); prevBtn.id = 'prev-question-btn'; prevBtn.className = 'btn btn-secondary quiz-actions-top-left'; prevBtn.textContent = '⬅️ Previous'; prevBtn.disabled = currentQuestionIndex === 0; elements.quizActions.appendChild(prevBtn); if (userAnswers[currentQuestionIndex].status !== 'answered') { const checkBtn = document.createElement('button'); checkBtn.id = 'check-answer-btn'; checkBtn.className = 'btn quiz-actions-top-right'; checkBtn.textContent = 'Check Answer ✅'; checkBtn.disabled = selectedOptionIndex === null; elements.quizActions.appendChild(checkBtn); const skipBtn = document.createElement('button'); skipBtn.id = 'skip-question-btn'; skipBtn.className = 'btn quiz-actions-bottom-left'; skipBtn.textContent = 'Skip ➡️'; elements.quizActions.appendChild(skipBtn); } else { const nextBtn = document.createElement('button'); nextBtn.id = 'next-question-btn'; nextBtn.className = 'btn quiz-actions-bottom-left'; nextBtn.textContent = 'Next ➡️'; nextBtn.disabled = currentQuestionIndex === originalQuizData.length - 1; elements.quizActions.appendChild(nextBtn); } const submitBtn = document.createElement('button'); submitBtn.id = 'submit-quiz-btn'; submitBtn.className = 'btn btn-danger quiz-actions-bottom-right'; submitBtn.textContent = 'Submit'; elements.quizActions.appendChild(submitBtn); }
     function handleBookmark(){bookmarkedQuestions.has(currentQuestionIndex)?bookmarkedQuestions.delete(currentQuestionIndex):bookmarkedQuestions.add(currentQuestionIndex);elements.bookmarkBtn.classList.toggle('bookmarked')}
