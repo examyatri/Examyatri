@@ -947,10 +947,10 @@
         <div id="creation-method-selector">
              <p id="generator-title" style="font-size: 1.1em; text-align: center; grid-column: 1 / -1;">❤️ Create your questions below ❤️</p>
              <div class="creation-option-card" id="select-from-topic">
-                <span class="card-icon">📝</span><h4>Generate from Topic</h4><p>Provide a topic to generate questions.</p>
+                <span class="card-icon">📝</span><h4>Generate from Topic</h4><p>Provide a topic or formula to generate question.</p>
             </div>
             <div class="creation-option-card" id="select-from-text">
-                <span class="card-icon">📋</span><h4>Generate from Text</h4><p>Paste text/ formula ( Maths,Physics )to create questions.</p>
+                <span class="card-icon">📋</span><h4>Customise Your Mock Test</h4><p>Add different topics from different subject and create a mock test similar to your exam.</p>
             </div>
             <div class="creation-option-card" id="select-from-image">
                 <span class="card-icon">🖼️</span><h4>Generate from Image</h4><p>Use images of notes / PYQs and generate similar question.</p>
@@ -970,7 +970,7 @@
                   <span class="guide-help-text">How to use</span>
               </div>
             </div>
-            <div class="input-group"><label for="prompt-topic" class="input-label">Primary Topic (Required)</label><input type="text" id="prompt-topic" class="input-field" placeholder="e.g., The Solar System, World War II"></div>
+            <div class="input-group"><label for="prompt-topic" class="input-label">Add Primary Topic Name or Formula of Physics or Mathematics or other subject</label><input type="text" id="prompt-topic" class="input-field" placeholder="e.g., The Solar System, World War II"></div>
             <div class="input-group"><label for="prompt-num-questions-topic" class="input-label">Number of Questions</label><input type="number" id="prompt-num-questions-topic" class="input-field" placeholder="e.g., 10" min="1" max="50"></div>
             <div class="input-group"><label for="prompt-subject-topic" class="input-label">Subject/ instruction e.g. generate question on this topic(Optional)</label><input type="text" id="prompt-subject-topic" class="input-field" placeholder="e.g., Science, maths"></div>
             <div class="input-group"><label for="prompt-language-topic" class="input-label">Language</label><select id="prompt-language-topic" class="input-field"><option value="English" selected>English</option><option value="Hindi">Hindi</option><option value="Spanish">Spanish</option><option value="French">French</option><option value="German">German</option></select></div>
@@ -989,7 +989,7 @@
                   <span class="guide-help-text">How to use</span>
               </div>
             </div>
-            <div class="input-group"><label for="source-text-input" class="input-label">Paste your source text below</label><textarea id="source-text-input" placeholder="Paste the content you want to create questions from..."></textarea></div>
+            <div class="input-group"><label for="source-text-input" class="input-label">Customise your mock test</label><textarea id="source-text-input" placeholder="Give instructions as you wish, according to your wish and customise your test series or mock test from different subject, different topics.&#10;&#10;Example for NEET student:&#10;Generate 20 questions from physics of both 11th and 12th&#10;Generate 15 questions from chemistry of both 11th and 12th&#10;Generate 10 questions from biology of both 11th and 12th&#10;Book instructions like use NCERT book of 11th and 12th as reference&#10;Generate random question like one question from physics and other from chemistry"></textarea></div>
             <div class="step-header-container">
               <h3 class="step-header">Step 2: Define Your Questions</h3>
               <div class="guide-container">
@@ -1592,8 +1592,8 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
     let isShakeReminderEnabled = true;
     let pressureTextCounter = 1;
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
-    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
+    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
     
     // --- INITIALIZATION ---
     async function init() {
@@ -2704,7 +2704,7 @@ CRITICAL INSTRUCTIONS (MUST be followed):
 `;
 
         if (sourceType === 'pdf') {
-            prompt += `*   **Knowledge Base:** You MUST generate questions *exclusively* from the "Source Material" provided below. DO NOT use any external knowledge. The goal is to test knowledge *of the provided document* at the level of the target exam.`;
+            prompt += `*   **Knowledge Base:** You MUST generate questions based primarily on the "Source Material" provided below. Use the provided text as the core context and factual basis for the questions. You may use your external knowledge to properly frame the questions, ensure they are conceptually sound, and match the difficulty and style of the specified target exam. DO NOT introduce facts or topics completely unrelated to the source material.`;
         } else { // For topic, text, image
             prompt += `*   **Knowledge Base:** Use your own internal knowledge, guided by the "Primary Topic" and "Subject". If "Source Material" is provided below, use it as the primary context or as an example to create *new, different questions* that match the specified parameters.`;
         }
@@ -2944,7 +2944,46 @@ Now, generate the questions based on all the instructions above.`;
             window.location.reload();
         }, 1000);
     }
-    function getFullQuizContent(bookmarksOnly) { /* ... implementation from file 67 ... */ }
+    function getFullQuizContent(bookmarksOnly) {
+        let text = `🏆 EXAMYATRI Assessment Results 🏆\n\n`;
+
+        const totalQuestions = originalQuizData.length;
+        const correctCount = userAnswers.filter(ans => ans.isCorrect).length;
+        const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
+        const timeDiff = Math.round(((new Date()) - quizStartTime) / 1000);
+        const timeTaken = `${String(Math.floor(timeDiff / 60)).padStart(2, '0')}:${String(timeDiff % 60).padStart(2, '0')}`;
+
+        text += `Final Score: ${correctCount} / ${totalQuestions} (${percentage.toFixed(1)}%)\n`;
+        text += `Time Taken: ${timeTaken}\n\n`;
+        text += '------------------------------------\n\n';
+
+        const questionsToProcess = originalQuizData.map((q, i) => ({ ...q, originalIndex: i }))
+            .filter(q => !bookmarksOnly || bookmarkedQuestions.has(q.originalIndex));
+
+        if (questionsToProcess.length === 0) return null;
+
+        questionsToProcess.forEach(q => {
+            const userAnswer = userAnswers[q.originalIndex];
+            text += `Q${q.originalIndex + 1}: ${q.question.replace(/<br>/g, '\n')}\n\n`;
+            if (q.statements && q.statements.length > 0) {
+                 q.statements.forEach(stmt => { text += `• ${stmt}\n`; });
+                 text += '\n';
+            }
+            q.options.forEach((opt, oi) => {
+                text += `${String.fromCharCode(97 + oi)}) ${opt.replace(/<[^>]*>/g, '')}\n`;
+            });
+            text += `\nCorrect Answer: ${String.fromCharCode(97 + q.correctAnswerIndex)})\n`;
+            if (userAnswer.status === 'answered') {
+                text += `Your Answer: ${String.fromCharCode(97 + userAnswer.selected)}) - ${userAnswer.isCorrect ? 'Correct' : 'Incorrect'}\n`;
+            } else {
+                text += `Your Answer: Skipped\n`;
+            }
+            text += `\nExplanation:\n${q.explanation}\n\n`;
+            text += '------------------------------------\n\n';
+        });
+
+        return text;
+    }
     function copyQuizContent(bookmarksOnly) { const fullTextToCopy = getFullQuizContent(bookmarksOnly); if (!fullTextToCopy) { showPasteNotification(`🤔 No ${bookmarksOnly ? 'bookmarked ' : ''}questions to copy!`); return; } copyTextToClipboard(fullTextToCopy).then(() => showPasteNotification(`✅ Summary & ${bookmarksOnly ? 'bookmarked ' : 'all '}questions copied!`)); }
     function copyTextToClipboard(text) { return new Promise((resolve, reject) => { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(resolve).catch(err => { console.warn('Modern clipboard API failed, falling back.', err); legacyCopy(reject); }); } else { legacyCopy(reject); } function legacyCopy(onFail) { const textArea = document.createElement("textarea"); textArea.value = text; textArea.style.position = "fixed"; textArea.style.top = "-9999px"; document.body.appendChild(textArea); textArea.focus(); textArea.select(); try { document.execCommand('copy') ? resolve() : onFail(new Error('Legacy copy command failed.')); } catch (err) { console.error('Legacy copy failed.', err); onFail(err); } finally { document.body.removeChild(textArea); } } }).catch(() => { showManualCopyModal(text); throw new Error("Manual intervention required for copy."); }); }
     function showManualCopyModal(text) { elements.manualCopyTextarea.value = text; elements.manualCopyModalOverlay.classList.remove('hidden'); elements.manualCopyTextarea.select(); elements.manualCopyTextarea.focus(); }
@@ -2959,10 +2998,177 @@ Now, generate the questions based on all the instructions above.`;
         const isDarkMode = document.body.classList.contains('dark-mode');
         document.getElementById('theme-toggle-btn').textContent = isDarkMode ? '☀️' : '🌙';
     }
-    function shareOnWhatsApp() { /* ... implementation from file 67 ... */ }
-    function shareWebsite() { /* ... implementation from file 67 ... */ }
+    function shareOnWhatsApp() {
+        const totalQuestions = originalQuizData.length;
+        const correctCount = userAnswers.filter(ans => ans.isCorrect).length;
+        const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
+
+        const text = `I just took a quiz on EXAMYATRI! 🚀\n\n*My Score:* ${correctCount} out of ${totalQuestions} (${percentage.toFixed(1)}%).\n\nThink you can beat me? Create your own free mock tests here:\n${window.location.href}`;
+        const encodedText = encodeURIComponent(text);
+
+        window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
+    }
+    async function shareWebsite() {
+        const shareData = {
+            title: 'EXAMYATRI - Free Mock Test Generator',
+            text: 'Create unlimited topic-wise mock tests for any exam, completely free! Generate questions from topics, text, images, or PDFs with AI. 🚀',
+            url: window.location.href
+        };
+
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                // Fallback for desktops or browsers not supporting navigator.share
+                await copyTextToClipboard(shareData.url);
+                showPasteNotification('✅ Website link copied to clipboard!');
+            }
+        } catch (err) {
+            console.error('Error sharing website:', err);
+             // If sharing fails, still try to copy
+            await copyTextToClipboard(shareData.url);
+            showPasteNotification('Sharing failed. Link copied to clipboard instead!');
+        }
+    }
     async function openTelegramWithBookmarks() { /* ... implementation from file 67 ... */ }
-    async function generatePDF() { /* ... implementation from file 67 ... */ }
+    async function generatePDF() {
+        showLoading("Generating PDF...");
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const totalQuestions = originalQuizData.length;
+        const correctCount = userAnswers.filter(ans => ans.isCorrect).length;
+        const incorrectCount = userAnswers.filter(ans => ans.status === 'answered' && !ans.isCorrect).length;
+        const skippedCount = totalQuestions - correctCount - incorrectCount;
+        const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
+        const timeDiff = Math.round(((new Date()) - quizStartTime) / 1000);
+        const timeTaken = `${String(Math.floor(timeDiff / 60)).padStart(2, '0')}:${String(timeDiff % 60).padStart(2, '0')}`;
+
+        let y = 15;
+        const x = 15;
+        const margin = 15;
+        const pageHeight = doc.internal.pageSize.height;
+        const pageWidth = doc.internal.pageSize.width;
+
+        const addText = (text, X, Y, options = {}) => {
+            doc.setFontSize(options.fontSize || 10);
+            const maxWidth = pageWidth - (margin * 2);
+            const lines = doc.splitTextToSize(text, maxWidth);
+            doc.text(lines, X, Y, options);
+            // Height calculation needs to factor in the font size for accurate line spacing
+            return y + (lines.length * (options.fontSize || 10) * 0.35); 
+        };
+        
+        const checkPageBreak = (currentY, neededHeight = 20) => {
+            if (currentY + neededHeight > pageHeight - margin) {
+                doc.addPage();
+                return margin; // Reset y to top margin
+            }
+            return currentY;
+        };
+
+        // --- PDF Header ---
+        doc.setFontSize(20);
+        doc.setFont("helvetica", "bold");
+        y = addText("EXAMYATRI - Assessment Results", x, y, { fontSize: 20 });
+        doc.setLineWidth(0.5);
+        doc.line(x, y, pageWidth - x, y);
+        y += 10;
+        
+        // --- Summary Section ---
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        y = addText("Summary:", x, y, { fontSize: 14 });
+        y += 5;
+
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        y = addText(`Final Score: ${correctCount} / ${totalQuestions} (${percentage.toFixed(1)}%)`, x, y, { fontSize: 11 });
+        y = addText(`Correct Answers: ${correctCount}`, x, y, { fontSize: 11 });
+        y = addText(`Incorrect Answers: ${incorrectCount}`, x, y, { fontSize: 11 });
+        y = addText(`Skipped Questions: ${skippedCount}`, x, y, { fontSize: 11 });
+        y = addText(`Time Taken: ${timeTaken}`, x, y, { fontSize: 11 });
+        y += 10;
+        doc.line(x, y, pageWidth - x, y);
+        y += 10;
+        
+        // --- Questions Review Section ---
+        y = checkPageBreak(y);
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        y = addText("Answer Review:", x, y, { fontSize: 14 });
+        y += 5;
+
+        for (let i = 0; i < originalQuizData.length; i++) {
+            y = checkPageBreak(y, 40); // Check if there's enough space for a question header
+            const q = originalQuizData[i];
+            const answer = userAnswers[i];
+            
+            // Question
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            const questionText = `Q${i + 1}: ${q.question.replace(/<[^>]*>/g, '').replace(/\n/g, ' ')}`;
+            y = addText(questionText, x, y, { fontSize: 12 });
+            y += 2;
+
+            // Statements
+             if (q.statements && q.statements.length > 0) {
+                 y = checkPageBreak(y, q.statements.length * 5);
+                 doc.setFontSize(10);
+                 doc.setFont("helvetica", "italic");
+                 q.statements.forEach(stmt => {
+                     y = addText(`• ${stmt}`, x + 5, y, { fontSize: 10 });
+                 });
+                 y += 2;
+             }
+            
+            // Options
+            y = checkPageBreak(y, q.options.length * 5);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            q.options.forEach((opt, oi) => {
+                let prefix = '';
+                const optionLetter = String.fromCharCode(97 + oi);
+                
+                const isUserAnswer = answer.status === 'answered' && oi === answer.selected;
+                const isCorrectAnswer = oi === q.correctAnswerIndex;
+
+                if (isUserAnswer && isCorrectAnswer) {
+                    doc.setFont("helvetica", "bold");
+                    prefix = `(Your Correct Answer) `;
+                } else if (isUserAnswer) {
+                     doc.setFont("helvetica", "bold");
+                    prefix = `(Your Answer) `;
+                } else if (isCorrectAnswer) {
+                    prefix = `(Correct Answer) `;
+                }
+
+                y = addText(`${optionLetter}) ${prefix}${opt.replace(/<[^>]*>/g, '')}`, x + 5, y, { fontSize: 10 });
+                doc.setFont("helvetica", "normal"); // Reset font style
+            });
+            y += 4;
+            
+            // Explanation
+            y = checkPageBreak(y, 20);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            y = addText("Explanation:", x + 5, y, { fontSize: 10 });
+            doc.setFont("helvetica", "normal");
+            y = addText(q.explanation.replace(/<[^>]*>/g, ''), x + 5, y, { fontSize: 10 });
+            y += 8;
+
+            if (i < originalQuizData.length - 1) {
+                y = checkPageBreak(y, 10);
+                doc.setDrawColor(200); // Lighter gray for separator
+                doc.line(x, y, pageWidth - x, y);
+                y += 8;
+            }
+        }
+        
+        const fileName = `Examyatri_Results_${new Date().toISOString().split('T')[0]}.pdf`;
+        doc.save(fileName);
+        hideLoading();
+    }
     function triggerCongratsAnimation() { elements.congratsAnimationContainer.innerHTML = ''; const emojis = ['🎉', '🤩', '🥳', '✨', '👍', '💯']; for (let i = 0; i < 30; i++) { const emojiSpan = document.createElement('span'); emojiSpan.className = 'congrats-emoji'; emojiSpan.textContent = emojis[Math.floor(Math.random() * emojis.length)]; const angle = Math.random() * Math.PI * 2; const radius = Math.random() * (window.innerWidth / 2); const endX = Math.cos(angle) * radius; const endY = Math.sin(angle) * radius; emojiSpan.style.setProperty('--transform-end', `translate(${endX}px, ${endY}px)`); elements.congratsAnimationContainer.appendChild(emojiSpan); } clapSound.currentTime = 0; clapSound.play(); }
     function showSadReaction() { const sadEmojis = ['😥', '😭', '🤦', '😫']; elements.sadReactionEmoji.textContent = sadEmojis[Math.floor(Math.random() * sadEmojis.length)]; elements.sadReactionOverlay.classList.remove('hidden'); setTimeout(() => { elements.sadReactionOverlay.classList.add('hidden'); }, 1500); }
     function loadPressureModeSettings() { const shakeEnabled = localStorage.getItem('shakeReminderEnabled'); isShakeReminderEnabled = shakeEnabled === null ? true : shakeEnabled === 'true'; elements.shakeReminderToggle.checked = isShakeReminderEnabled; }
