@@ -860,104 +860,6 @@
         letter-spacing: 1px;
     }
 
-    /* --- NEW: Dynamic Prompt Builder Styles --- */
-    #dynamic-prompt-builder {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    .prompt-row {
-      background-color: var(--component-bg);
-      border: 1px solid var(--border-color);
-      border-left: 4px solid var(--accent-color);
-      border-radius: 8px;
-      padding: 1.5rem;
-      position: relative;
-      transition: all 0.4s ease-in-out;
-      overflow: hidden;
-    }
-    .prompt-row-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
-    .prompt-row-title {
-        font-weight: bold;
-        color: var(--accent-color);
-    }
-    .remove-row-btn {
-        background: none;
-        border: 1px solid var(--incorrect-color);
-        color: var(--incorrect-color);
-        font-size: 1.2rem;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-    }
-    .remove-row-btn:hover {
-        background-color: var(--incorrect-color);
-        color: white;
-    }
-    .prompt-row-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out;
-    }
-    .prompt-row-grid .input-group {
-        margin-bottom: 0;
-    }
-    .prompt-row-grid .input-group .input-label {
-        font-size: 0.9em;
-        margin-bottom: 4px;
-    }
-    .prompt-row-grid .input-field {
-        padding: 10px;
-        font-size: 0.95em;
-    }
-    .prompt-row-summary {
-        display: none;
-        font-size: 0.95em;
-        font-style: italic;
-        opacity: 0.8;
-    }
-    .prompt-row.concise {
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
-    }
-    .prompt-row.concise .prompt-row-grid {
-       max-height: 0;
-       opacity: 0;
-       overflow: hidden;
-       pointer-events: none;
-    }
-    .prompt-row.concise .prompt-row-header {
-        margin-bottom: 0;
-    }
-    .prompt-row.concise .prompt-row-summary {
-        display: block;
-    }
-    #add-prompt-row-btn {
-        width: 100%;
-        padding: 12px;
-        font-size: 1.1em;
-        font-weight: bold;
-        background-color: var(--component-bg);
-        color: var(--accent-color);
-        border: 2px dashed var(--accent-color);
-    }
-    #add-prompt-row-btn:hover {
-        background-color: var(--primary-bg);
-    }
-
-
   </style>
 </head>
 <body class="dark-mode">
@@ -1078,34 +980,25 @@
             <button id="generate-prompt-btn-topic" class="btn btn-full-width glowing">Start 🚀</button>
             <button class="btn btn-secondary back-to-creation-selection-btn" style="margin-top: 1rem; width: 100%;">&larr; Back to Options</button>
         </div>
-
-        <!-- WORKFLOW 2: From Text (MODIFIED) -->
+        <!-- WORKFLOW 2: From Text -->
         <div id="text-generator-workflow" class="hidden">
             <div class="step-header-container">
-              <h3 class="step-header">Step 1: Build Your Mock Test</h3>
+              <h3 class="step-header">Step 1: Provide Your Text / Formula</h3>
               <div class="guide-container">
                   <button class="btn guide-btn" data-guide-id="text-step1" title="Show Guide">💁</button>
                   <span class="guide-help-text">How to use</span>
               </div>
             </div>
-
-            <div class="input-group">
-                <label class="input-label">Add topics one by one to build your test.</label>
-                <div id="dynamic-prompt-builder">
-                    <!-- Dynamic rows will be inserted here by JavaScript -->
-                </div>
-                <button id="add-prompt-row-btn" class="btn">➕ Add Topic</button>
-            </div>
-            
+            <div class="input-group"><label for="source-text-input" class="input-label">Customise your mock test</label><textarea id="source-text-input" placeholder="Give instructions as you wish, according to your wish and customise your test series or mock test from different subject, different topics.&#10;&#10;Example for NEET student:&#10;Generate 20 questions from physics of both 11th and 12th&#10;Generate 15 questions from chemistry of both 11th and 12th&#10;Generate 10 questions from biology of both 11th and 12th&#10;Book instructions like use NCERT book of 11th and 12th as reference&#10;Generate random question like one question from physics and other from chemistry"></textarea></div>
             <div class="step-header-container">
-              <h3 class="step-header">Step 2: Define General Settings</h3>
+              <h3 class="step-header">Step 2: Define Your Questions</h3>
               <div class="guide-container">
                   <button class="btn guide-btn" data-guide-id="text-step2" title="Show Guide">💁</button>
                   <span class="guide-help-text">How to use</span>
               </div>
             </div>
-            
-            <div class="input-group"><label for="prompt-num-questions-text" class="input-label">Total Number of Questions (auto-calculated)</label><input type="number" id="prompt-num-questions-text" class="input-field" placeholder="e.g., 5" min="1" max="50" readonly style="font-weight: bold; background-color: var(--primary-bg);"></div>
+            <div class="input-group"><label for="prompt-num-questions-text" class="input-label">Number of Questions</label><input type="number" id="prompt-num-questions-text" class="input-field" placeholder="e.g., 5" min="1" max="50"></div>
+            <div class="input-group"><label for="prompt-subject-text" class="input-label">Subject/Instruction e.g. generate quiz on this formula</label><input type="text" id="prompt-subject-text" class="input-field" placeholder="e.g., Generate questions on this topic"></div>
             <div class="input-group"><label for="prompt-language-text" class="input-label">Language</label><select id="prompt-language-text" class="input-field"><option value="English" selected>English</option><option value="Hindi">Hindi</option><option value="Spanish">Spanish</option><option value="French">French</option><option value="German">German</option></select></div>
             <div class="input-group"><label for="prompt-difficulty-text" class="input-label">Difficulty Level</label><select id="prompt-difficulty-text" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
             <div class="input-group"><label class="input-label">Target Exam (Required)</label><div class="exam-buttons-container"></div><input type="text" class="prompt-exam-other input-field hidden" placeholder="Enter other exam name" style="margin-top: 10px;"></div>
@@ -1210,7 +1103,7 @@
                     </div>
                 </div>
                 <div class="input-group">
-                    <label><input type="checkbox" id="pdf-force-ocr" checked> Force OCR (for scanned or image-based PDFs)</label>
+                    <label><input type="checkbox" id="pdf-force-ocr"> Force OCR (for scanned or image-based PDFs)</label>
                 </div>
 
                 <button id="extract-text-pdf-btn" class="btn btn-full-width glowing">🔍 Extract Text from PDF</button>
@@ -1525,7 +1418,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     const LEGACY_FORMAT_TEXT = [MCQ_EXAMPLE, AR_EXAMPLE, STATEMENT_EXAMPLE, MATH_EXAMPLE, TF_EXAMPLE, FILL_BLANK_EXAMPLE].join('\n\n');
 
 
-    const commonGuideAfterInput = `<div class="guide-step"><strong>Step 2: Fill Question Details</strong><p>Fill in the details like Number of Questions, Subject, Language, Difficulty, Exam, and Question Format.</p><p class="hindi-text">(चरण 2: क्विज़ का विवरण भरें - प्रश्नों की संख्या, विषय, भाषा, कठिनाई, परीक्षा और प्रश्न प्रारूप जैसे विवरण भरें।)</p></div><div class="guide-step"><strong>Step 3: Generate Prompt & Open AI</strong><p>Click the big "Start 🚀" button. This automatically copies the instructions for the AI and opens the Gemini website in a new tab.</p><p class="hindi-text">(चरण 3: 'Start 🚀' बटन पर क्लिक करें - यह AI के लिए निर्देश अपने आप कॉपी कर लेगा और एक नए टैब में Gemini वेबसाइट खोल देगा।)</p></div><div class="guide-step"><strong>Step 4: Use the AI (Gemini)</strong><p>In the Gemini website, just paste the prompt into the message box and send it. Wait for the AI to generate all the questions.</p><p class="hindi-text">(चरण 4: AI (Gemini) का उपयोग करें - Gemini वेबसाइट में, बस प्रॉम्प्ट को मैसेज बॉक्स में पेस्ट करें और भेजें। AI द्वारा सभी प्रश्न बनाने तक प्रतीक्षा करें।)</p></div><div class="guide-step"><strong>Step 5: Copy AI's Response</strong><p>After the questions are generated, copy the entire response. There are two ways to copy from Gemini: 1) Click the copy icon (like a clipboard 📋) below the answer. 2) Click the three dots (...) at the top-right of the response and select 'Copy'.</p><p class="hindi-text">(चरण 5: AI की प्रतिक्रिया कॉपी करें - प्रश्न बन जाने के बाद, पूरी प्रतिक्रिया कॉपी करें। Gemini से कॉपी करने के 2 तरीके हैं: 1) उत्तर के नीचे कॉपी आइकन (📋) पर क्लिक करें। 2) प्रतिक्रिया के ऊपर-दाईं ओर तीन डॉट्स (...) पर क्लिक करें और 'कॉपी करें' चुनें।)</p></div><div class="guide-step"><strong>Step 6: Return to Examyatri</strong><p>You have two choices: 1) Simply switch tabs from Gemini back to examyatri. 2) On mobile, you can press your phone's 'Back' navigation button twice. The questions will be created automatically!</p><p class="hindi-text">(चरण 6: Examyatri पर वापस आएं - आपके पास 2 विकल्प हैं: 1) बस Gemini से Gemini टैब पर वापस स्विच करें। 2) मोबाइल पर, आप अपने फोन का 'बैक' नेगेशन बटन दो बार दबा सकते हैं। क्विज़ अपने आप बन जाएगा!)</p></div>`;
+    const commonGuideAfterInput = `<div class="guide-step"><strong>Step 2: Fill Question Details</strong><p>Fill in the details like Number of Questions, Subject, Language, Difficulty, Exam, and Question Format.</p><p class="hindi-text">(चरण 2: क्विज़ का विवरण भरें - प्रश्नों की संख्या, विषय, भाषा, कठिनाई, परीक्षा और प्रश्न प्रारूप जैसे विवरण भरें।)</p></div><div class="guide-step"><strong>Step 3: Generate Prompt & Open AI</strong><p>Click the big "Start 🚀" button. This automatically copies the instructions for the AI and opens the Gemini website in a new tab.</p><p class="hindi-text">(चरण 3: 'Start 🚀' बटन पर क्लिक करें - यह AI के लिए निर्देश अपने आप कॉपी कर लेगा और एक नए टैब में Gemini वेबसाइट खोल देगा।)</p></div><div class="guide-step"><strong>Step 4: Use the AI (Gemini)</strong><p>In the Gemini website, just paste the prompt into the message box and send it. Wait for the AI to generate all the questions.</p><p class="hindi-text">(चरण 4: AI (Gemini) का उपयोग करें - Gemini वेबसाइट में, बस प्रॉम्प्ट को मैसेज बॉक्स में पेस्ट करें और भेजें। AI द्वारा सभी प्रश्न बनाने तक प्रतीक्षा करें।)</p></div><div class="guide-step"><strong>Step 5: Copy AI's Response</strong><p>After the questions are generated, copy the entire response. There are two ways to copy from Gemini: 1) Click the copy icon (like a clipboard 📋) below the answer. 2) Click the three dots (...) at the top-right of the response and select 'Copy'.</p><p class="hindi-text">(चरण 5: AI की प्रतिक्रिया कॉपी करें - प्रश्न बन जाने के बाद, पूरी प्रतिक्रिया कॉपी करें। Gemini से कॉपी करने के 2 तरीके हैं: 1) उत्तर के नीचे कॉपी आइकन (📋) पर क्लिक करें। 2) प्रतिक्रिया के ऊपर-दाईं ओर तीन डॉट्स (...) पर क्लिक करें और 'कॉपी करें' चुनें।)</p></div><div class="guide-step"><strong>Step 6: Return to Examyatri</strong><p>You have two choices: 1) Simply switch tabs from Gemini back to examyatri. 2) On mobile, you can press your phone's 'Back' navigation button twice. The questions will be created automatically!</p><p class="hindi-text">(चरण 6: Examyatri पर वापस आएं - आपके पास 2 विकल्प हैं: 1) बस Gemini से Gemini टैब पर वापस स्विच करें। 2) मोबाइल पर, आप अपने फोन का 'बैक' नेविगेशन बटन दो बार दबा सकते हैं। क्विज़ अपने आप बन जाएगा!)</p></div>`;
 
     const GUIDE_DATA = {
         'topic-step1':{title:'Guide: Create Questions from Topic',content:`<div class="guide-step"><strong>Step 1: Enter Your Topic</strong><p>First, fill in the "Primary Topic" field. For example: "World War II" or "Solar System".</p><p class="hindi-text">(चरण 1: अपना विषय दर्ज करें - सबसे पहले, "Primary Topic" फ़ील्ड भरें। उदाहरण के लिए: "द्वितीय विश्व युद्ध" या "सौर मंडल"।)</p></div>${commonGuideAfterInput}`},
@@ -1699,8 +1592,8 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
     let isShakeReminderEnabled = true;
     let pressureTextCounter = 1;
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
-    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
+    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE=');
     
     // --- INITIALIZATION ---
     async function init() {
@@ -1713,10 +1606,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         loadScrollPosition();
         loadPressureModeSettings();
         
-        // NEW: Initialize the first dynamic row in the "Customise" workflow
-        if (!document.querySelector('.prompt-row')) {
-            createNewPromptRow();
-        }
+        document.getElementById('pdf-force-ocr').checked = true;
         
         await dbHelper.init();
         
@@ -1784,7 +1674,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             const targetId = target.id;
             const closestButton = target.closest('[id]'); // Find nearest parent with an ID
             const closestPill = target.closest('.lang-pill-btn'); // Use new class
-            const closestRemoveBtn = target.closest('.remove-row-btn');
 
             // Use the closest button's ID if the target itself doesn't have one (e.g., clicking an icon inside a button)
             const effectiveId = closestButton ? closestButton.id : targetId;
@@ -1813,10 +1702,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             if (effectiveId === 'select-from-image') { showWorkflow('image'); return; }
             if (effectiveId === 'select-from-pdf') { showWorkflow('pdf'); return; }
             
-            // --- NEW: Dynamic Prompt Builder ---
-            if (effectiveId === 'add-prompt-row-btn') { addAndConciseRows(); return; }
-            if (closestRemoveBtn) { removePromptRow(closestRemoveBtn); return; }
-
             // --- UPDATED: Language Pill Selection ---
             if (closestPill) {
                 const lang = closestPill.dataset.lang;
@@ -1918,13 +1803,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
              // It controls whether to USE the selected OCR language or not.
         });
 
-        // Listener for the dynamic rows to update total questions
-        document.getElementById('text-generator-workflow').addEventListener('input', (event) => {
-            if (event.target.classList.contains('prompt-row-num-questions')) {
-                updateTotalQuestions();
-            }
-        });
-
         document.querySelectorAll('input[name="pdf-page-option"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const isRange = e.target.value === 'range';
@@ -1953,8 +1831,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         inputs.forEach(input => {
             if (!input.id && !input.name) return;
             const key = input.id || input.name;
-            // CORRECTED LOGIC: Always skip loading the saved state for pdf-force-ocr
-            if (key === 'pdf-force-ocr') return;
             if (input.type === 'radio' && state[input.name]) {
                 input.checked = (input.id === state[input.name]);
             } else if (state.hasOwnProperty(key)) {
@@ -2796,31 +2672,49 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     // --- UPDATED PROMPT GENERATION ---
     function generatePrompt(source, sourceType) {
         const { numQuestions, topic, subject, difficulty, language, formatKey, exam } = source;
-        
-        let sourceText;
-        if (sourceType === 'text') {
-            sourceText = source.sourceText; // Use the pre-compiled text from the dynamic rows
-        } else {
-            sourceText = sourceType === 'pdf' ? elements.sourceTextPdf.value.trim() :
-                           sourceType === 'image' ? elements.sourceTextImage.value.trim() : '';
-        }
+        const sourceText = sourceType === 'pdf' ? elements.sourceTextPdf.value.trim() :
+                           sourceType === 'image' ? elements.sourceTextImage.value.trim() :
+                           sourceType === 'text' ? document.getElementById('source-text-input').value.trim() : '';
 
-        if (sourceType === 'topic' && !topic) { alert('Please enter a Primary Topic.'); return null; }
-        if ((sourceType !== 'topic' && !sourceText) || !numQuestions) { alert('Please ensure you have provided source material and the number of questions.'); return null; }
-        if (!exam) { alert("Please select a target exam before generating questions."); return null; }
+        if (sourceType === 'topic' && !topic) { alert('Please enter a Primary Topic.'); return; }
+        if ((sourceType !== 'topic' && !sourceText) || !numQuestions) { alert('Please ensure you have provided source material and the number of questions.'); return; }
+        if (!exam) { alert("Please select a target exam before generating questions."); return; }
         
         let formatInstruction = "";
         let sampleFormat = "";
 
         switch (formatKey) {
-            case 'mcq': formatInstruction = "You MUST generate ONLY Multiple Choice (MCQ) questions."; sampleFormat = MCQ_EXAMPLE; break;
-            case 'statement': formatInstruction = "You MUST generate ONLY Statement-Based questions."; sampleFormat = STATEMENT_EXAMPLE; break;
-            case 'assertion-reason': formatInstruction = "You MUST generate ONLY Assertion-Reason questions."; sampleFormat = AR_EXAMPLE; break;
-            case 'math-physics': formatInstruction = "You MUST generate ONLY Math, Physics, or other formula-based questions using LaTeX for symbols."; sampleFormat = MATH_EXAMPLE; break;
-            case 'true-false': formatInstruction = "You MUST generate ONLY True/False questions."; sampleFormat = TF_EXAMPLE; break;
-            case 'fill-blank': formatInstruction = "You MUST generate ONLY Fill-in-the-Blank style questions."; sampleFormat = FILL_BLANK_EXAMPLE; break;
-            case 'mix': default: formatInstruction = "Generate a mix of question formats based on the examples provided."; sampleFormat = LEGACY_FORMAT_TEXT; break;
+            case 'mcq':
+                formatInstruction = "You MUST generate ONLY Multiple Choice (MCQ) questions.";
+                sampleFormat = MCQ_EXAMPLE;
+                break;
+            case 'statement':
+                formatInstruction = "You MUST generate ONLY Statement-Based questions.";
+                sampleFormat = STATEMENT_EXAMPLE;
+                break;
+            case 'assertion-reason':
+                formatInstruction = "You MUST generate ONLY Assertion-Reason questions.";
+                sampleFormat = AR_EXAMPLE;
+                break;
+            case 'math-physics':
+                 formatInstruction = "You MUST generate ONLY Math, Physics, or other formula-based questions using LaTeX for symbols.";
+                 sampleFormat = MATH_EXAMPLE;
+                break;
+            case 'true-false':
+                 formatInstruction = "You MUST generate ONLY True/False questions.";
+                 sampleFormat = TF_EXAMPLE;
+                break;
+            case 'fill-blank':
+                 formatInstruction = "You MUST generate ONLY Fill-in-the-Blank style questions.";
+                 sampleFormat = FILL_BLANK_EXAMPLE;
+                break;
+            case 'mix':
+            default:
+                formatInstruction = "Generate a mix of question formats based on the examples provided.";
+                sampleFormat = LEGACY_FORMAT_TEXT;
+                break;
         }
+
 
         let prompt = `You are an expert at generating high-quality assessment questions in plain text format. Your responses must be very fast and precise.
 
@@ -2834,9 +2728,9 @@ CRITICAL INSTRUCTIONS (MUST be followed):
 7.  **Format Adherence:** ${formatInstruction}
 
 --- ASSESSMENT PARAMETERS ---
-*   **Total Number of Questions:** ${numQuestions}
-*   **Primary Topic/Instructions:** ${topic || 'Based on source material'}
-*   **Subject:** ${subject || 'Mixed/Not specified'}
+*   **Number of Questions:** ${numQuestions}
+*   **Primary Topic:** ${topic || 'Not specified'}
+*   **Subject:** ${subject || 'Not specified'}
 *   **Difficulty Level:** ${difficulty}
 *   **Language:** ${language}
 *   **Question Format:** ${QUESTION_FORMATS[formatKey].name}
@@ -2845,15 +2739,12 @@ CRITICAL INSTRUCTIONS (MUST be followed):
 
 --- SOURCE MATERIAL INSTRUCTIONS ---
 `;
-        
-        if (sourceType === 'pdf') {
-            prompt += `*   **Knowledge Base:** You MUST generate questions based primarily on the "Source Material" provided below. Use the provided text as the core context and factual basis for the questions. You may use your external knowledge to properly frame the questions, ensure they are conceptually sound, and match the difficulty and style of the specified target exam. DO NOT introduce facts or topics completely unrelated to the source material.
-*   **Difficulty Application:** For 'Easy' difficulty, questions can be line-by-line. For 'Medium', 'Hard', and 'Expert', create more conceptual and tricky questions by combining information from the source text, but ensure the answer is always supported by the provided material.`;
-        } else { // For topic, image, and custom text (text workflow)
-            prompt += `*   **Knowledge Base:** Use your complete internal knowledge to generate the best possible questions that align with the parameters.
-*   **Context:** Use the "Primary Topic" and "Subject" as your guide. If "Source Material" is provided below (from an image or custom instructions), use it as the primary context or as an example to create *new, different questions* that are relevant to the topic. You are not strictly limited to the provided text.`;
-        }
 
+        if (sourceType === 'pdf') {
+            prompt += `*   **Knowledge Base:** You MUST generate questions based primarily on the "Source Material" provided below. Use the provided text as the core context and factual basis for the questions. You may use your external knowledge to properly frame the questions, ensure they are conceptually sound, and match the difficulty and style of the specified target exam. DO NOT introduce facts or topics completely unrelated to the source material.`;
+        } else { // For topic, text, image
+            prompt += `*   **Knowledge Base:** Use your own internal knowledge, guided by the "Primary Topic" and "Subject". If "Source Material" is provided below, use it as the primary context or as an example to create *new, different questions* that match the specified parameters.`;
+        }
 
         prompt += `
 
@@ -2889,69 +2780,13 @@ Now, generate the questions based on all the instructions above.`;
         generatePrompt(source, 'topic');
     }
 
-    // --- MODIFIED: generateTextPrompt for dynamic rows ---
     function generateTextPrompt() {
-        const promptRows = document.querySelectorAll('.prompt-row');
-        let instructions = [];
-        let totalQuestions = 0;
-        let subjects = new Set();
-
-        for (let i = 0; i < promptRows.length; i++) {
-            const row = promptRows[i];
-            const topic = row.querySelector('.prompt-row-topic').value.trim();
-            const numQuestions = row.querySelector('.prompt-row-num-questions').value.trim();
-            
-            if (!topic || !numQuestions) {
-                alert(`Please fill out the mandatory 'Topic' and 'Number of Questions' for Topic #${i + 1}.`);
-                return;
-            }
-
-            const subject = row.querySelector('.prompt-row-subject').value.trim();
-            const classLevel = row.querySelector('.prompt-row-class').value.trim();
-            const book = row.querySelector('.prompt-row-book').value.trim();
-            
-            let instruction = `Generate ${numQuestions} questions from the topic "${topic}"`;
-            if (subject) {
-                instruction += ` in ${subject}`;
-                subjects.add(subject);
-            }
-            if (classLevel) instruction += `, suitable for class/level: ${classLevel}`;
-            if (book) instruction += `, using "${book}" as a reference`;
-            instruction += ".";
-            
-            instructions.push(instruction);
-            totalQuestions += parseInt(numQuestions, 10);
-        }
-
-        if (instructions.length === 0) {
-            alert("Please add at least one topic to generate questions.");
-            return;
-        }
-
-        const compiledSourceText = "Follow these instructions to create the test:\n- " + instructions.join('\n- ');
-        
-        quizMetaData = { 
-            topic: `Custom Mock Test (${instructions.length} topics)`, 
-            subject: Array.from(subjects).join(', ') || 'Mixed'
-        };
-        
+        quizMetaData = { topic: '', subject: document.getElementById('prompt-subject-text').value.trim() };
         const otherExamInput = elements.textGeneratorWorkflow.querySelector('.prompt-exam-other');
         const finalExam = (selectedExam === 'Other') ? otherExamInput.value.trim() : selectedExam;
-
-        const source = {
-            numQuestions: totalQuestions,
-            topic: `Custom Mock Test`,
-            subject: quizMetaData.subject,
-            difficulty: document.getElementById('prompt-difficulty-text').value,
-            language: document.getElementById('prompt-language-text').value,
-            formatKey: document.getElementById('question-format-select-text').value,
-            exam: finalExam,
-            sourceText: compiledSourceText // Pass the compiled instructions
-        };
-        
+        const source = { numQuestions: document.getElementById('prompt-num-questions-text').value, topic: '', subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-text').value, language: document.getElementById('prompt-language-text').value, formatKey: document.getElementById('question-format-select-text').value, exam: finalExam };
         generatePrompt(source, 'text');
     }
-
 
     function generateImagePrompt() {
         quizMetaData = { topic: document.getElementById('prompt-topic-image').value.trim(), subject: document.getElementById('prompt-subject-image').value.trim() };
@@ -2969,83 +2804,6 @@ Now, generate the questions based on all the instructions above.`;
         generatePrompt(source, 'pdf');
     }
     // END OF REPLACEMENT BLOCK 2
-
-    // --- NEW: Dynamic Prompt Builder Functions ---
-    let rowCounter = 0;
-    function createNewPromptRow() {
-        rowCounter++;
-        const builder = document.getElementById('dynamic-prompt-builder');
-        const row = document.createElement('div');
-        row.className = 'prompt-row';
-        row.innerHTML = `
-            <div class="prompt-row-header">
-                <span class="prompt-row-title">Topic #${rowCounter}</span>
-                <button class="remove-row-btn" title="Remove Topic">－</button>
-            </div>
-            <p class="prompt-row-summary"></p>
-            <div class="prompt-row-grid">
-                <div class="input-group">
-                    <label class="input-label">Subject (Optional)</label>
-                    <input type="text" class="input-field prompt-row-subject" placeholder="e.g., Physics">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Topic (Mandatory)</label>
-                    <input type="text" class="input-field prompt-row-topic" placeholder="e.g., Circular Motion">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">No. of Questions (Mandatory)</label>
-                    <input type="number" class="input-field prompt-row-num-questions" placeholder="e.g., 10" min="1" max="25">
-                </div>
-                 <div class="input-group">
-                    <label class="input-label">Class / Level</label>
-                    <input type="text" class="input-field prompt-row-class" placeholder="e.g., 11th and 12th">
-                </div>
-                 <div class="input-group">
-                    <label class="input-label">Reference Book</label>
-                    <input type="text" class="input-field prompt-row-book" placeholder="e.g., NCERT">
-                </div>
-            </div>
-        `;
-        builder.appendChild(row);
-        updateTotalQuestions();
-        return row;
-    }
-
-    function addAndConciseRows() {
-        const rows = document.querySelectorAll('.prompt-row');
-        rows.forEach(row => {
-            const topic = row.querySelector('.prompt-row-topic').value;
-            const num = row.querySelector('.prompt-row-num-questions').value;
-            if (topic && num) {
-                 const summary = row.querySelector('.prompt-row-summary');
-                 summary.textContent = `Topic: ${topic} (${num} Questions)`;
-                 row.classList.add('concise');
-            }
-        });
-        const newRow = createNewPromptRow();
-        newRow.querySelector('.prompt-row-topic').focus();
-    }
-
-    function removePromptRow(button) {
-        const rowToRemove = button.closest('.prompt-row');
-        rowToRemove.remove();
-        // Renumber remaining rows
-        const remainingRows = document.querySelectorAll('.prompt-row');
-        rowCounter = 0;
-        remainingRows.forEach(row => {
-            rowCounter++;
-            row.querySelector('.prompt-row-title').textContent = `Topic #${rowCounter}`;
-        });
-        updateTotalQuestions();
-    }
-    
-    function updateTotalQuestions() {
-        let total = 0;
-        document.querySelectorAll('.prompt-row-num-questions').forEach(input => {
-            total += parseInt(input.value, 10) || 0;
-        });
-        document.getElementById('prompt-num-questions-text').value = total > 0 ? total : '';
-    }
 
     function setupAllExamSelectors() { document.querySelectorAll('.exam-buttons-container').forEach(container => { const inputField = container.nextElementSibling; populateExamButtons(container, inputField); }); }
     
@@ -3455,11 +3213,15 @@ Now, generate the questions based on all the instructions above.`;
     function startQuiz(){ showScreen('player'); quizStartTime=new Date(); currentQuestionIndex=0; userAnswers=quizData.map((q, i)=>({selected:null,isCorrect:null,status:'unseen', startTime: null, endTime: null})); bookmarkedQuestions.clear(); originalQuizData=JSON.parse(JSON.stringify(quizData)); loadQuestion(0); }
     function loadQuestion(index){ if(index<0||index>=originalQuizData.length)return; currentQuestionIndex=index;selectedOptionIndex=null; const question=originalQuizData[currentQuestionIndex]; const answer=userAnswers[currentQuestionIndex]; elements.congratsAnimationContainer.innerHTML = ''; if (!clapSound.paused) { clapSound.pause(); clapSound.currentTime = 0; } pressureTextCounter = 1; const pressureTextEl = document.getElementById('pressure-text-animation'); if(pressureTextEl) pressureTextEl.classList.add('hidden'); document.getElementById('pressure-mode-toggle-btn').classList.remove('hidden'); if(answer.status==='answered'){ clearInterval(timerId); elements.timerText.textContent="--:--"; Object.values(elements.faces).forEach(face=>face.classList.remove('visible')) } else { resetAndStartQuestionTimer() } updateQuestionUI(question); updateOptionsAndExplanationState(); updateQuizActions(); if (window.MathJax) MathJax.typesetPromise([elements.quizPlayerContainer]); }
     
+    // =========================================================
+    // =============== FUNCTION WITH CORRECTION ================
+    // =========================================================
     function updateQuestionUI(q) {
         elements.questionTopic.textContent = quizMetaData.topic || "";
         elements.progress.textContent = `Question ${currentQuestionIndex + 1} / ${originalQuizData.length}`;
         elements.questionText.innerHTML = q.question.replace(/\n/g, '<br>');
 
+        // CORRECTED LINE: Used 'currentQuestionIndex' instead of the undefined variable 'i'.
         elements.bookmarkBtn.classList.toggle('bookmarked', bookmarkedQuestions.has(currentQuestionIndex));
         
         elements.statementsList.innerHTML = q.statements?.map(stmt => `<p>• ${stmt}</p>`).join('') || '';
@@ -3472,6 +3234,9 @@ Now, generate the questions based on all the instructions above.`;
             elements.optionsContainer.appendChild(optionDiv);
         });
     }
+    // =========================================================
+    // =========================================================
+    // =========================================================
 
     function updateOptionsAndExplanationState() { const answer = userAnswers[currentQuestionIndex]; const question = originalQuizData[currentQuestionIndex]; const correctEmojis = ['🥳', '🎉', '🤩', '👍', '💯']; const incorrectEmojis = ['🤔', '😟', '🤨', '🤦‍♂️', '❌']; document.querySelectorAll('.option').forEach((optionDiv, i) => { if (answer.status === 'answered') { optionDiv.classList.add('disabled'); if (i === question.correctAnswerIndex) { optionDiv.classList.add('correct'); optionDiv.querySelector('.feedback-icon').textContent = '✔️'; } if (i === answer.selected) { const userChoiceEmoji = optionDiv.querySelector('.user-choice-emoji'); if (answer.isCorrect) userChoiceEmoji.textContent = correctEmojis[Math.floor(Math.random() * correctEmojis.length)]; else { optionDiv.classList.add('incorrect'); optionDiv.querySelector('.feedback-icon').textContent = '❌'; userChoiceEmoji.textContent = incorrectEmojis[Math.floor(Math.random() * incorrectEmojis.length)]; } userChoiceEmoji.classList.add('visible'); } } }); const isAnswered = answer.status === 'answered'; elements.explanationContainer.classList.toggle('hidden', !isAnswered); if (isAnswered) { elements.explanationText.innerHTML = question.explanation; } }
     function updateQuizActions() { elements.quizActions.innerHTML = ''; const prevBtn = document.createElement('button'); prevBtn.id = 'prev-question-btn'; prevBtn.className = 'btn btn-secondary quiz-actions-top-left'; prevBtn.textContent = '⬅️ Previous'; prevBtn.disabled = currentQuestionIndex === 0; elements.quizActions.appendChild(prevBtn); if (userAnswers[currentQuestionIndex].status !== 'answered') { const checkBtn = document.createElement('button'); checkBtn.id = 'check-answer-btn'; checkBtn.className = 'btn quiz-actions-top-right'; checkBtn.textContent = 'Check Answer ✅'; checkBtn.disabled = selectedOptionIndex === null; elements.quizActions.appendChild(checkBtn); const skipBtn = document.createElement('button'); skipBtn.id = 'skip-question-btn'; skipBtn.className = 'btn quiz-actions-bottom-left'; skipBtn.textContent = 'Skip ➡️'; elements.quizActions.appendChild(skipBtn); } else { const nextBtn = document.createElement('button'); nextBtn.id = 'next-question-btn'; nextBtn.className = 'btn quiz-actions-bottom-left'; nextBtn.textContent = 'Next ➡️'; nextBtn.disabled = currentQuestionIndex === originalQuizData.length - 1; elements.quizActions.appendChild(nextBtn); } const submitBtn = document.createElement('button'); submitBtn.id = 'submit-quiz-btn'; submitBtn.className = 'btn btn-danger quiz-actions-bottom-right'; submitBtn.textContent = 'Submit'; elements.quizActions.appendChild(submitBtn); }
