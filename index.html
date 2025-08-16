@@ -1667,11 +1667,12 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     let lastRoomData = null; // To store the final room data for results
     let mpCurrentQuestionIndex = 0; // Local index for multiplayer navigation
     let mpSelectedOptionIndex = null; // Local selection for multiplayer
+    let countdownTimerId = null; // FIX: Added for leaderboard countdown control
 
     let isShakeReminderEnabled = true;
     let pressureTextCounter = 1;
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
-    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE');
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
+    const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE');
     
     // --- INITIALIZATION ---
     async function init() {
@@ -1684,23 +1685,40 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         loadScrollPosition();
         loadPressureModeSettings();
         
-        // BUG FIX: Ensure Force OCR is always checked on page load
         document.getElementById('pdf-force-ocr').checked = true;
         
         await dbHelper.init();
         
+        // *** MODIFICATION START: Simplified and Robust Routing Logic ***
+
+        // Add event listener for back/forward button presses
+        window.addEventListener('hashchange', handleHashChange);
+
+        // Add safety net to prevent accidental reloads during a quiz
+        window.addEventListener('beforeunload', (event) => {
+            const isQuizActive = !elements.quizPlayerContainer.classList.contains('hidden') && quizData.length > 0;
+            const isMultiplayerQuizActive = !elements.multiplayerQuizPlayerContainer.classList.contains('hidden');
+
+            if (isQuizActive || isMultiplayerQuizActive) {
+                event.preventDefault(); // Required for modern browsers
+                event.returnValue = ''; // Required for older browsers
+            }
+        });
+
         const quizRestored = await loadQuizState();
         if (quizRestored) {
-            // Active quiz session takes precedence.
-        } else if (sessionStorage.getItem('promptGenerated') === 'true') {
-            gameMode = sessionStorage.getItem('gameMode'); // Restore game mode
-            showScreen('paste');
-            handleClipboardPermission();
+            // Priority 1: If there's a saved quiz, ALWAYS go to the player.
+            // The loadQuizState function already handles showing the screen. We just set the hash.
+            showScreen('player');
         } else {
-            showScreen('modeSelection');
+            // Priority 2: If no saved quiz, let the hash router decide what to show.
+            // This will correctly handle #paste if the user is returning from the AI tab,
+            // or default to the home screen if the hash is empty.
+            handleHashChange();
         }
+        
+        // *** MODIFICATION END ***
 
-        // Initialize the dynamic prompt builder
         setupDynamicPromptBuilder();
     }
     
@@ -1712,7 +1730,26 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     function showLoading(text) { elements.loadingText.textContent = text; elements.loadingOverlay.classList.remove('hidden'); }
     function hideLoading() { elements.loadingOverlay.classList.add('hidden'); }
 
+    /**
+     * Navigates to a new screen by updating the URL hash.
+     * This creates a browser history entry, allowing the back button to work.
+     * @param {string} screenName - The key of the screen to navigate to.
+     */
     function showScreen(screenName) {
+        const newHash = `#${screenName}`;
+        if (window.location.hash !== newHash) {
+            window.location.hash = newHash;
+        } else {
+            _displayScreen(screenName);
+        }
+    }
+
+    /**
+     * The internal function that physically shows/hides the screen divs.
+     * It does NOT modify the URL hash. This is called by the router (handleHashChange).
+     * @param {string} screenName - The key of the screen to display.
+     */
+    function _displayScreen(screenName) {
         const screens = {
             modeSelection: elements.modeSelectionContainer,
             multiplayerSelection: elements.multiplayerSelectionContainer,
@@ -1727,24 +1764,43 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             mpResults: elements.multiplayerResultsContainer,
         };
 
-        // --- MODIFIED: Handle global nav visibility ---
         const isQuizScreen = screenName === 'player' || screenName === 'mpPlayer';
         if (elements.globalNavBar) {
             elements.globalNavBar.classList.toggle('hidden', isQuizScreen);
         }
 
-        // Hide all page-level screens
         Object.values(screens).forEach(screen => {
             if (screen) screen.classList.add('hidden');
         });
 
-        // Show the target screen
         if(screens[screenName]) {
             screens[screenName].classList.remove('hidden');
-            // Specific setup for certain screens
             if(screenName === 'manualGenerator') {
-                showCreationSelector(); // By default, show the creation options
+                showCreationSelector();
             }
+        }
+    }
+
+    /**
+     * The "Router". This function is triggered by the 'hashchange' event or on initial load.
+     * It reads the current URL hash and shows the correct content.
+     */
+    function handleHashChange() {
+        const screenName = window.location.hash.substring(1);
+
+        // All possible screens must have a corresponding container element with the id `${screenName}Container`
+        const allScreens = ['modeSelection', 'multiplayerSelection', 'manualGenerator', 'paste', 'player', 'results', 'joinRoom', 'configureRoom', 'lobby', 'mpPlayer', 'mpResults'];
+
+        if (!screenName || !allScreens.includes(screenName)) {
+            _displayScreen('modeSelection');
+            return;
+        }
+
+        _displayScreen(screenName);
+        
+        // *** MODIFICATION ***: Trigger clipboard logic when we route to the paste screen.
+        if (screenName === 'paste') {
+            handleClipboardPermission();
         }
     }
 
@@ -1966,11 +2022,12 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     
     // --- PARSER, VALIDATOR, AND QUIZ START LOGIC ---
     function handlePasteAndParse() {
+        // FIX: Retrieve the game mode from sessionStorage to persist it across the redirect to the AI.
+        const gameMode = sessionStorage.getItem('gameMode');
         const text = elements.quizDataInput.value.trim();
         if (!text) { alert('Please paste the response into the box.'); return; }
 
-        sessionStorage.removeItem('promptGenerated');
-        sessionStorage.removeItem('gameMode');
+        sessionStorage.removeItem('gameMode'); // Clear this after use
 
         if (gameMode === 'multiplayer') {
             localStorage.setItem('multiplayerQuizText', text);
@@ -2018,7 +2075,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         if (!quizText) { alert('Error: Question text not found. Please go back and create the questions.'); return; }
 
         isHost = true;
-        // UPDATED: Generate a 6-digit numeric code
         currentRoomCode = Math.floor(100000 + Math.random() * 900000).toString();
         
         const { db, ref, set, push, serverTimestamp } = window.firebase;
@@ -2044,6 +2100,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
     function enterLobby() {
         showScreen('lobby');
+        // The display logic is now handled by the router, but we can set up the content here.
         if (isHost) {
             elements.roomCodeText.textContent = currentRoomCode;
             elements.roomCodeDisplay.classList.remove('hidden');
@@ -2069,13 +2126,14 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
                 const resultsScreenVisible = !elements.multiplayerResultsContainer.classList.contains('hidden');
                 if (!resultsScreenVisible) {
                     alert("The host has left or the room was deleted.");
-                    window.location.reload();
+                    window.location.hash = ''; // Go home
                 }
                 return;
             }
             const roomData = snapshot.val();
             lastRoomData = roomData;
     
+            // Update Lobby UI
             if (roomData.status === 'waiting') {
                 const players = roomData.players || {};
                 elements.lobbyPlayersList.innerHTML = '';
@@ -2089,6 +2147,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
                 if (isHost) { document.getElementById('start-game-btn').disabled = Object.keys(players).length < 1; }
             }
     
+            // Start the quiz for all players if status changes to 'playing'
             if (roomData.status === 'playing' && elements.multiplayerQuizPlayerContainer.classList.contains('hidden')) {
                  startMultiplayerQuiz(roomData);
             }
@@ -2103,12 +2162,10 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
                 }
             }
             
+            // FIX: Simplified this block to be more robust
             if (roomData.status === 'finished') {
-                const leaderboardSection = elements.multiplayerResultsContainer.querySelector('#leaderboard-section');
-                if (leaderboardSection && leaderboardSection.classList.contains('hidden')) {
-                     if (clientTimer) clearInterval(clientTimer);
-                     showFinalLeaderboardAndStartCountdown(roomData);
-                }
+                if (clientTimer) clearInterval(clientTimer);
+                showFinalLeaderboardAndStartCountdown(roomData);
             }
         });
     }
@@ -2118,11 +2175,9 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         const roomRef = ref(db, `rooms/${currentRoomCode}`);
         try {
             await runTransaction(roomRef, (room) => {
-                if (room) {
-                    if (room.status === 'waiting') {
-                        room.status = 'playing';
-                        room.startTime = serverTimestamp();
-                    }
+                if (room && room.status === 'waiting') {
+                    room.status = 'playing';
+                    room.startTime = serverTimestamp();
                 }
                 return room;
             });
@@ -2416,6 +2471,9 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     }
     
     function showFinalLeaderboardAndStartCountdown(roomData) {
+        // FIX: Add a guard to prevent this function from running multiple times and creating multiple timers.
+        if (countdownTimerId) return;
+
         if (elements.multiplayerResultsContainer.classList.contains('hidden')) {
             showPersonalMultiplayerResults();
         }
@@ -2453,20 +2511,17 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             leaderboard.appendChild(li);
         });
     
-        let countdown = 10;
+        let countdown = 8;
         countdownText.textContent = `Room will be deleted and you will return to the home screen in ${countdown} seconds...`;
         
-        const countdownInterval = setInterval(() => {
+        // FIX: Assign the interval to the guard variable.
+        countdownTimerId = setInterval(() => {
             countdown--;
             countdownText.textContent = `Room will be deleted and you will return to the home screen in ${countdown} seconds...`;
             if (countdown <= 0) {
-                clearInterval(countdownInterval);
-                if (isHost) {
-                    const { db, ref, remove } = window.firebase;
-                    remove(ref(db, `rooms/${currentRoomCode}`)).catch(err => console.error("Error deleting room:", err));
-                }
-                showLoading("Returning to home screen...");
-                setTimeout(() => window.location.reload(), 1500);
+                clearInterval(countdownTimerId);
+                countdownTimerId = null; // FIX: Reset the guard variable.
+                handleHardReset();
             }
         }, 1000);
     }
@@ -2478,12 +2533,10 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
     // --- OCR & Image/PDF Processing (UPGRADED) ---
     async function getOcrWorker(lang, statusEl) {
-        // If we have a worker and the language is already correct, return it.
         if (ocrWorker && currentOcrLang === lang) {
             return ocrWorker;
         }
 
-        // If a worker exists but for a different language, terminate it.
         if (ocrWorker) {
             statusEl.textContent = 'Switching OCR language model...';
             await ocrWorker.terminate();
@@ -2491,12 +2544,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             currentOcrLang = null;
         }
 
-        const langName = {
-            'eng': 'English',
-            'hin': 'Hindi',
-            'eng+hin': 'English+Hindi'
-        }[lang];
-
+        const langName = { 'eng': 'English', 'hin': 'Hindi', 'eng+hin': 'English+Hindi' }[lang];
         statusEl.textContent = `Initializing ${langName} OCR Engine (this happens once per language)...`;
         try {
             ocrWorker = await Tesseract.createWorker(lang, 1, {
@@ -2509,7 +2557,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
                     }
                 }
             });
-            currentOcrLang = lang; // Set the current language
+            currentOcrLang = lang;
             statusEl.textContent = `${langName} OCR Engine is ready.`;
             return ocrWorker;
         } catch (error) {
@@ -2716,12 +2764,12 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     }
 
     async function saveQuizState() { if (quizData.length === 0 || elements.quizPlayerContainer.classList.contains('hidden')) { await dbHelper.set(QUIZ_STATE_KEY, null); return; } const state = { originalQuizData, userAnswers, currentQuestionIndex, bookmarkedQuestions: Array.from(bookmarkedQuestions), quizStartTime: quizStartTime.toISOString(), quizMetaData: quizMetaData }; await dbHelper.set(QUIZ_STATE_KEY, state); }
-    async function loadQuizState() { const state = await dbHelper.get(QUIZ_STATE_KEY); if (!state) return false; try { originalQuizData = state.originalQuizData; quizData = JSON.parse(JSON.stringify(originalQuizData)); userAnswers = state.userAnswers; currentQuestionIndex = state.currentQuestionIndex; bookmarkedQuestions = new Set(state.bookmarkedQuestions); quizStartTime = new Date(state.quizStartTime); quizMetaData = state.quizMetaData || {}; showScreen('player'); loadQuestion(currentQuestionIndex); showPasteNotification('✅ Your active assessment has been restored.'); return true; } catch (e) { console.error("Failed to load state:", e); await dbHelper.set(QUIZ_STATE_KEY, null); return false; } }
+    async function loadQuizState() { const state = await dbHelper.get(QUIZ_STATE_KEY); if (!state) return false; try { originalQuizData = state.originalQuizData; quizData = JSON.parse(JSON.stringify(originalQuizData)); userAnswers = state.userAnswers; currentQuestionIndex = state.currentQuestionIndex; bookmarkedQuestions = new Set(state.bookmarkedQuestions); quizStartTime = new Date(state.quizStartTime); quizMetaData = state.quizMetaData || {}; _displayScreen('player'); loadQuestion(currentQuestionIndex); showPasteNotification('✅ Your active assessment has been restored.'); return true; } catch (e) { console.error("Failed to load state:", e); await dbHelper.set(QUIZ_STATE_KEY, null); return false; } }
     async function handleClipboardPermission() { if (!navigator.clipboard || !navigator.permissions) return; try { const permissionStatus = await navigator.permissions.query({ name: "clipboard-read" }); if (permissionStatus.state === "granted") { await tryAutoPasteOnReturn(); } else if (permissionStatus.state === "prompt") { elements.clipboardPermissionModalOverlay.classList.remove('hidden'); } } catch (e) { console.warn("Clipboard permission API not supported or failed.", e); } }
     async function requestClipboardAndPaste() { elements.clipboardPermissionModalOverlay.classList.add('hidden'); await tryAutoPasteOnReturn(true); }
     async function tryAutoPasteOnReturn(forcePrompt = false) { if (!forcePrompt && document.hidden) return; try { const text = await navigator.clipboard.readText(); if (text && text.trim() && (text.includes("Question:") || text.includes("Correct Answer:"))) { elements.quizDataInput.value = text; showPasteNotification('✨ Auto-pasted! Processing...'); handlePasteAndParse(); } else if (forcePrompt) { showPasteNotification("📋 Your clipboard is empty or doesn't look like a set of questions."); } } catch (err) { if (err.name !== 'NotAllowedError') console.error("Clipboard read failed: ", err); if (forcePrompt) showPasteNotification("Permission denied. You can paste manually."); } }
     async function tryAutoPasteOnFocus() { if(elements.quizDataInput.value.trim() !== '') return; try { const permissionStatus = await navigator.permissions.query({ name: "clipboard-read" }); if (permissionStatus.state === "granted") await tryAutoPasteOnReturn(false); } catch (e) { /* Fail silently */ } }
-    async function handleVisibilityChange() { if (!document.hidden && sessionStorage.getItem('promptGenerated') === 'true') await handleClipboardPermission(); }
+    async function handleVisibilityChange() { if (!document.hidden && window.location.hash === '#paste') await handleClipboardPermission(); }
     function showFlowchartGuide(guideId) { const guideContent = GUIDE_DATA[guideId]; if (guideContent) { elements.flowchartModalTitle.textContent = guideContent.title; elements.flowchartModalContent.innerHTML = guideContent.content; elements.flowchartModalOverlay.classList.remove('hidden'); } else { console.error('No guide found for ID:', guideId); } }
     
     function generatePrompt(source, sourceType) {
@@ -2731,29 +2779,28 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         if ((sourceType !== 'topic' && !sourceText) || !numQuestions) { alert('Please ensure you have provided source material and the number of questions.'); return null; }
         if (!exam) { alert("Please select a target exam before generating questions."); return null; }
         
-        let formatInstruction = "";
         let sampleFormat = "";
-
         switch (formatKey) {
-            case 'mcq': formatInstruction = "You MUST generate ONLY Multiple Choice (MCQ) questions."; sampleFormat = MCQ_EXAMPLE; break;
-            case 'statement': formatInstruction = "You MUST generate ONLY Statement-Based questions."; sampleFormat = STATEMENT_EXAMPLE; break;
-            case 'assertion-reason': formatInstruction = "You MUST generate ONLY Assertion-Reason questions."; sampleFormat = AR_EXAMPLE; break;
-            case 'math-physics': formatInstruction = "You MUST generate ONLY Math, Physics, or other formula-based questions using LaTeX for symbols."; sampleFormat = MATH_EXAMPLE; break;
-            case 'true-false': formatInstruction = "You MUST generate ONLY True/False questions."; sampleFormat = TF_EXAMPLE; break;
-            case 'fill-blank': formatInstruction = "You MUST generate ONLY Fill-in-the-Blank style questions."; sampleFormat = FILL_BLANK_EXAMPLE; break;
-            default: formatInstruction = "Generate a mix of question formats based on the examples provided."; sampleFormat = LEGACY_FORMAT_TEXT; break;
+            case 'mcq': sampleFormat = MCQ_EXAMPLE; break;
+            case 'statement': sampleFormat = STATEMENT_EXAMPLE; break;
+            case 'assertion-reason': sampleFormat = AR_EXAMPLE; break;
+            case 'math-physics': sampleFormat = MATH_EXAMPLE; break;
+            case 'true-false': sampleFormat = TF_EXAMPLE; break;
+            case 'fill-blank': sampleFormat = FILL_BLANK_EXAMPLE; break;
+            default: sampleFormat = LEGACY_FORMAT_TEXT; break;
         }
 
         let prompt = `You are an expert at generating high-quality assessment questions in plain text format. Your responses must be very fast and precise.
 
 CRITICAL INSTRUCTIONS (MUST be followed):
 1.  **Output Format:** Provide the entire response as a single block of plain text. DO NOT use Markdown, JSON, code blocks, or any other formatting.
-2.  **Question Structure:** STRICTLY follow the sample format provided below for every single question.
-3.  **Correct Answer Line:** The 'Correct Answer:' line MUST contain ONLY the letter of the correct option (e.g., "Correct Answer: c"). DO NOT include the text of the answer.
-4.  **Completeness:** Each question MUST have a question, all options, a single correct answer letter, and a detailed explanation.
-5.  **Math/Physics Symbols:** Use valid LaTeX for all formulas. Enclose all inline math with \\( ... \\) delimiters (e.g., \\(x^2\\)) and all display math with \\[ ... \\]. DO NOT use $ or $$.
-6.  **Terminology:** Use the term "questions" or "assessment". DO NOT use the word "quiz".
-7.  **Format Adherence:** ${formatInstruction}
+2.  **Strict Format Adherence:** You MUST generate questions that EXACTLY match the requested "Question Format" parameter below. For example, if asked for "Multiple Choice (MCQ)", you MUST generate ONLY MCQs.
+3.  **Question Structure:** STRICTLY follow the sample format provided below for every single question.
+4.  **Statement Formatting:** For Statement-Based questions, individual statements MUST be preceded by an asterisk (*) and a space. DO NOT number the statements (e.g., use "* Statement text" NOT "1. Statement text"). The provided sample for Statement-Based questions demonstrates this correct format.
+5.  **Correct Answer Line:** The 'Correct Answer:' line MUST contain ONLY the letter of the correct option (e.g., "Correct Answer: c"). DO NOT include the text of the answer.
+6.  **Completeness:** Each question MUST have a question, all options, a single correct answer letter, and a detailed explanation.
+7.  **Math/Physics Symbols:** Use valid LaTeX for all formulas. Enclose all inline math with \\( ... \\) delimiters (e.g., \\(x^2\\)) and all display math with \\[ ... \\]. DO NOT use $ or $$.
+8.  **Terminology:** Use the term "questions" or "assessment". DO NOT use the word "quiz".
 
 --- ASSESSMENT PARAMETERS ---
 *   **Number of Questions:** ${numQuestions}
@@ -2798,8 +2845,9 @@ Now, generate the questions based on all the instructions above.`;
         promptForGemini = prompt;
         elements.geminiInstructionsModalOverlay.classList.remove('hidden');
     }
-
-    async function executePostPromptActions(prompt) { clearFormState(); try { await copyTextToClipboard(prompt); } catch {} sessionStorage.setItem('promptGenerated', 'true'); sessionStorage.setItem('gameMode', gameMode); showScreen('paste'); openAiWithFallback(); }
+    
+    // *** MODIFICATION ***: Removed the unreliable 'promptGenerated' flag.
+    async function executePostPromptActions(prompt) { clearFormState(); try { await copyTextToClipboard(prompt); } catch {} sessionStorage.setItem('gameMode', gameMode); showScreen('paste'); openAiWithFallback(); }
     function openAiWithFallback() { const aiWindow = window.open('https://gemini.google.com', '_blank'); if (!aiWindow || aiWindow.closed || typeof aiWindow.closed === 'undefined') { showPasteNotification('⚠️ Popup blocked! Click the link to open manually.'); elements.aiLinkFallback.classList.remove('hidden'); } else { elements.aiLinkFallback.classList.add('hidden'); } }
     
     function generateTopicPrompt() {
@@ -2956,8 +3004,8 @@ Now, generate the questions based on all the instructions above.`;
     function validateParsedData(questions) { for (let i = 0; i < questions.length; i++) { const q = questions[i]; const qNum = i + 1; if (!q.question || q.question.trim() === '') return { isValid: false, error: `Question ${qNum} is missing its main text.` }; if (!q.options || q.options.length < 2) return { isValid: false, error: `Question ${qNum} has fewer than two options.` }; if (typeof q.correctAnswerIndex !== 'number' || q.correctAnswerIndex < 0 || q.correctAnswerIndex >= q.options.length) return { isValid: false, error: `Could not find a valid correct answer for Question ${qNum}. Check the 'Correct Answer' line.` }; if (!q.explanation || q.explanation.trim() === '') return { isValid: false, error: `Question ${qNum} is missing its explanation.` }; } return { isValid: true }; }
     function transformParsedData_Legacy(parsedQuestions) { return parsedQuestions.map(q => { if (!q) return null; const cleanedOptions = q.options.map(opt => opt.replace(/^[a-zA-Z]\)\s*/, '').trim()); const correctAnswerIndex = q.options.findIndex(opt => opt.trim().toLowerCase().startsWith(q.answer.toLowerCase() + ')')); if (correctAnswerIndex === -1) { console.error("Could not find correct answer for question:", q); return null; } let finalQuestionText = q.question; let statements = []; if (q.type === 'Statement' || q.question.includes('*')) { const parts = q.question.split(/Which of the above statements are correct\?/i); if (parts.length > 1) { finalQuestionText = `Which of the above statements are correct?`; statements = parts[0].split('*').map(s => s.trim()).filter(s => s); } } else if (q.type === 'Assertion-Reason') { finalQuestionText = q.question.replace(/<br>/g, '\n'); } return { question: finalQuestionText, options: cleanedOptions, correctAnswerIndex: correctAnswerIndex, explanation: q.explanation, statements: statements, image: null, }; }).filter(Boolean); }
     function parseQuizText_Legacy(text) { if (!text || !text.trim()) return []; const questionBlocks = text.trim().split(/\n(?=\d+\.\s)/); return questionBlocks.map(block => { const fullBlock = block.trim(); const headerMatch = fullBlock.match(/^\d+\.\s(.*?Questions)/); if (!headerMatch) return null; let data = { type: 'Unknown', question: '', options: [], answer: '', explanation: '' }; const headerText = headerMatch[1]; if (headerText.includes('Assertion-Reason')) data.type = 'Assertion-Reason'; else if (headerText.includes('Statement-Based')) data.type = 'Statement'; else if (headerText.includes('Maths, Physics, or Other')) data.type = 'Maths'; else if (headerText.includes('True/False')) data.type = 'True/False'; else if (headerText.includes('Fill-in-the-Blank')) data.type = 'Fill-in-the-Blank'; else data.type = 'MCQ'; const questionRegex = /Question:([\s\S]*?)Options:\n([\s\S]*?)Correct Answer:([\s\S]*?)(?:Explanation:([\s\S]*))?$/; const arRegex = /Assertion \(A\):([\s\S]*?)Reason \(R\):([\s\S]*?)Options:\n([\s\S]*?)Correct Answer:([\s\S]*?)(?:Explanation:([\s\S]*))?$/; const match = (data.type === 'Assertion-Reason') ? fullBlock.match(arRegex) : fullBlock.match(questionRegex); if (match) { if (data.type === 'Assertion-Reason') { data.question = `Assertion (A): ${match[1].trim()}\nReason (R): ${match[2].trim()}`; data.options = match[3].trim().split('\n').map(opt => opt.trim()); data.answer = match[4].trim().split(')')[0].trim(); data.explanation = (match[5] || 'No explanation provided.').trim(); } else { data.question = match[1].trim(); data.options = match[2].trim().split('\n').map(opt => opt.trim()); data.answer = match[3].trim().split(')')[0].trim(); data.explanation = (match[4] || 'No explanation provided.').trim(); } return data; } return null; }).filter(Boolean); }
-    async function restartQuiz() { clearFormState(); sessionStorage.removeItem('promptGenerated'); await dbHelper.clear(); window.location.reload(); }
-    async function handleHardReset() { elements.mainContainer.classList.add('fade-out-and-shrink'); showLoading("Deleting all data and returning home..."); localStorage.clear(); sessionStorage.clear(); await dbHelper.clear(); if (gameMode === 'multiplayer' && currentRoomCode && window.firebase) { const { db, ref, remove } = window.firebase; const roomRef = ref(db, `rooms/${currentRoomCode}`); try { if (isHost) { await remove(roomRef); } else if(currentPlayerId) { await remove(ref(db, `rooms/${currentRoomCode}/players/${currentPlayerId}`)); } } catch (error) { console.error("Firebase deletion failed:", error); } } setTimeout(() => { window.location.reload(); }, 1000); }
+    async function restartQuiz() { clearFormState(); await dbHelper.clear(); window.location.hash = ''; }
+    async function handleHardReset() { elements.mainContainer.classList.add('fade-out-and-shrink'); showLoading("Deleting all data and returning home..."); localStorage.clear(); sessionStorage.clear(); await dbHelper.clear(); if (gameMode === 'multiplayer' && currentRoomCode && window.firebase) { const { db, ref, remove } = window.firebase; const roomRef = ref(db, `rooms/${currentRoomCode}`); try { if (isHost) { await remove(roomRef); } else if(currentPlayerId) { await remove(ref(db, `rooms/${currentRoomCode}/players/${currentPlayerId}`)); } } catch (error) { console.error("Firebase deletion failed:", error); } } setTimeout(() => { window.location.href = window.location.pathname; }, 1000); }
     function getFullQuizContent(bookmarksOnly) { let text = `🏆 EXAMYATRI Assessment Results 🏆\n\n`; const totalQuestions = originalQuizData.length; const correctCount = userAnswers.filter(ans => ans.isCorrect).length; const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0; const timeDiff = Math.round(((new Date()) - quizStartTime) / 1000); const timeTaken = `${String(Math.floor(timeDiff / 60)).padStart(2, '0')}:${String(timeDiff % 60).padStart(2, '0')}`; text += `Final Score: ${correctCount} / ${totalQuestions} (${percentage.toFixed(1)}%)\n`; text += `Time Taken: ${timeTaken}\n\n`; text += '------------------------------------\n\n'; const questionsToProcess = originalQuizData.map((q, i) => ({ ...q, originalIndex: i })).filter(q => !bookmarksOnly || bookmarkedQuestions.has(q.originalIndex)); if (questionsToProcess.length === 0) return null; questionsToProcess.forEach(q => { const userAnswer = userAnswers[q.originalIndex]; text += `Q${q.originalIndex + 1}: ${q.question.replace(/<br>/g, '\n')}\n\n`; if (q.statements && q.statements.length > 0) { q.statements.forEach(stmt => { text += `• ${stmt}\n`; }); text += '\n'; } q.options.forEach((opt, oi) => { text += `${String.fromCharCode(97 + oi)}) ${opt.replace(/<[^>]*>/g, '')}\n`; }); text += `\nCorrect Answer: ${String.fromCharCode(97 + q.correctAnswerIndex)})\n`; if (userAnswer.status === 'answered') { text += `Your Answer: ${String.fromCharCode(97 + userAnswer.selected)}) - ${userAnswer.isCorrect ? 'Correct' : 'Incorrect'}\n`; } else { text += `Your Answer: Skipped\n`; } text += `\nExplanation:\n${q.explanation}\n\n`; text += '------------------------------------\n\n'; }); return text; }
     function copyQuizContent(bookmarksOnly) { const fullTextToCopy = getFullQuizContent(bookmarksOnly); if (!fullTextToCopy) { showPasteNotification(`🤔 No ${bookmarksOnly ? 'bookmarked ' : ''}questions to copy!`); return; } copyTextToClipboard(fullTextToCopy).then(() => showPasteNotification(`✅ Summary & ${bookmarksOnly ? 'bookmarked ' : 'all '}questions copied!`)); }
     function copyTextToClipboard(text) { return new Promise((resolve, reject) => { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(resolve).catch(err => { console.warn('Modern clipboard API failed, falling back.', err); legacyCopy(reject); }); } else { legacyCopy(reject); } function legacyCopy(onFail) { const textArea = document.createElement("textarea"); textArea.value = text; textArea.style.position = "fixed"; textArea.style.top = "-9999px"; document.body.appendChild(textArea); textArea.focus(); textArea.select(); try { document.execCommand('copy') ? resolve() : onFail(new Error('Legacy copy command failed.')); } catch (err) { console.error('Legacy copy failed.', err); onFail(err); } finally { document.body.removeChild(textArea); } } }).catch(() => { showManualCopyModal(text); throw new Error("Manual intervention required for copy."); }); }
@@ -2979,7 +3027,6 @@ Now, generate the questions based on all the instructions above.`;
         elements.questionTopic.textContent = quizMetaData.topic || "";
         elements.progress.textContent = `Question ${currentQuestionIndex + 1} / ${originalQuizData.length}`;
         elements.questionText.innerHTML = q.question.replace(/\n/g, '<br>');
-        // BUG FIX: Used correct global 'currentQuestionIndex'
         elements.bookmarkBtn.classList.toggle('bookmarked', bookmarkedQuestions.has(currentQuestionIndex));
         elements.statementsList.innerHTML = q.statements?.map(stmt => `<p>• ${stmt}</p>`).join('') || '';
         elements.optionsContainer.innerHTML = '';
