@@ -992,134 +992,129 @@
         </div>
         <button class="btn btn-secondary back-to-mode-selection-btn" style="margin-top: 2rem;">← Back</button>
     </div>
+  <b:if cond='data:view.isHomepage'>
   <!-- ===== BLOGGER POSTS SECTION ===== -->
-<div id="blog-section">
-  <p style="text-align:center;">Loading latest posts...</p>
-</div>
-
-<style>
-  /* Blog Section Styling */
-  #blog-section {
-    max-width: 1000px;
-    margin: 30px auto;
-    padding: 0 15px;
-  }
-  .blog-feed-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  .blog-card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-  .blog-card img {
-    width: 100%;
-    aspect-ratio: 16/9;
-    object-fit: cover;
-    border-bottom: 1px solid #eee;
-  }
-  .blog-content {
-    padding: 20px;
-  }
-  .blog-content h3 {
-    margin: 0 0 10px;
-    font-size: 1.2em;
-    color: #0056b3;
-  }
-  .blog-content p {
-    margin: 0;
-    font-size: 0.9em;
-    color: #555;
-    line-height: 1.5;
-  }
-  .blog-content a {
-    text-decoration: none;
-    color: inherit;
-  }
-  .blog-content a:hover h3 {
-    color: #007bff;
-  }
-</style>
-
-<script>
-  /**
-   * This function is the designated "callback" that Blogger will invoke.
-   * It receives the blog data as an argument and processes it.
-   * @param {object} data - The JSON data returned by the Blogger API.
-   */
-  function displayBloggerPosts(data) {
-    const blogSection = document.getElementById("blog-section");
-    const posts = data.feed.entry;
-    
-    // Check if there are any posts
-    if (!posts || posts.length === 0) {
-      blogSection.innerHTML = "<p style='text-align:center;'>No recent posts found.</p>";
-      return;
+  <div id="blog-section">
+    <p style="text-align:center;">Loading latest posts...</p>
+  </div>
+  <style>
+    /* Blog Section Styling */
+    #blog-section {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 15px;
     }
-
-    let html = '<div class="blog-feed-container">';
-    const latestPosts = posts.slice(0, 2); // Get only the 2 latest posts
-
-    latestPosts.forEach(post => {
-      const title = post.title.$t;
-      const link = post.link.find(l => l.rel === "alternate").href;
+    .blog-feed-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .blog-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .blog-card img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border-bottom: 1px solid #eee;
+    }
+    .blog-content {
+      padding: 20px;
+    }
+    .blog-content h3 {
+      margin: 0 0 10px;
+      font-size: 1.2em;
+      color: #0056b3;
+    }
+    .blog-content p {
+      margin: 0;
+      font-size: 0.9em;
+      color: #555;
+      line-height: 1.5;
+    }
+    .blog-content a {
+      text-decoration: none;
+      color: inherit;
+    }
+    .blog-content a:hover h3 {
+      color: #007bff;
+    }
+  </style>
+  <script>
+    /**
+     * This function is the designated "callback" that Blogger will invoke.
+     * It receives the blog data as an argument and processes it.
+     * @param {object} data - The JSON data returned by the Blogger API.
+     */
+    function displayBloggerPosts(data) {
+      const blogSection = document.getElementById("blog-section");
+      const posts = data.feed.entry;
       
-      // Remove HTML tags from content for a clean summary
-      const content = post.content.$t.replace(/<[^>]+>/g, "");
-      const shortDesc = content.substring(0, 150) + "...";
-      let image = "";
-
-      // Regex to find the first image URL in the post content
-      const imgMatch = post.content.$t.match(/<img[^>]+src="([^">]+)"/);
-      if (imgMatch && imgMatch[1]) {
-        image = imgMatch[1];
-      } else {
-        // Use a placeholder if no image is found
-        image = "https://via.placeholder.com/640x360.png?text=No+Image";
+      // Check if there are any posts
+      if (!posts || posts.length === 0) {
+        blogSection.innerHTML = "<p style='text-align:center;'>No recent posts found.</p>";
+        return;
       }
 
-      // **CORRECTED PART**: Using backticks (`) for the template literal
-      html += `
-        <div class="blog-card">
-          <a href="${link}" target="_blank" rel="noopener noreferrer">
-            <img src="${image}" alt="${title}" loading="lazy">
-          </a>
-          <div class="blog-content">
+      let html = '<div class="blog-feed-container">';
+      const latestPosts = posts.slice(0, 2); // Get only the 2 latest posts
+
+      latestPosts.forEach(post => {
+        const title = post.title.$t;
+        const link = post.link.find(l => l.rel === "alternate").href;
+        
+        // Remove HTML tags from content for a clean summary
+        const content = post.content.$t.replace(/<[^>]+>/g, "");
+        const shortDesc = content.substring(0, 150) + "...";
+        let image = "";
+
+        // Regex to find the first image URL in the post content
+        const imgMatch = post.content.$t.match(/<img[^>]+src="([^">]+)"/);
+        if (imgMatch && imgMatch[1]) {
+          image = imgMatch[1];
+        } else {
+          // Use a placeholder if no image is found
+          image = "https://via.placeholder.com/640x360.png?text=No+Image";
+        }
+
+        html += `
+          <div class="blog-card">
             <a href="${link}" target="_blank" rel="noopener noreferrer">
-              <h3>${title}</h3>
+              <img src="${image}" alt="${title}" loading="lazy">
             </a>
-            <p>${shortDesc}</p>
+            <div class="blog-content">
+              <a href="${link}" target="_blank" rel="noopener noreferrer">
+                <h3>${title}</h3>
+              </a>
+              <p>${shortDesc}</p>
+            </div>
           </div>
-        </div>
-      `;
-    });
+        `;
+      });
 
-    html += "</div>";
-    blogSection.innerHTML = html;
-  }
+      html += "</div>";
+      blogSection.innerHTML = html;
+    }
 
-  // --- Script Loader for JSONP ---
-  // We create a <script> tag dynamically to make the cross-domain request.
-  
-  // **CORRECTED PART**: Using "json-in-script" and a "callback" parameter
-  const blogUrl = "https://examyatrilive.blogspot.com/feeds/posts/default?alt=json-in-script&callback=displayBloggerPosts";
-  
-  const jsonp_script = document.createElement('script');
-  jsonp_script.src = blogUrl;
-  
-  // Add error handling in case the blog URL is wrong or the feed can't be loaded
-  jsonp_script.onerror = function() {
-    document.getElementById("blog-section").innerHTML = "<p style='text-align:center;color:red;'>⚠️ Failed to load blog posts. Please check the blog URL and make sure the feed is public.</p>";
-  };
-  
-  // Append the script to the body to trigger the fetch
-  document.body.appendChild(jsonp_script);
-</script>
+    // --- Script Loader for JSONP ---
+    const blogUrl = "https://examyatrilive.blogspot.com/feeds/posts/default?alt=json-in-script&callback=displayBloggerPosts";
+    
+    const jsonp_script = document.createElement('script');
+    jsonp_script.src = blogUrl;
+    
+    jsonp_script.onerror = function() {
+      document.getElementById("blog-section").innerHTML = "<p style='text-align:center;color:red;'>⚠️ Failed to load blog posts. Please check the blog URL and make sure the feed is public.</p>";
+    };
+    
+    document.body.appendChild(jsonp_script);
+  </script>
+</b:if>
+
 
     <!-- ===== JOIN ROOM SCREEN ===== -->
     <div id="join-room-container" class="hidden">
