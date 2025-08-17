@@ -992,6 +992,99 @@
         </div>
         <button class="btn btn-secondary back-to-mode-selection-btn" style="margin-top: 2rem;">← Back</button>
     </div>
+  <!-- ===== BLOGGER POSTS SECTION ===== -->
+<div id="blog-section">
+  <p style="text-align:center;">Loading latest posts...</p>
+</div>
+
+<style>
+  /* Blog Section Styling */
+  #blog-section {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 15px;
+  }
+  .blog-feed-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .blog-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .blog-card img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+  }
+  .blog-content {
+    padding: 15px;
+  }
+  .blog-content h3 {
+    margin: 0 0 10px;
+    font-size: 1.2em;
+    color: #007bff;
+  }
+  .blog-content p {
+    margin: 0;
+    font-size: 0.9em;
+    opacity: 0.85;
+  }
+  .blog-content a {
+    text-decoration: none;
+    color: inherit;
+  }
+</style>
+
+<script>
+  // Blogger JSON Feed Fetch
+  const rssUrl = "https://examyatrilive.blogspot.com/feeds/posts/default?alt=json";
+
+  fetch(rssUrl)
+    .then(res => res.json())
+    .then(data => {
+      const posts = data.feed.entry.slice(0, 2); // Sirf 2 latest posts
+      let html = '<div class="blog-feed-container">';
+      
+      posts.forEach(post => {
+        const title = post.title.$t;
+        const link = post.link.find(l => l.rel === "alternate").href;
+        const content = post.content.$t.replace(/<[^>]+>/g, "");
+        const shortDesc = content.substring(0, 120) + "...";
+        let image = "";
+
+        // Image nikalne ki koshish
+        const imgMatch = post.content.$t.match(/<img[^>]+src="([^">]+)"/);
+        if (imgMatch && imgMatch[1]) {
+          image = imgMatch[1];
+        } else {
+          image = "https://via.placeholder.com/640x360.png?text=ExamYatri";
+        }
+
+        html += 
+          <div class="blog-card">
+            <img src="${image}" alt="${title}">
+            <div class="blog-content">
+              <h3><a href="${link}" target="_blank">${title}</a></h3>
+              <p>${shortDesc}</p>
+            </div>
+          </div>
+        ;
+      });
+
+      html += "</div>";
+      document.getElementById("blog-section").innerHTML = html;
+    })
+    .catch(err => {
+      document.getElementById("blog-section").innerHTML = "<p style='text-align:center;color:red;'>⚠️ Blog posts load nahi ho paye.</p>";
+      console.error("Error loading blog feed:", err);
+    });
+</script>
 
     <!-- ===== JOIN ROOM SCREEN ===== -->
     <div id="join-room-container" class="hidden">
