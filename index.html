@@ -925,6 +925,65 @@
         text-transform: uppercase;
         letter-spacing: 1px;
     }
+    
+    /* --- NEW: BLOG STYLES --- */
+    #blog-section {
+      max-width: 1000px;
+      margin: 40px auto 20px;
+      padding: 0 15px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .blog-feed-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .blog-card {
+      background: var(--component-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 4px 10px var(--shadow-color);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .blog-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px var(--shadow-color);
+    }
+    .blog-card img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .blog-content {
+      padding: 15px;
+      flex-grow: 1;
+    }
+    .blog-content h3 {
+      margin: 0 0 10px;
+      font-size: 1.1em;
+      color: var(--accent-color);
+    }
+    .blog-content p {
+      margin: 0;
+      font-size: 0.9em;
+      opacity: 0.85;
+      line-height: 1.5;
+    }
+    .blog-content a {
+      text-decoration: none;
+      color: inherit;
+    }
+    .blog-content a:hover h3 {
+       text-decoration: underline;
+    }
+    body.dark-mode .blog-content p {
+        color: var(--text-color);
+    }
 
   </style>
 </head>
@@ -971,6 +1030,12 @@
                 <h3>Multiplayer/ Practice With Friends</h3>
                 <p>Create a room or join a friend's to practice together.</p>
             </div>
+        </div>
+        
+        <!-- NEW: BLOGGER POSTS SECTION -->
+        <div id="blog-section">
+          <h2 style="text-align:center; margin-bottom: 1.5rem;">Latest from Our Blog</h2>
+          <p style="text-align:center;">Loading latest posts...</p>
         </div>
     </div>
 
@@ -1211,14 +1276,17 @@
 
     <!-- ===== PASTE CONTAINER (UNIFIED FOR SINGLE/MULTI) ====== -->
     <div id="paste-quiz-container" class="hidden">
-        <p style="text-align: center; font-size: 1.1em;"><b>Welcome back!</b> I'm now waiting for the questions from the AI.</p>
+        <p style="text-align: center; font-size: 1.1em;"><b>Welcome back!</b> Waiting for the questions from the AI.</p>
         <div id="ai-link-fallback" class="hidden">
             <p>⚠️ It looks like the AI tab was blocked by your browser.</p>
             <a href="https://gemini.google.com" target="_blank" class="btn">Click Here to Open Gemini Manually</a>
         </div>
         <div class="input-group">
-            <div class="input-label-group"><label for="quiz-data-input" class="input-label">Paste AI response here</label></div>
-            <textarea id="quiz-data-input" placeholder="I'll try to paste and start automatically when you return to this tab. If that doesn't work, just click into this box."></textarea>
+            <div class="prompt-actions-row" style="margin-bottom: 1rem;">
+                <button id="paste-from-clipboard-btn" class="btn btn-secondary">📋 Paste from Clipboard</button>
+            </div>
+            <p style="text-align:center; font-size: 0.9em; margin-top: 0;">...or paste manually into the box below.</p>
+            <textarea id="quiz-data-input" placeholder="I'll try to paste and start automatically when you return to this tab. If that doesn't work, use the button above or paste manually here."></textarea>
         </div>
         <button id="start-manual-quiz-btn" class="btn btn-full-width">Parse & Start! 🧠</button>
     </div>
@@ -1377,7 +1445,8 @@
 <div id="crop-modal-overlay" class="modal-overlay hidden"><div id="crop-modal-content" class="modal-content"><h3>Crop Image</h3><div id="crop-image-container"><img id="image-to-crop" src="" alt="Image for cropping"></div><div class="modal-actions"><button id="cancel-crop-btn" class="btn btn-secondary">Cancel</button><button id="save-crop-btn" class="btn">Crop & Save</button></div></div></div>
 <div id="flowchart-modal-overlay" class="modal-overlay hidden"><div class="modal-content"><button class="modal-close-btn-top" title="Close guide">&times;</button><h3 id="flowchart-modal-title">Step Guide</h3><div id="flowchart-modal-content"></div><div class="modal-actions"><button id="flowchart-modal-close-btn" class="btn">Got It!</button></div></div></div>
 <div id="telegram-backup-modal-overlay" class="modal-overlay hidden"><div class="modal-content"><button class="modal-close-btn-top" title="Close guide">&times;</button><h3>How to Backup on Telegram</h3><div id="telegram-backup-modal-content" class="guide-step"><p><strong>Step 1: Create a Telegram Channel</strong><br>Open Telegram, create a "New Channel". Make sure you set it to "Public" and give it a unique, easy-to-remember username (e.g., "my_upsc_notes_123").</p><p><strong>Step 2: Copy Questions from EXAMYATRI</strong><br>On this results page, click the "⭐ Copy Bookmarked" or "📋 Copy All" button. This copies the text to your clipboard.</p><p><strong>Step 3: Enter Username & Open</strong><br>Type the channel username you created (e.g., "my_upsc_notes_123") into the box above the 🤔 button and click "Open".</p><p><strong>Step 4: Paste and Save</strong><br>This will open your channel in Telegram. Just paste the copied questions into the message box and send. Your notes are now saved!</p></div><div class="modal-actions"><button id="telegram-backup-close-btn" class="btn">Okay, I Understand</button></div></div></div>
-<div id="clipboard-permission-modal-overlay" class="modal-overlay hidden"><div id="clipboard-permission-modal-content" class="modal-content"><h3>✨ Automation Helper</h3><p>To make things super fast, this website can automatically paste the generated questions for you when you return from the AI.</p><p>For this to work, I need your permission to read text from your clipboard. I will only do this when you're on this page and only to find the questions.</p><div class="modal-actions"><button id="deny-clipboard-btn" class="btn btn-secondary">No, I'll paste manually</button><button id="grant-clipboard-btn" class="btn">Yes, allow auto-pasting</button></div></div></div>
+<!-- This modal is no longer used with the new clipboard logic -->
+<!-- <div id="clipboard-permission-modal-overlay" class="modal-overlay hidden"><div id="clipboard-permission-modal-content" class="modal-content"><h3>✨ Automation Helper</h3><p>To make things super fast, this website can automatically paste the generated questions for you when you return from the AI.</p><p>For this to work, I need your permission to read text from your clipboard. I will only do this when you're on this page and only to find the questions.</p><div class="modal-actions"><button id="deny-clipboard-btn" class="btn btn-secondary">No, I'll paste manually</button><button id="grant-clipboard-btn" class="btn">Yes, allow auto-pasting</button></div></div></div> -->
 <div id="gemini-instructions-modal-overlay" class="modal-overlay hidden"><div class="modal-content"><h3>Ready for AI Magic? ✨</h3><div id="gemini-instructions-content-wrapper"><div class="guide-step"><strong>1️⃣ When Gemini opens:</strong><p>Just paste the instructions into the message box and hit send.</p></div><div class="guide-step"><strong>2️⃣ Copy the Generated Questions:</strong><p>Once the AI finishes, copy the entire response.</p><ul style="padding-left: 20px; margin-top: 0.5em; font-size: 0.9em;"><li><strong>Method 1:</strong> Tap on 3 Vertical Dots (⋮) at the start of the generated question.</li><li><strong>Method 2:</strong> Tap the Copy Icon (📋) at the end of the generated question.</li></ul></div><div class="guide-step"><strong>3️⃣ Return to Examyatri:</strong><p>Come back to this tab to start the assessment.</p><ul style="padding-left: 20px; margin-top: 0.5em; font-size: 0.9em;"><li><strong>Method 1:</strong> Press your device's 'Back' button twice.</li><li><strong>Method 2:</strong> Manually switch tabs from Gemini back to Examyatri.</li></ul></div></div><div class="modal-actions" style="justify-content: center;"><button id="open-gemini-btn" class="btn btn-full-width fire-animation">Got it and Open Gemini Now ➜</button></div></div></div>
 
 
@@ -1607,7 +1676,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         flowchartModalTitle: document.getElementById('flowchart-modal-title'),
         flowchartModalContent: document.getElementById('flowchart-modal-content'),
         telegramBackupModalOverlay: document.getElementById('telegram-backup-modal-overlay'),
-        clipboardPermissionModalOverlay: document.getElementById('clipboard-permission-modal-overlay'),
         geminiInstructionsModalOverlay: document.getElementById('gemini-instructions-modal-overlay'),
         
         // Multiplayer Elements
@@ -1653,6 +1721,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     let cropper = null;
     let currentEditingImageId = null;
     let selectedExam = '';
+    let blogPostsLoaded = false; // NEW: Flag for blog posts
     
     // --- OCR State (FIX) ---
     let ocrWorker = null;
@@ -1671,7 +1740,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
     let isShakeReminderEnabled = true;
     let pressureTextCounter = 1;
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
     const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE');
     
     // --- INITIALIZATION ---
@@ -1779,6 +1848,19 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
                 showCreationSelector();
             }
         }
+        
+        // NEW: Blog Section Logic
+        const blogSection = document.getElementById('blog-section');
+        if (blogSection) {
+            // 1. Show blog only on the welcome screen
+            blogSection.style.display = (screenName === 'modeSelection') ? 'block' : 'none';
+
+            // 2. Load blog posts only once
+            if (screenName === 'modeSelection' && !blogPostsLoaded) {
+                loadBlogPosts();
+                blogPostsLoaded = true;
+            }
+        }
     }
 
     /**
@@ -1788,7 +1870,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     function handleHashChange() {
         const screenName = window.location.hash.substring(1);
 
-        // All possible screens must have a corresponding container element with the id `${screenName}Container`
+        // All possible screens must have a corresponding container element
         const allScreens = ['modeSelection', 'multiplayerSelection', 'manualGenerator', 'paste', 'player', 'results', 'joinRoom', 'configureRoom', 'lobby', 'mpPlayer', 'mpResults'];
 
         if (!screenName || !allScreens.includes(screenName)) {
@@ -1798,10 +1880,77 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
         _displayScreen(screenName);
         
-        // *** MODIFICATION ***: Trigger clipboard logic when we route to the paste screen.
+        // If we route to the paste screen, set up its specific listeners.
         if (screenName === 'paste') {
-            handleClipboardPermission();
+            setupPasteScreen();
         }
+    }
+    
+    // --- NEW: 100% WORKING BLOG LOADER FUNCTION ---
+    function loadBlogPosts() {
+        const blogSection = document.getElementById("blog-section");
+        if (!blogSection) return;
+
+        let timeout = setTimeout(() => {
+            handleError();
+        }, 8000); // 8 second timeout
+
+        const callbackName = 'handleBloggerResponse';
+
+        window[callbackName] = function(data) {
+            clearTimeout(timeout); // Success, so cancel the timeout
+            const posts = data.feed.entry.slice(0, 3);
+            if (!posts || posts.length === 0) {
+              blogSection.innerHTML = "<p style='text-align:center;'>No recent blog posts found.</p>";
+              cleanup();
+              return;
+            }
+            
+            let html = '<div class="blog-feed-container">';
+            posts.forEach(post => {
+              const title = post.title.$t;
+              const link = post.link.find(l => l.rel === "alternate").href;
+              const content = post.content.$t.replace(/<[^>]+>/g, "");
+              const shortDesc = content.substring(0, 120) + "...";
+              const imgMatch = post.content.$t.match(/<img[^>]+src="([^">]+)"/);
+              const image = imgMatch ? imgMatch[1] : "https://via.placeholder.com/640x360.png?text=ExamYatri";
+
+              html += `
+                <div class="blog-card">
+                  <a href="${link}" target="_blank" rel="noopener noreferrer">
+                    <img src="${image}" alt="${title}" loading="lazy">
+                    <div class="blog-content">
+                      <h3>${title}</h3>
+                      <p>${shortDesc}</p>
+                    </div>
+                  </a>
+                </div>
+              `;
+            });
+
+            html += "</div>";
+            blogSection.innerHTML = `<h2 style="text-align:center; margin-bottom: 1.5rem;">Latest from Our Blog</h2>` + html;
+            cleanup();
+        };
+        
+        const handleError = () => {
+            blogSection.innerHTML = "<p style='text-align:center;color:var(--incorrect-color);'>⚠️ Could not load blog posts. Please check your network connection.</p>";
+            cleanup();
+        };
+
+        const cleanup = () => {
+            const script = document.getElementById('blogger-jsonp-script');
+            if (script) {
+                script.remove();
+            }
+            delete window[callbackName];
+        };
+
+        const script = document.createElement('script');
+        script.id = 'blogger-jsonp-script';
+        script.src = `https://examyatrilive.blogspot.com/feeds/posts/default?alt=json&callback=${callbackName}`;
+        script.onerror = handleError;
+        document.body.appendChild(script);
     }
 
     // --- EVENT LISTENERS (REFACTORED WITH EVENT DELEGATION) ---
@@ -1889,6 +2038,8 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
             // --- Quiz Parsing ---
             if (effectiveId === 'start-manual-quiz-btn') { handlePasteAndParse(); return; }
+            if (effectiveId === 'paste-from-clipboard-btn') { handlePasteFromClipboard(); return; }
+
 
             // --- Quiz Player Actions ---
             if (target.closest('.option')) { 
@@ -1926,8 +2077,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             if (effectiveId === 'manual-copy-close-btn') { elements.manualCopyModalOverlay.classList.add('hidden'); return; }
             if (effectiveId === 'cancel-crop-btn') { closeCropModal(); return; }
             if (effectiveId === 'save-crop-btn') { saveCrop(); return; }
-            if (effectiveId === 'grant-clipboard-btn') { requestClipboardAndPaste(); return; }
-            if (effectiveId === 'deny-clipboard-btn') { elements.clipboardPermissionModalOverlay.classList.add('hidden'); showPasteNotification("Okay, you can paste the text yourself."); return; }
             if (effectiveId === 'open-gemini-btn') { if (promptForGemini) { executePostPromptActions(promptForGemini); promptForGemini = null; elements.geminiInstructionsModalOverlay.classList.add('hidden'); } return; }
             if (effectiveId === 'pressure-mode-toggle-btn') { elements.pressureModeControls.classList.toggle('hidden'); return; }
 
@@ -1936,22 +2085,16 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         // --- Other non-click event listeners ---
         elements.imageFileInput.addEventListener('change', handleImageSelection);
         elements.pdfFileInput.addEventListener('change', handlePdfSelection);
-        elements.pdfForceOcrCheckbox.addEventListener('change', (e) => {
-             // This logic remains, though language selection is separate.
-             // It controls whether to USE the selected OCR language or not.
-        });
-
+        elements.shakeReminderToggle.addEventListener('change', (e) => { isShakeReminderEnabled = e.target.checked; localStorage.setItem('shakeReminderEnabled', isShakeReminderEnabled); const checkBtn = document.getElementById('check-answer-btn'); if (!isShakeReminderEnabled && checkBtn) checkBtn.classList.remove('vibrating'); });
+        
         document.querySelectorAll('input[name="pdf-page-option"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const isRange = e.target.value === 'range';
                 elements.pdfPageRangeSelector.classList.toggle('hidden', !isRange);
             });
         });
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
+        
         window.addEventListener('beforeunload', saveQuizState);
-        elements.quizDataInput.addEventListener('focus', tryAutoPasteOnFocus);
-        elements.shakeReminderToggle.addEventListener('change', (e) => { isShakeReminderEnabled = e.target.checked; localStorage.setItem('shakeReminderEnabled', isShakeReminderEnabled); const checkBtn = document.getElementById('check-answer-btn'); if (!isShakeReminderEnabled && checkBtn) checkBtn.classList.remove('vibrating'); });
         
         let scrollTimeout;
         window.addEventListener('scroll', () => { clearTimeout(scrollTimeout); scrollTimeout = setTimeout(saveScrollPosition, 150); });
@@ -2022,12 +2165,11 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     
     // --- PARSER, VALIDATOR, AND QUIZ START LOGIC ---
     function handlePasteAndParse() {
-        // FIX: Retrieve the game mode from sessionStorage to persist it across the redirect to the AI.
         const gameMode = sessionStorage.getItem('gameMode');
         const text = elements.quizDataInput.value.trim();
         if (!text) { alert('Please paste the response into the box.'); return; }
 
-        sessionStorage.removeItem('gameMode'); // Clear this after use
+        sessionStorage.removeItem('gameMode');
 
         if (gameMode === 'multiplayer') {
             localStorage.setItem('multiplayerQuizText', text);
@@ -2035,10 +2177,9 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         } else {
             // Single Player Logic
             if (!quizMetaData || Object.keys(quizMetaData).length === 0) { quizMetaData = { topic: '', subject: '' }; }
-            const parsedQuestions = transformParsedData_Legacy(parseQuizText_Legacy(text));
-            if (!parsedQuestions || parsedQuestions.length === 0) { alert('Parsing Failed: Could not find valid questions.'); return; }
-            const validation = validateParsedData(parsedQuestions);
-            if (!validation.isValid) { alert(`Validation Failed:\n\n${validation.error}`); return; }
+            const parsedQuestions = flexibleParser(text);
+            if (!parsedQuestions || parsedQuestions.length === 0) { alert('Parsing Failed: Could not find any valid questions. Please check the text from the AI.'); return; }
+            
             quizData = parsedQuestions;
             startQuiz();
         }
@@ -2100,7 +2241,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
     function enterLobby() {
         showScreen('lobby');
-        // The display logic is now handled by the router, but we can set up the content here.
         if (isHost) {
             elements.roomCodeText.textContent = currentRoomCode;
             elements.roomCodeDisplay.classList.remove('hidden');
@@ -2162,7 +2302,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
                 }
             }
             
-            // FIX: Simplified this block to be more robust
             if (roomData.status === 'finished') {
                 if (clientTimer) clearInterval(clientTimer);
                 showFinalLeaderboardAndStartCountdown(roomData);
@@ -2189,7 +2328,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     
     function startMultiplayerQuiz(roomData) {
         const quizText = roomData.quizText;
-        quizData = parseMultiplayerQuizText(quizText);
+        quizData = flexibleParser(quizText); // Use new parser
         mpCurrentQuestionIndex = 0;
         mpSelectedOptionIndex = null;
         showScreen('mpPlayer');
@@ -2471,7 +2610,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     }
     
     function showFinalLeaderboardAndStartCountdown(roomData) {
-        // FIX: Add a guard to prevent this function from running multiple times and creating multiple timers.
         if (countdownTimerId) return;
 
         if (elements.multiplayerResultsContainer.classList.contains('hidden')) {
@@ -2514,23 +2652,17 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         let countdown = 8;
         countdownText.textContent = `Room will be deleted and you will return to the home screen in ${countdown} seconds...`;
         
-        // FIX: Assign the interval to the guard variable.
         countdownTimerId = setInterval(() => {
             countdown--;
             countdownText.textContent = `Room will be deleted and you will return to the home screen in ${countdown} seconds...`;
             if (countdown <= 0) {
                 clearInterval(countdownTimerId);
-                countdownTimerId = null; // FIX: Reset the guard variable.
+                countdownTimerId = null; 
                 handleHardReset();
             }
         }, 1000);
     }
-
-    function parseMultiplayerQuizText(text) {
-        return transformParsedData_Legacy(parseQuizText_Legacy(text));
-    }
-
-
+    
     // --- OCR & Image/PDF Processing (UPGRADED) ---
     async function getOcrWorker(lang, statusEl) {
         if (ocrWorker && currentOcrLang === lang) {
@@ -2569,6 +2701,40 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         }
     }
     
+    // --- MEMORY-FIX: New helper function to resize images before processing ---
+    async function resizeImage(file, maxDimension = 2048) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    let { width, height } = img;
+                    if (width > maxDimension || height > maxDimension) {
+                        if (width > height) {
+                            height = Math.round(height * (maxDimension / width));
+                            width = maxDimension;
+                        } else {
+                            width = Math.round(width * (maxDimension / height));
+                            height = maxDimension;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas);
+                };
+                img.onerror = reject;
+                img.src = event.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // --- MEMORY-FIX: Rewritten image processing function ---
     async function processAndExtractAllImages(files) {
         if (files.length === 0) {
             hideLoading();
@@ -2600,47 +2766,53 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
                 const imgState = imageFiles[i];
                 const fileToProcess = imgState.croppedFile || imgState.originalFile;
 
+                elements.ocrStatus.textContent = `Resizing image ${i + 1}/${imageFiles.length} for optimal performance...`;
+                const mainCanvas = await resizeImage(fileToProcess);
+
                 let bestText = '';
                 let bestConfidence = -1;
-
-                const imageElement = new Image();
-                const imageLoadPromise = new Promise(resolve => imageElement.onload = resolve);
-                imageElement.src = URL.createObjectURL(fileToProcess);
-                await imageLoadPromise;
 
                 for (const angle of [0, 90, 180, 270]) {
                     elements.ocrStatus.textContent = `Analyzing image ${i + 1}/${imageFiles.length} (orientation: ${angle}°)...`;
 
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
+                    let rotatedCanvas = document.createElement('canvas');
+                    let ctx = rotatedCanvas.getContext('2d');
 
                     if (angle === 90 || angle === 270) {
-                        canvas.width = imageElement.height;
-                        canvas.height = imageElement.width;
+                        rotatedCanvas.width = mainCanvas.height;
+                        rotatedCanvas.height = mainCanvas.width;
                     } else {
-                        canvas.width = imageElement.width;
-                        canvas.height = imageElement.height;
+                        rotatedCanvas.width = mainCanvas.width;
+                        rotatedCanvas.height = mainCanvas.height;
                     }
-
-                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    
+                    ctx.translate(rotatedCanvas.width / 2, rotatedCanvas.height / 2);
                     ctx.rotate(angle * Math.PI / 180);
-                    ctx.drawImage(imageElement, -imageElement.width / 2, -imageElement.height / 2);
-
+                    ctx.drawImage(mainCanvas, -mainCanvas.width / 2, -mainCanvas.height / 2);
+                    
                     const isHandwriting = elements.handwritingToggle.checked;
-                    const psm = isHandwriting ? Tesseract.PSM.SINGLE_BLOCK : Tesseract.PSM.AUTO;
-                    await worker.setParameters({ tessedit_pageseg_mode: psm });
+                    await worker.setParameters({ tessedit_pageseg_mode: isHandwriting ? Tesseract.PSM.SINGLE_BLOCK : Tesseract.PSM.AUTO });
 
-                    const { data } = await worker.recognize(canvas);
+                    const { data } = await worker.recognize(rotatedCanvas);
 
                     if (data.confidence > bestConfidence) {
                         bestConfidence = data.confidence;
                         bestText = data.text;
                     }
 
+                    // Aggressive cleanup
+                    rotatedCanvas.width = 0;
+                    rotatedCanvas.height = 0;
+                    rotatedCanvas = null;
+                    ctx = null;
+                    
                     if (bestConfidence > 95) break; 
                 }
+                
+                // Cleanup main canvas for the image
+                mainCanvas.width = 0;
+                mainCanvas.height = 0;
 
-                URL.revokeObjectURL(imageElement.src);
                 allExtractedText += bestText + '\n\n';
             }
 
@@ -2649,16 +2821,17 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
                 elements.imageQuizDefinitionArea.classList.remove('hidden');
                 elements.ocrStatus.textContent = `✅ Text extracted successfully from ${imageFiles.length} image(s).`;
             } else {
-                elements.ocrStatus.textContent = `🤔 Could not extract any text from the image(s). Try a different image.`;
+                elements.ocrStatus.textContent = `🤔 Could not extract any text. Try clearer images.`;
             }
         } catch (err) {
             console.error("Error during image processing:", err);
-            elements.ocrStatus.textContent = '❌ Error during image processing. Please try again.';
+            elements.ocrStatus.textContent = '❌ Error: Processing failed. This can happen with very large images or on devices with low memory. Please try with smaller or fewer images.';
         } finally {
             hideLoading();
         }
     }
 
+    // --- MEMORY-FIX: Rewritten PDF processing function ---
     async function runPdfExtraction() {
         if (!pdfFile) { alert("Please select a PDF file first."); return; }
         
@@ -2669,45 +2842,46 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             worker = await getOcrWorker(selectedPdfOcrLang, elements.pdfStatus);
             if (!worker) {
                 hideLoading();
-                alert("OCR Engine could not be started. Please check your internet connection and try again.");
+                alert("OCR Engine could not be started. Please try again.");
                 return;
             }
         }
 
         showLoading("Extracting text from PDF...");
-        elements.pdfStatus.textContent = 'Starting extraction... Please wait.';
-        try {
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const typedarray = new Uint8Array(e.target.result);
-                    const pdfDoc = await pdfjsLib.getDocument(typedarray).promise;
-                    const pageOption = document.querySelector('input[name="pdf-page-option"]:checked').value;
-                    let startPage = 1, endPage = pdfDoc.numPages;
-                    if (pageOption === 'range') {
-                        startPage = parseInt(document.getElementById('pdf-page-from').value, 10) || 1;
-                        endPage = parseInt(document.getElementById('pdf-page-to').value, 10) || pdfDoc.numPages;
-                    }
-                    elements.pdfStatus.textContent = `Processing pages ${startPage} to ${endPage}...`;
-                    const text = useOcr 
-                        ? await extractPdfTextWithOcr(pdfDoc, startPage, endPage, worker) 
-                        : await extractPdfTextNative(pdfDoc, startPage, endPage);
-                    elements.sourceTextPdf.value = text;
-                    elements.pdfQuizDefinitionArea.classList.remove('hidden');
-                    elements.pdfStatus.textContent = '✅ Text extracted successfully!';
-                } catch (err) {
-                    console.error("Error during PDF processing:", err);
-                    elements.pdfStatus.textContent = '❌ Error: Could not process PDF. It may be corrupt or protected.';
-                } finally {
-                    hideLoading();
+        elements.pdfStatus.textContent = 'Starting extraction...';
+        
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const typedarray = new Uint8Array(e.target.result);
+                const pdfDoc = await pdfjsLib.getDocument(typedarray).promise;
+                const pageOption = document.querySelector('input[name="pdf-page-option"]:checked').value;
+                let startPage = 1, endPage = pdfDoc.numPages;
+                if (pageOption === 'range') {
+                    startPage = parseInt(document.getElementById('pdf-page-from').value, 10) || 1;
+                    endPage = parseInt(document.getElementById('pdf-page-to').value, 10) || pdfDoc.numPages;
                 }
-            };
-            reader.readAsArrayBuffer(pdfFile);
-        } catch (error) {
-            console.error("FileReader error:", error);
+                
+                const text = useOcr 
+                    ? await extractPdfTextWithOcr(pdfDoc, startPage, endPage, worker) 
+                    : await extractPdfTextNative(pdfDoc, startPage, endPage);
+                    
+                elements.sourceTextPdf.value = text;
+                elements.pdfQuizDefinitionArea.classList.remove('hidden');
+                elements.pdfStatus.textContent = '✅ Text extracted successfully!';
+            } catch (err) {
+                console.error("Error during PDF processing:", err);
+                elements.pdfStatus.textContent = '❌ Error: Could not process PDF. It may be corrupt, protected, or too large for this device. Try a smaller page range.';
+            } finally {
+                hideLoading();
+            }
+        };
+        reader.onerror = (e) => {
+            console.error("FileReader error:", e);
             elements.pdfStatus.textContent = '❌ Error: Could not read the selected file.';
             hideLoading();
-        }
+        };
+        reader.readAsArrayBuffer(pdfFile);
     }
 
     // --- All other functions ---
@@ -2729,16 +2903,13 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             const examButtonsContainer = workflowElement.querySelector('.exam-buttons-container');
             const otherExamInput = workflowElement.querySelector('.prompt-exam-other');
 
-            if (examButtonsContainer) {
+            if (examButtonsContainer && otherExamInput) {
                 examButtonsContainer.querySelectorAll('.exam-btn').forEach(btn => btn.classList.remove('active'));
                 const btnToActivate = examButtonsContainer.querySelector(`.exam-btn[data-exam-name="${selectedExam}"]`);
                 if (btnToActivate) {
                     btnToActivate.classList.add('active');
                 }
-            }
-
-            if (otherExamInput) {
-                otherExamInput.classList.toggle('hidden', selectedExam === 'Other');
+                otherExamInput.classList.toggle('hidden', selectedExam !== 'Other');
             }
 
             if (workflowName === 'pdf') {
@@ -2765,11 +2936,51 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
     async function saveQuizState() { if (quizData.length === 0 || elements.quizPlayerContainer.classList.contains('hidden')) { await dbHelper.set(QUIZ_STATE_KEY, null); return; } const state = { originalQuizData, userAnswers, currentQuestionIndex, bookmarkedQuestions: Array.from(bookmarkedQuestions), quizStartTime: quizStartTime.toISOString(), quizMetaData: quizMetaData }; await dbHelper.set(QUIZ_STATE_KEY, state); }
     async function loadQuizState() { const state = await dbHelper.get(QUIZ_STATE_KEY); if (!state) return false; try { originalQuizData = state.originalQuizData; quizData = JSON.parse(JSON.stringify(originalQuizData)); userAnswers = state.userAnswers; currentQuestionIndex = state.currentQuestionIndex; bookmarkedQuestions = new Set(state.bookmarkedQuestions); quizStartTime = new Date(state.quizStartTime); quizMetaData = state.quizMetaData || {}; _displayScreen('player'); loadQuestion(currentQuestionIndex); showPasteNotification('✅ Your active assessment has been restored.'); return true; } catch (e) { console.error("Failed to load state:", e); await dbHelper.set(QUIZ_STATE_KEY, null); return false; } }
-    async function handleClipboardPermission() { if (!navigator.clipboard || !navigator.permissions) return; try { const permissionStatus = await navigator.permissions.query({ name: "clipboard-read" }); if (permissionStatus.state === "granted") { await tryAutoPasteOnReturn(); } else if (permissionStatus.state === "prompt") { elements.clipboardPermissionModalOverlay.classList.remove('hidden'); } } catch (e) { console.warn("Clipboard permission API not supported or failed.", e); } }
-    async function requestClipboardAndPaste() { elements.clipboardPermissionModalOverlay.classList.add('hidden'); await tryAutoPasteOnReturn(true); }
-    async function tryAutoPasteOnReturn(forcePrompt = false) { if (!forcePrompt && document.hidden) return; try { const text = await navigator.clipboard.readText(); if (text && text.trim() && (text.includes("Question:") || text.includes("Correct Answer:"))) { elements.quizDataInput.value = text; showPasteNotification('✨ Auto-pasted! Processing...'); handlePasteAndParse(); } else if (forcePrompt) { showPasteNotification("📋 Your clipboard is empty or doesn't look like a set of questions."); } } catch (err) { if (err.name !== 'NotAllowedError') console.error("Clipboard read failed: ", err); if (forcePrompt) showPasteNotification("Permission denied. You can paste manually."); } }
-    async function tryAutoPasteOnFocus() { if(elements.quizDataInput.value.trim() !== '') return; try { const permissionStatus = await navigator.permissions.query({ name: "clipboard-read" }); if (permissionStatus.state === "granted") await tryAutoPasteOnReturn(false); } catch (e) { /* Fail silently */ } }
-    async function handleVisibilityChange() { if (!document.hidden && window.location.hash === '#paste') await handleClipboardPermission(); }
+    
+    function setupPasteScreen() {
+        const tryAutoPaste = async () => {
+            if (!navigator.clipboard || !navigator.clipboard.readText) return;
+            if (elements.quizDataInput.value.trim() !== '') return;
+            if (document.hidden) return;
+
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text && text.trim() && (text.includes("Question:") || text.includes("?"))) {
+                    elements.quizDataInput.value = text;
+                    showPasteNotification('✨ Auto-pasted! Processing...');
+                    handlePasteAndParse();
+                }
+            } catch (err) {
+                console.log("Silent auto-paste attempt failed. User can paste manually.", err.name);
+            }
+        };
+
+        elements.quizDataInput.addEventListener('focus', tryAutoPaste);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && window.location.hash === '#paste') {
+                tryAutoPaste();
+            }
+        });
+
+        tryAutoPaste(); // Attempt once when the screen loads
+    }
+
+    async function handlePasteFromClipboard() {
+        try {
+            const text = await navigator.clipboard.readText();
+            if (text && text.trim()) {
+                elements.quizDataInput.value = text;
+                showPasteNotification('✅ Pasted from clipboard! Parsing...');
+                handlePasteAndParse();
+            } else {
+                showPasteNotification('🤔 Your clipboard is empty.');
+            }
+        } catch (err) {
+            console.error('Failed to read clipboard:', err);
+            alert('Could not read from clipboard. This can happen if you denied permission or are in a private browser window. Please paste the text manually into the box.');
+        }
+    }
+    
     function showFlowchartGuide(guideId) { const guideContent = GUIDE_DATA[guideId]; if (guideContent) { elements.flowchartModalTitle.textContent = guideContent.title; elements.flowchartModalContent.innerHTML = guideContent.content; elements.flowchartModalOverlay.classList.remove('hidden'); } else { console.error('No guide found for ID:', guideId); } }
     
     function generatePrompt(source, sourceType) {
@@ -2846,10 +3057,22 @@ Now, generate the questions based on all the instructions above.`;
         elements.geminiInstructionsModalOverlay.classList.remove('hidden');
     }
     
-    // *** MODIFICATION ***: Removed the unreliable 'promptGenerated' flag.
-    async function executePostPromptActions(prompt) { clearFormState(); try { await copyTextToClipboard(prompt); } catch {} sessionStorage.setItem('gameMode', gameMode); showScreen('paste'); openAiWithFallback(); }
-    function openAiWithFallback() { const aiWindow = window.open('https://gemini.google.com', '_blank'); if (!aiWindow || aiWindow.closed || typeof aiWindow.closed === 'undefined') { showPasteNotification('⚠️ Popup blocked! Click the link to open manually.'); elements.aiLinkFallback.classList.remove('hidden'); } else { elements.aiLinkFallback.classList.add('hidden'); } }
+    function executePostPromptActions(prompt) {
+        const aiWindow = window.open('https://gemini.google.com', '_blank');
     
+        if (!aiWindow || aiWindow.closed || typeof aiWindow.closed === 'undefined') {
+            showPasteNotification('⚠️ Popup blocked! Click the link to open manually.');
+            elements.aiLinkFallback.classList.remove('hidden');
+        } else {
+            elements.aiLinkFallback.classList.add('hidden');
+        }
+    
+        clearFormState();
+        copyTextToClipboard(prompt).catch(() => {});
+        sessionStorage.setItem('gameMode', gameMode);
+        showScreen('paste');
+    }
+
     function generateTopicPrompt() {
         quizMetaData = { topic: document.getElementById('prompt-topic').value.trim(), subject: document.getElementById('prompt-subject-topic').value.trim() };
         const otherExamInput = elements.topicGeneratorWorkflow.querySelector('.prompt-exam-other');
@@ -2935,14 +3158,17 @@ Now, generate the questions based on all the instructions above.`;
             if (e.target.classList.contains('exam-btn')) {
                 const clickedBtn = e.target;
                 const examName = clickedBtn.dataset.examName;
+                // De-select all buttons in the *same* container
                 container.querySelectorAll('.exam-btn').forEach(btn => btn.classList.remove('active'));
                 clickedBtn.classList.add('active');
                 selectedExam = examName;
+                
+                // Show/hide the 'Other' input field
                 if (inputField) {
                     inputField.classList.toggle('hidden', examName !== 'Other');
                     if (examName === 'Other') inputField.focus();
                 }
-                saveFormState(); 
+                saveFormState();
             }
         });
 
@@ -2964,35 +3190,44 @@ Now, generate the questions based on all the instructions above.`;
         } 
     }
     
+    // --- MEMORY-FIX: Rewritten page-by-page OCR function for PDFs ---
     async function extractPdfTextWithOcr(pdfDoc, start, end, worker) {
         let fullText = '';
-        const scale = 2.5;
+        const scale = 2.0; // Reduced scale for better memory management
 
         for (let i = start; i <= Math.min(end, pdfDoc.numPages); i++) {
-            elements.pdfStatus.textContent = `Performing OCR on page ${i} of ${end}... (this may take a moment)`;
-            const page = await pdfDoc.getPage(i);
-            const viewport = page.getViewport({ scale: scale });
-            
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
+            let canvas = null;
+            try {
+                elements.pdfStatus.textContent = `Processing page ${i} of ${end}...`;
+                const page = await pdfDoc.getPage(i);
+                const viewport = page.getViewport({ scale: scale });
+                
+                canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
 
-            const renderContext = {
-                canvasContext: context,
-                viewport: viewport
-            };
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+                page.cleanup(); // Immediately release page data
 
-            await page.render(renderContext).promise;
-            
-            const { data: { text } } = await worker.recognize(canvas);
-            fullText += text + '\n\n';
-
-            canvas.width = 0;
-            canvas.height = 0;
+                elements.pdfStatus.textContent = `Extracting text from page ${i} of ${end}... (This can take a moment)`;
+                const { data: { text } } = await worker.recognize(canvas);
+                fullText += text + '\n\n';
+            } catch (error) {
+                console.error(`Error processing page ${i}:`, error);
+                fullText += `[Error processing page ${i}]\n\n`;
+            } finally {
+                // Aggressively clean up the canvas to free memory
+                if (canvas) {
+                    canvas.width = 0;
+                    canvas.height = 0;
+                    canvas = null;
+                }
+            }
         }
         return fullText;
     }
+
 
     async function extractPdfTextNative(pdf, start, end) { let fullText = ''; for (let i = start; i <= end; i++) { elements.pdfStatus.textContent = `Reading text from page ${i}...`; const page = await pdf.getPage(i); const textContent = await page.getTextContent(); fullText += textContent.items.map(item => item.str).join(' ') + '\n\n'; } return fullText; }
     async function handleImageSelection(event) { const newFiles = Array.from(event.target.files); if (newFiles.length === 0) return; imageFiles = []; elements.sourceTextImage.value = ''; elements.imageQuizDefinitionArea.classList.add('hidden'); elements.ocrStatus.textContent = ''; updateImagePreviews(); processAndExtractAllImages(newFiles); event.target.value = ''; }
@@ -3001,9 +3236,95 @@ Now, generate the questions based on all the instructions above.`;
     function openCropModal(imageId) { const imgFile = imageFiles.find(f => f.id === imageId); if (!imgFile) return; currentEditingImageId = imageId; const fileToCrop = imgFile.croppedFile || imgFile.originalFile; elements.imageToCrop.src = URL.createObjectURL(fileToCrop); elements.cropModalOverlay.classList.remove('hidden'); elements.imageToCrop.onload = () => { if (cropper) cropper.destroy(); cropper = new Cropper(elements.imageToCrop, { aspectRatio: NaN, viewMode: 1, background: false, autoCropArea: 0.9, }); }; }
     function closeCropModal() { if(cropper) cropper.destroy(); cropper = null; currentEditingImageId = null; elements.cropModalOverlay.classList.add('hidden'); }
     function saveCrop() { if (!cropper || !currentEditingImageId) return; cropper.getCroppedCanvas({ minWidth: 256, maxWidth: 4096, imageSmoothingQuality: 'high' }).toBlob((blob) => { const imgFile = imageFiles.find(f => f.id === currentEditingImageId); if(imgFile) { imgFile.croppedFile = blob; updateImagePreviews(); const currentFiles = imageFiles.map(f => f.croppedFile || f.originalFile); showLoading("Re-extracting text from cropped image..."); processAndExtractAllImages(currentFiles); } closeCropModal(); }); }
-    function validateParsedData(questions) { for (let i = 0; i < questions.length; i++) { const q = questions[i]; const qNum = i + 1; if (!q.question || q.question.trim() === '') return { isValid: false, error: `Question ${qNum} is missing its main text.` }; if (!q.options || q.options.length < 2) return { isValid: false, error: `Question ${qNum} has fewer than two options.` }; if (typeof q.correctAnswerIndex !== 'number' || q.correctAnswerIndex < 0 || q.correctAnswerIndex >= q.options.length) return { isValid: false, error: `Could not find a valid correct answer for Question ${qNum}. Check the 'Correct Answer' line.` }; if (!q.explanation || q.explanation.trim() === '') return { isValid: false, error: `Question ${qNum} is missing its explanation.` }; } return { isValid: true }; }
-    function transformParsedData_Legacy(parsedQuestions) { return parsedQuestions.map(q => { if (!q) return null; const cleanedOptions = q.options.map(opt => opt.replace(/^[a-zA-Z]\)\s*/, '').trim()); const correctAnswerIndex = q.options.findIndex(opt => opt.trim().toLowerCase().startsWith(q.answer.toLowerCase() + ')')); if (correctAnswerIndex === -1) { console.error("Could not find correct answer for question:", q); return null; } let finalQuestionText = q.question; let statements = []; if (q.type === 'Statement' || q.question.includes('*')) { const parts = q.question.split(/Which of the above statements are correct\?/i); if (parts.length > 1) { finalQuestionText = `Which of the above statements are correct?`; statements = parts[0].split('*').map(s => s.trim()).filter(s => s); } } else if (q.type === 'Assertion-Reason') { finalQuestionText = q.question.replace(/<br>/g, '\n'); } return { question: finalQuestionText, options: cleanedOptions, correctAnswerIndex: correctAnswerIndex, explanation: q.explanation, statements: statements, image: null, }; }).filter(Boolean); }
-    function parseQuizText_Legacy(text) { if (!text || !text.trim()) return []; const questionBlocks = text.trim().split(/\n(?=\d+\.\s)/); return questionBlocks.map(block => { const fullBlock = block.trim(); const headerMatch = fullBlock.match(/^\d+\.\s(.*?Questions)/); if (!headerMatch) return null; let data = { type: 'Unknown', question: '', options: [], answer: '', explanation: '' }; const headerText = headerMatch[1]; if (headerText.includes('Assertion-Reason')) data.type = 'Assertion-Reason'; else if (headerText.includes('Statement-Based')) data.type = 'Statement'; else if (headerText.includes('Maths, Physics, or Other')) data.type = 'Maths'; else if (headerText.includes('True/False')) data.type = 'True/False'; else if (headerText.includes('Fill-in-the-Blank')) data.type = 'Fill-in-the-Blank'; else data.type = 'MCQ'; const questionRegex = /Question:([\s\S]*?)Options:\n([\s\S]*?)Correct Answer:([\s\S]*?)(?:Explanation:([\s\S]*))?$/; const arRegex = /Assertion \(A\):([\s\S]*?)Reason \(R\):([\s\S]*?)Options:\n([\s\S]*?)Correct Answer:([\s\S]*?)(?:Explanation:([\s\S]*))?$/; const match = (data.type === 'Assertion-Reason') ? fullBlock.match(arRegex) : fullBlock.match(questionRegex); if (match) { if (data.type === 'Assertion-Reason') { data.question = `Assertion (A): ${match[1].trim()}\nReason (R): ${match[2].trim()}`; data.options = match[3].trim().split('\n').map(opt => opt.trim()); data.answer = match[4].trim().split(')')[0].trim(); data.explanation = (match[5] || 'No explanation provided.').trim(); } else { data.question = match[1].trim(); data.options = match[2].trim().split('\n').map(opt => opt.trim()); data.answer = match[3].trim().split(')')[0].trim(); data.explanation = (match[4] || 'No explanation provided.').trim(); } return data; } return null; }).filter(Boolean); }
+    
+    function flexibleParser(text) {
+        const questions = [];
+        const blocks = text.replace(/\r\n/g, '\n').split(/\n(?=^\s*(Question:|Q\d|^\d+[\.\)]))/im);
+
+        blocks.forEach(block => {
+            if (block.trim().length < 10) return;
+
+            const lines = block.trim().split('\n');
+            let questionText = '';
+            const options = [];
+            let correctAnswer = null;
+            let explanation = 'No explanation provided.';
+            
+            let questionLines = [];
+            let optionsStarted = false;
+            let answerFound = false;
+            let explanationStarted = false;
+
+            for (const line of lines) {
+                const trimmedLine = line.trim();
+                if (!trimmedLine) continue;
+
+                const isExplanation = trimmedLine.match(/^(Explanation:|Reason:)/i);
+                const isAnswer = trimmedLine.match(/^(Correct Answer:|Answer:|Ans:|Correct:)/i);
+                const isOption = trimmedLine.match(/^([a-zA-Z][\.\)]|[\d]+[\.\)]|[-*•])\s*(.*)/);
+
+                if (isExplanation) {
+                    explanationStarted = true;
+                    explanation = trimmedLine.replace(/^(Explanation:|Reason:)\s*/i, '');
+                    continue;
+                }
+                if (explanationStarted) {
+                    explanation += '\n' + trimmedLine;
+                    continue;
+                }
+
+                if (isAnswer) {
+                    answerFound = true;
+                    correctAnswer = trimmedLine.replace(/^(Correct Answer:|Answer:|Ans:|Correct:)\s*/i, '').trim();
+                    continue;
+                }
+                if (answerFound) continue;
+
+                if (isOption) {
+                    optionsStarted = true;
+                    options.push({ original: trimmedLine, text: isOption[2].trim() });
+                    continue;
+                }
+
+                if (!optionsStarted) {
+                    questionLines.push(trimmedLine);
+                }
+            }
+
+            if (questionLines.length > 0) {
+                questionText = questionLines.join(' ').replace(/^(Question:|Q\d|^\d+[\.\)])\s*/i, '').trim();
+            }
+
+            if (questionText && options.length > 0 && correctAnswer !== null) {
+                let correctAnswerIndex = -1;
+                const cleanedAnswer = correctAnswer.replace(/[\.\)]$/, '').toLowerCase();
+
+                if (cleanedAnswer.length === 1 && cleanedAnswer >= 'a' && cleanedAnswer <= 'z') {
+                    correctAnswerIndex = cleanedAnswer.charCodeAt(0) - 'a'.charCodeAt(0);
+                }
+
+                if (correctAnswerIndex === -1 || correctAnswerIndex >= options.length) {
+                    correctAnswerIndex = options.findIndex(opt =>
+                        opt.text.toLowerCase().trim() === correctAnswer.toLowerCase().trim()
+                    );
+                }
+                
+                if (correctAnswerIndex >= 0 && correctAnswerIndex < options.length) {
+                    questions.push({
+                        question: questionText,
+                        options: options.map(o => o.text),
+                        correctAnswerIndex: correctAnswerIndex,
+                        explanation: explanation.trim(),
+                        statements: [],
+                        image: null
+                    });
+                }
+            }
+        });
+
+        return questions;
+    }
+
     async function restartQuiz() { clearFormState(); await dbHelper.clear(); window.location.hash = ''; }
     async function handleHardReset() { elements.mainContainer.classList.add('fade-out-and-shrink'); showLoading("Deleting all data and returning home..."); localStorage.clear(); sessionStorage.clear(); await dbHelper.clear(); if (gameMode === 'multiplayer' && currentRoomCode && window.firebase) { const { db, ref, remove } = window.firebase; const roomRef = ref(db, `rooms/${currentRoomCode}`); try { if (isHost) { await remove(roomRef); } else if(currentPlayerId) { await remove(ref(db, `rooms/${currentRoomCode}/players/${currentPlayerId}`)); } } catch (error) { console.error("Firebase deletion failed:", error); } } setTimeout(() => { window.location.href = window.location.pathname; }, 1000); }
     function getFullQuizContent(bookmarksOnly) { let text = `🏆 EXAMYATRI Assessment Results 🏆\n\n`; const totalQuestions = originalQuizData.length; const correctCount = userAnswers.filter(ans => ans.isCorrect).length; const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0; const timeDiff = Math.round(((new Date()) - quizStartTime) / 1000); const timeTaken = `${String(Math.floor(timeDiff / 60)).padStart(2, '0')}:${String(timeDiff % 60).padStart(2, '0')}`; text += `Final Score: ${correctCount} / ${totalQuestions} (${percentage.toFixed(1)}%)\n`; text += `Time Taken: ${timeTaken}\n\n`; text += '------------------------------------\n\n'; const questionsToProcess = originalQuizData.map((q, i) => ({ ...q, originalIndex: i })).filter(q => !bookmarksOnly || bookmarkedQuestions.has(q.originalIndex)); if (questionsToProcess.length === 0) return null; questionsToProcess.forEach(q => { const userAnswer = userAnswers[q.originalIndex]; text += `Q${q.originalIndex + 1}: ${q.question.replace(/<br>/g, '\n')}\n\n`; if (q.statements && q.statements.length > 0) { q.statements.forEach(stmt => { text += `• ${stmt}\n`; }); text += '\n'; } q.options.forEach((opt, oi) => { text += `${String.fromCharCode(97 + oi)}) ${opt.replace(/<[^>]*>/g, '')}\n`; }); text += `\nCorrect Answer: ${String.fromCharCode(97 + q.correctAnswerIndex)})\n`; if (userAnswer.status === 'answered') { text += `Your Answer: ${String.fromCharCode(97 + userAnswer.selected)}) - ${userAnswer.isCorrect ? 'Correct' : 'Incorrect'}\n`; } else { text += `Your Answer: Skipped\n`; } text += `\nExplanation:\n${q.explanation}\n\n`; text += '------------------------------------\n\n'; }); return text; }
