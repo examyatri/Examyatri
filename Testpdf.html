@@ -150,8 +150,8 @@
             <!-- Step 4 -->
             <div id="quiz-start-view" class="main-view hidden">
                 <h2 class="text-xl font-semibold mb-2">Step 4: Get Quiz from Gemini</h2>
-                <p class="mb-4 text-sm text-muted">After returning from Gemini, paste the JSON array below if it doesn't appear automatically. The quiz will start once the JSON is detected.</p>
-                <textarea id="json-paste-area" class="modal-textarea" rows="10" placeholder="[{...}]"></textarea>
+                <p class="mb-4 text-sm text-muted">After returning from Gemini, paste the quiz text below if it doesn't appear automatically. The quiz will start once the text is detected.</p>
+                <textarea id="json-paste-area" class="modal-textarea" rows="10" placeholder="Paste the plain text quiz from the AI here..."></textarea>
                 <p id="json-error-message" class="text-sm mt-2" style="color: var(--incorrect-color); min-height: 1.25rem;"></p>
                 <div class="mt-4">
                     <button id="start-quiz-btn" class="btn w-full">Start Quiz</button>
@@ -202,7 +202,7 @@
         <div id="ai-prompt-modal" class="modal-overlay hidden">
             <div class="modal-content">
                 <h3 class="text-xl font-semibold mb-2">Extraction Complete!</h3>
-                <p class="mb-4 text-sm text-muted">Copy the prompt below and paste it into Gemini. Return to this page with the JSON response to start the quiz.</p>
+                <p class="mb-4 text-sm text-muted">Copy the prompt below and paste it into Gemini. Return to this page with the plain text response to start the quiz.</p>
                 <p id="fallback-link" class="hidden mb-4 text-sm text-yellow-400">Could not open a new tab automatically. Please <a href="https://gemini.google.com/" target="_blank" class="underline">click here to open Gemini manually</a>.</p>
                 <textarea id="ai-prompt-textarea" class="modal-textarea" readonly></textarea>
                 <div class="mt-4 flex flex-wrap justify-end gap-2">
@@ -393,35 +393,78 @@
         showAiPrompt(fullText); 
     }
     
-    // MODIFIED: Updated prompt with a strict word limit for explanations.
     function showAiPrompt(extractedText) {
-        const prompt = `You are a highly skilled data extraction AI. Your only function is to convert the user-provided text into a machine-readable JSON format.
+        const prompt = `You are a highly skilled data extraction AI. Your function is to convert the user-provided text into a structured, plain text quiz format.
 
 ### CRITICAL INSTRUCTIONS - FOLLOW THESE EXACTLY ###
-1.  **JSON ONLY**: Your entire output must be a valid JSON array. Do NOT include any introductory text, closing remarks, or markdown formatting like \`\`\`json. Your response must begin with \`[\` and end with \`]\`.
-2.  **STRICT FORMAT**: Every object within the JSON array must strictly adhere to the following structure. Do not add, remove, or rename any keys.
+1.  **PLAIN TEXT ONLY**: Your entire output must be plain text. Do NOT use any JSON, markdown, or other formatting.
+2.  **STRICT FORMATTING**: Each question must follow a precise structure. Use "---" (three hyphens) on a new line to separate each question.
 
-    \`\`\`json
-    {
-      "question": "The complete question text goes here, including all statements and formatting. Use \\n for line breaks.",
-      "options": [
-        "First possible answer.",
-        "Second possible answer.",
-        "Third possible answer.",
-        "Fourth possible answer."
-      ],
-      "correctAnswerIndex": 0,
-      "explanation": "A concise and accurate explanation for why the indexed answer is correct."
-    }
-    \`\`\`
+#### FORMAT FOR MULTIPLE CHOICE QUESTIONS (MCQ):
+Question: [The full question text]
+A) [Option A]
+B) [Option B]
+C) [Option C]
+D) [Option D]
+Answer: [Correct option letter, e.g., C]
+Explanation: [A concise and accurate explanation.]
 
-3.  **ESCAPE CHARACTERS**: You MUST properly escape any special characters within the string values. Pay special attention to double quotes (\`) and backslashes (\\) inside the "question", "options", and "explanation" fields. For example, a quote inside an explanation must be written as \\". This is the most common reason for errors.
-4.  **EXPLANATION WORD LIMIT**: All explanations MUST be very concise. The maximum length for any explanation is 30 words. This is a strict limit. For questions involving formulas, state the primary formula and the result.
-5.  **ACCURACY AND COMPLETION ARE KEY**: The provided text may be messy or incomplete.
-    *   If the text does not explicitly state the correct answer or an explanation, you **MUST** use your own knowledge to determine the correct \`correctAnswerIndex\` and write a factually correct, detailed \`explanation\` (respecting the word limit).
-    *   Clean up any OCR errors or formatting issues in the question and options. Ensure statement-based questions are fully captured in the "question" field.
+**--- EXAMPLE MCQ ---**
+Question: What is the capital of Japan?
+A) Beijing
+B) Seoul
+C) Tokyo
+D) Bangkok
+Answer: C
+Explanation: Tokyo is the capital and largest city of Japan.
+---
 
-Now, process the following text and provide ONLY the JSON array as your response:
+#### FORMAT FOR STATEMENT-BASED QUESTIONS:
+Question:
+Statement 1: [Text of the first statement]
+Statement 2: [Text of the second statement]
+A) Only Statement 1 is correct.
+B) Only Statement 2 is correct.
+C) Both are correct.
+D) Both are incorrect.
+Answer: [Correct option letter, e.g., C]
+Explanation: [A concise and accurate explanation.]
+
+**--- EXAMPLE STATEMENT-BASED ---**
+Question:
+Statement 1: The Earth is the third planet from the Sun.
+Statement 2: Mars is known as the Red Planet.
+A) Only Statement 1 is correct
+B) Only Statement 2 is correct
+C) Both are correct
+D) Both are incorrect
+Answer: C
+Explanation: Both statements are factually correct astronomical facts.
+---
+
+#### FORMAT FOR ASSERTION-REASON QUESTIONS:
+Assertion: [Text of the assertion]
+Reason: [Text of the reason]
+A) Both Assertion and Reason are true, and Reason is the correct explanation of Assertion.
+B) Both Assertion and Reason are true, but Reason is not the correct explanation of Assertion.
+C) Assertion is true, but Reason is false.
+D) Assertion is false, but Reason is true.
+Answer: [Correct option letter, e.g., A]
+Explanation: [A concise and accurate explanation.]
+
+**--- EXAMPLE ASSERTION-REASON ---**
+Assertion: A convex lens is used as a magnifying glass.
+Reason: A convex lens can form a virtual, erect, and magnified image.
+Answer: A
+Explanation: When an object is within the focal length, a convex lens produces a magnified, virtual image, which is how it functions as a magnifier.
+---
+
+### FINAL INSTRUCTIONS ###
+*   **ACCURACY IS KEY**: The provided text may have errors. If the correct answer or explanation is missing, use your own knowledge to provide factually correct information.
+*   **CLEANUP**: Fix any OCR errors or formatting issues in the questions and options.
+*   **SEPARATOR**: The "---" separator between questions is mandatory for the quiz to work.
+
+Now, process the following text and provide ONLY the plain text quiz as your response:
 ---
 ${extractedText.trim()}`;
         getEl('ai-prompt-textarea').value = prompt;
@@ -447,7 +490,8 @@ ${extractedText.trim()}`;
         
         try {
             const text = await navigator.clipboard.readText();
-            if (text.includes('[') && text.includes(']')) {
+            // A simple check for the plain text format by looking for common markers.
+            if (text.includes('Answer:') && (text.includes('Question:') || text.includes('Assertion:'))) {
                 jsonPasteArea.value = text;
                 processAndStartQuiz();
             }
@@ -455,32 +499,95 @@ ${extractedText.trim()}`;
             console.warn('Could not read clipboard:', err.name, err.message);
         }
     }
-
+    
+    //
+    // FIXED: This function now decodes URL-encoded text before parsing.
+    //
     function processAndStartQuiz() {
-        jsonErrorMessage.textContent = ''; 
-        const rawText = jsonPasteArea.value;
+        jsonErrorMessage.textContent = '';
+        let rawText = jsonPasteArea.value;
 
         if (!rawText.trim()) {
-            return; 
+            return; // Do nothing if the paste area is empty
         }
 
         try {
-            const jsonMatch = rawText.match(/(\[.*\])/s);
-            if (!jsonMatch || jsonMatch.length < 1) {
-                throw new Error("Could not find a valid JSON array (starting with '[' and ending with ']'). Please check the pasted text.");
+            // FIX: Decode the text in case it's URL-encoded
+            try {
+                const decodedText = decodeURIComponent(rawText);
+                rawText = decodedText;
+            } catch (e) {
+                // Ignore decoding errors, proceed with the original text
+                console.log("Text is not URL-encoded, proceeding as is.");
             }
-            let potentialJson = jsonMatch[0];
+
+            const questionBlocks = rawText.split(/\n---\n?/).filter(b => b.trim() !== '');
             
-            const sanitizedJson = potentialJson.replace(/\\(?!["\\/bfnrtu])/g, "\\\\");
-
-            const data = JSON.parse(sanitizedJson);
-
-            if (!Array.isArray(data) || data.length === 0) {
-                throw new Error("The extracted text is not a valid, non-empty quiz array. Please check the JSON structure.");
+            if (questionBlocks.length === 0) {
+                throw new Error("No questions found. Make sure questions are separated by '---' on a new line.");
             }
-            startQuiz(data);
+
+            const parsedQuizData = [];
+            for (const block of questionBlocks) {
+                const lines = block.trim().split(/\r?\n/).filter(line => line.trim() !== '');
+                if (lines.length < 4) continue;
+
+                let questionLines = [];
+                const options = [];
+                let answerLine = null;
+                let explanationLine = null;
+
+                const optionRegex = /^\s*([A-D])\)\s*(.*)/i;
+                const answerRegex = /^\s*Answer:\s*([A-D])/i;
+                const explanationRegex = /^\s*Explanation:\s*(.*)/i;
+
+                let optionsStarted = false;
+                let explanationStarted = false;
+                for (const line of lines) {
+                    if (answerRegex.test(line)) {
+                        answerLine = line;
+                    } else if (explanationRegex.test(line)) {
+                        explanationLine = line;
+                        explanationStarted = true;
+                    } else if (optionRegex.test(line)) {
+                        options.push(line);
+                        optionsStarted = true;
+                    } else if (!optionsStarted) {
+                        questionLines.push(line);
+                    } else if (explanationStarted) {
+                        // Append subsequent lines to the explanation
+                        explanationLine += " " + line.trim();
+                    }
+                }
+                
+                if (questionLines.length > 0 && options.length > 0 && answerLine && explanationLine) {
+                    const question = questionLines.join('\n').replace(/^Question:\s*/i, '').trim();
+                    const processedOptions = options.map(opt => opt.replace(optionRegex, '$2').trim());
+                    
+                    const answerMatch = answerLine.match(answerRegex);
+                    const answerLetter = answerMatch[1].toUpperCase();
+                    const correctAnswerIndex = "ABCD".indexOf(answerLetter);
+
+                    const explanation = explanationLine.replace(explanationRegex, '$1').trim();
+
+                    if (processedOptions.length >= 2 && correctAnswerIndex !== -1) {
+                        parsedQuizData.push({
+                            question,
+                            options: processedOptions,
+                            correctAnswerIndex,
+                            explanation
+                        });
+                    }
+                }
+            }
+            
+            if (parsedQuizData.length === 0) {
+                 throw new Error("Could not parse any valid questions. Please check the text format (it needs Question/Options/Answer/Explanation for each entry).");
+            }
+            startQuiz(parsedQuizData);
         } catch (error) {
-            jsonErrorMessage.textContent = `Parsing Error: ${error.message}. Please check that the pasted text contains a valid JSON array.`;
+            jsonErrorMessage.textContent = `Parsing Error: ${error.message}`;
+            console.error(error);
         }
     }
     
@@ -668,4 +775,4 @@ ${extractedText.trim()}`;
     }
 </script>
 </body>
-</html>
+</html>```
