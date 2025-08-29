@@ -399,6 +399,7 @@
 ### CRITICAL INSTRUCTIONS - FOLLOW THESE EXACTLY ###
 1.  **PLAIN TEXT ONLY**: Your entire output must be plain text. Do NOT use any JSON, markdown, or other formatting.
 2.  **STRICT FORMATTING**: Each question must follow a precise structure. Use "---" (three hyphens) on a new line to separate each question.
+3.  **CONCISE EXPLANATIONS**: Explanations must be short and to the point, with a strict maximum of 30 words.
 
 #### FORMAT FOR MULTIPLE CHOICE QUESTIONS (MCQ):
 Question: [The full question text]
@@ -407,7 +408,7 @@ B) [Option B]
 C) [Option C]
 D) [Option D]
 Answer: [Correct option letter, e.g., C]
-Explanation: [A concise and accurate explanation.]
+Explanation: [A concise and accurate explanation, **MAX 30 WORDS**.]
 
 **--- EXAMPLE MCQ ---**
 Question: What is the capital of Japan?
@@ -416,7 +417,7 @@ B) Seoul
 C) Tokyo
 D) Bangkok
 Answer: C
-Explanation: Tokyo is the capital and largest city of Japan.
+Explanation: Tokyo is the capital and largest city of Japan. It is the political and economic center of the country, as well as the seat of the Emperor of Japan.
 ---
 
 #### FORMAT FOR STATEMENT-BASED QUESTIONS:
@@ -428,7 +429,7 @@ B) Only Statement 2 is correct.
 C) Both are correct.
 D) Both are incorrect.
 Answer: [Correct option letter, e.g., C]
-Explanation: [A concise and accurate explanation.]
+Explanation: [A concise and accurate explanation, **MAX 30 WORDS**.]
 
 **--- EXAMPLE STATEMENT-BASED ---**
 Question:
@@ -439,7 +440,7 @@ B) Only Statement 2 is correct
 C) Both are correct
 D) Both are incorrect
 Answer: C
-Explanation: Both statements are factually correct astronomical facts.
+Explanation: Both statements are factually correct. Earth's position is third from the sun, and the iron oxide on Mars' surface gives it its characteristic reddish appearance.
 ---
 
 #### FORMAT FOR ASSERTION-REASON QUESTIONS:
@@ -450,18 +451,19 @@ B) Both Assertion and Reason are true, but Reason is not the correct explanation
 C) Assertion is true, but Reason is false.
 D) Assertion is false, but Reason is true.
 Answer: [Correct option letter, e.g., A]
-Explanation: [A concise and accurate explanation.]
+Explanation: [A concise and accurate explanation, **MAX 30 WORDS**.]
 
 **--- EXAMPLE ASSERTION-REASON ---**
 Assertion: A convex lens is used as a magnifying glass.
 Reason: A convex lens can form a virtual, erect, and magnified image.
 Answer: A
-Explanation: When an object is within the focal length, a convex lens produces a magnified, virtual image, which is how it functions as a magnifier.
+Explanation: When an object is within the focal length, a convex lens produces a magnified, virtual image. This principle allows it to function as a common magnifier.
 ---
 
 ### FINAL INSTRUCTIONS ###
 *   **ACCURACY IS KEY**: The provided text may have errors. If the correct answer or explanation is missing, use your own knowledge to provide factually correct information.
 *   **CLEANUP**: Fix any OCR errors or formatting issues in the questions and options.
+*   **START QUIZ ON PARTIAL DATA**: If you can only extract some questions completely but the last one is incomplete, provide the output for the complete ones. The system will start the quiz with any valid questions found.
 *   **SEPARATOR**: The "---" separator between questions is mandatory for the quiz to work.
 
 Now, process the following text and provide ONLY the plain text quiz as your response:
@@ -500,9 +502,6 @@ ${extractedText.trim()}`;
         }
     }
     
-    //
-    // FIXED: This function now decodes URL-encoded text before parsing.
-    //
     function processAndStartQuiz() {
         jsonErrorMessage.textContent = '';
         let rawText = jsonPasteArea.value;
@@ -512,13 +511,11 @@ ${extractedText.trim()}`;
         }
 
         try {
-            // FIX: Decode the text in case it's URL-encoded
+            // Try to decode the text in case it's URL-encoded, but don't fail if it's not.
             try {
-                const decodedText = decodeURIComponent(rawText);
-                rawText = decodedText;
+                rawText = decodeURIComponent(rawText);
             } catch (e) {
                 // Ignore decoding errors, proceed with the original text
-                console.log("Text is not URL-encoded, proceeding as is.");
             }
 
             const questionBlocks = rawText.split(/\n---\n?/).filter(b => b.trim() !== '');
@@ -530,7 +527,7 @@ ${extractedText.trim()}`;
             const parsedQuizData = [];
             for (const block of questionBlocks) {
                 const lines = block.trim().split(/\r?\n/).filter(line => line.trim() !== '');
-                if (lines.length < 4) continue;
+                if (lines.length < 4) continue; // Skip blocks that are too short to be a valid question
 
                 let questionLines = [];
                 const options = [];
@@ -555,11 +552,12 @@ ${extractedText.trim()}`;
                     } else if (!optionsStarted) {
                         questionLines.push(line);
                     } else if (explanationStarted) {
-                        // Append subsequent lines to the explanation
+                        // Append subsequent lines to the explanation in case of line breaks
                         explanationLine += " " + line.trim();
                     }
                 }
                 
+                // A block is considered valid only if all parts are present
                 if (questionLines.length > 0 && options.length > 0 && answerLine && explanationLine) {
                     const question = questionLines.join('\n').replace(/^Question:\s*/i, '').trim();
                     const processedOptions = options.map(opt => opt.replace(optionRegex, '$2').trim());
@@ -582,8 +580,11 @@ ${extractedText.trim()}`;
             }
             
             if (parsedQuizData.length === 0) {
-                 throw new Error("Could not parse any valid questions. Please check the text format (it needs Question/Options/Answer/Explanation for each entry).");
+                 throw new Error("Could not parse any valid questions. Please check the text format (it needs Question/Options/Answer/Explanation for each entry separated by '---').");
             }
+
+            // If we reach here with at least one valid question, start the quiz.
+            // This inherently handles cases where some questions are complete and others are not.
             startQuiz(parsedQuizData);
         } catch (error) {
             jsonErrorMessage.textContent = `Parsing Error: ${error.message}`;
@@ -775,4 +776,4 @@ ${extractedText.trim()}`;
     }
 </script>
 </body>
-</html>```
+</html>
