@@ -394,12 +394,16 @@
     }
     
     function showAiPrompt(extractedText) {
-        const prompt = `You are a highly skilled data extraction AI. Your function is to convert the user-provided text into a structured, plain text quiz format.
+        const prompt = `You are a high-speed text processing AI. Your only job is to reformat text into a quiz structure as fast as possible. Do not analyze, just format.
 
-### CRITICAL INSTRUCTIONS - FOLLOW THESE EXACTLY ###
-1.  **PLAIN TEXT ONLY**: Your entire output must be plain text. Do NOT use any JSON, markdown, or other formatting.
-2.  **STRICT FORMATTING**: Each question must follow a precise structure. Use "---" (three hyphens) on a new line to separate each question.
-3.  **CONCISE EXPLANATIONS**: Explanations must be short and to the point, with a strict maximum of 30 words.
+### PRIMARY DIRECTIVES - NON-NEGOTIABLE ###
+1.  **SPEED IS CRITICAL**: Generate the output immediately. Do not add any introductory text. Your response must start with "Question:" or "Assertion:".
+2.  **PLAIN TEXT ONLY**: The entire output must be plain text. No JSON, no markdown (like **bold**), no formatting of any kind.
+3.  **ABSOLUTE 30-WORD LIMIT FOR EXPLANATIONS**: Every explanation MUST be 30 words or less. This is the most important rule. Any explanation over 30 words is a failure. Count the words.
+
+### STRICT OUTPUT FORMATTING ###
+*   Use "---" (three hyphens) on a new line to separate each question. This is mandatory.
+*   Follow the exact structure for each question type shown below.
 
 #### FORMAT FOR MULTIPLE CHOICE QUESTIONS (MCQ):
 Question: [The full question text]
@@ -408,7 +412,7 @@ B) [Option B]
 C) [Option C]
 D) [Option D]
 Answer: [Correct option letter, e.g., C]
-Explanation: [A concise and accurate explanation, **MAX 30 WORDS**.]
+Explanation: [A concise explanation. **MUST BE 30 WORDS OR LESS.**]
 
 **--- EXAMPLE MCQ ---**
 Question: What is the capital of Japan?
@@ -417,7 +421,7 @@ B) Seoul
 C) Tokyo
 D) Bangkok
 Answer: C
-Explanation: Tokyo is the capital and largest city of Japan. It is the political and economic center of the country, as well as the seat of the Emperor of Japan.
+Explanation: Tokyo is Japan's capital and largest city. It serves as the nation's political and economic center and is the seat of the Emperor of Japan. (23 words)
 ---
 
 #### FORMAT FOR STATEMENT-BASED QUESTIONS:
@@ -429,18 +433,14 @@ B) Only Statement 2 is correct.
 C) Both are correct.
 D) Both are incorrect.
 Answer: [Correct option letter, e.g., C]
-Explanation: [A concise and accurate explanation, **MAX 30 WORDS**.]
+Explanation: [A concise explanation. **MUST BE 30 WORDS OR LESS.**]
 
 **--- EXAMPLE STATEMENT-BASED ---**
 Question:
 Statement 1: The Earth is the third planet from the Sun.
 Statement 2: Mars is known as the Red Planet.
-A) Only Statement 1 is correct
-B) Only Statement 2 is correct
-C) Both are correct
-D) Both are incorrect
 Answer: C
-Explanation: Both statements are factually correct. Earth's position is third from the sun, and the iron oxide on Mars' surface gives it its characteristic reddish appearance.
+Explanation: Both statements are factually correct. Earth is third from the sun, and iron oxide on Mars' surface gives it a distinct reddish appearance. (22 words)
 ---
 
 #### FORMAT FOR ASSERTION-REASON QUESTIONS:
@@ -451,22 +451,21 @@ B) Both Assertion and Reason are true, but Reason is not the correct explanation
 C) Assertion is true, but Reason is false.
 D) Assertion is false, but Reason is true.
 Answer: [Correct option letter, e.g., A]
-Explanation: [A concise and accurate explanation, **MAX 30 WORDS**.]
+Explanation: [A concise explanation. **MUST BE 30 WORDS OR LESS.**]
 
 **--- EXAMPLE ASSERTION-REASON ---**
 Assertion: A convex lens is used as a magnifying glass.
 Reason: A convex lens can form a virtual, erect, and magnified image.
 Answer: A
-Explanation: When an object is within the focal length, a convex lens produces a magnified, virtual image. This principle allows it to function as a common magnifier.
+Explanation: A convex lens creates a magnified, virtual image when an object is placed within its focal length. This principle allows it to function as a magnifier. (23 words)
 ---
 
-### FINAL INSTRUCTIONS ###
-*   **ACCURACY IS KEY**: The provided text may have errors. If the correct answer or explanation is missing, use your own knowledge to provide factually correct information.
-*   **CLEANUP**: Fix any OCR errors or formatting issues in the questions and options.
-*   **START QUIZ ON PARTIAL DATA**: If you can only extract some questions completely but the last one is incomplete, provide the output for the complete ones. The system will start the quiz with any valid questions found.
-*   **SEPARATOR**: The "---" separator between questions is mandatory for the quiz to work.
+### FINAL COMMANDS ###
+*   **Fix Errors**: Correct obvious OCR errors in the source text. If an answer is missing or wrong, provide the correct one.
+*   **Process Incomplete Data**: If the text cuts off, format all the complete questions you can find.
+*   **REMEMBER THE 30-WORD LIMIT**: Do not exceed 30 words for any explanation. Be brief.
 
-Now, process the following text and provide ONLY the plain text quiz as your response:
+Now, process the following text instantly. Provide ONLY the plain text quiz as your response:
 ---
 ${extractedText.trim()}`;
         getEl('ai-prompt-textarea').value = prompt;
@@ -511,80 +510,90 @@ ${extractedText.trim()}`;
         }
 
         try {
-            // Try to decode the text in case it's URL-encoded, but don't fail if it's not.
-            try {
-                rawText = decodeURIComponent(rawText);
-            } catch (e) {
-                // Ignore decoding errors, proceed with the original text
-            }
+            // Try to decode the text in case it's URL-encoded
+            try { rawText = decodeURIComponent(rawText); } catch (e) { /* ignore */ }
 
-            const questionBlocks = rawText.split(/\n---\n?/).filter(b => b.trim() !== '');
-            
+            // General cleanup: Remove common emojis and trim whitespace from the whole block
+            const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu;
+            rawText = rawText.replace(emojiRegex, '').trim();
+
+            // Split into question blocks, allowing for flexible whitespace around the separator
+            const questionBlocks = rawText.split(/\s*\n---\n\s*/).filter(b => b.trim() !== '');
+
             if (questionBlocks.length === 0) {
-                throw new Error("No questions found. Make sure questions are separated by '---' on a new line.");
+                throw new Error("No questions found. Ensure questions are separated by '---' on a new line.");
             }
 
             const parsedQuizData = [];
             for (const block of questionBlocks) {
                 const lines = block.trim().split(/\r?\n/).filter(line => line.trim() !== '');
-                if (lines.length < 4) continue; // Skip blocks that are too short to be a valid question
+                if (lines.length < 3) continue; // A valid question needs at least Question, Option A, and Answer.
 
-                let questionLines = [];
+                let questionText = '';
                 const options = [];
-                let answerLine = null;
-                let explanationLine = null;
+                let answerLetter = null;
+                let explanationText = 'No explanation provided.'; // Default value
 
+                const questionRegex = /^\s*(Question|Assertion):/i;
                 const optionRegex = /^\s*([A-D])\)\s*(.*)/i;
                 const answerRegex = /^\s*Answer:\s*([A-D])/i;
                 const explanationRegex = /^\s*Explanation:\s*(.*)/i;
+                
+                let currentPart = 'question'; // Start by collecting question lines
 
-                let optionsStarted = false;
-                let explanationStarted = false;
                 for (const line of lines) {
-                    if (answerRegex.test(line)) {
-                        answerLine = line;
-                    } else if (explanationRegex.test(line)) {
-                        explanationLine = line;
-                        explanationStarted = true;
-                    } else if (optionRegex.test(line)) {
-                        options.push(line);
-                        optionsStarted = true;
-                    } else if (!optionsStarted) {
-                        questionLines.push(line);
-                    } else if (explanationStarted) {
-                        // Append subsequent lines to the explanation in case of line breaks
-                        explanationLine += " " + line.trim();
+                    const optionMatch = line.match(optionRegex);
+                    const answerMatch = line.match(answerRegex);
+                    const explanationMatch = line.match(explanationRegex);
+
+                    if (answerMatch) {
+                        answerLetter = answerMatch[1].toUpperCase();
+                        currentPart = 'answer';
+                    } else if (explanationMatch) {
+                        explanationText = explanationMatch[1].trim();
+                        currentPart = 'explanation';
+                    } else if (optionMatch) {
+                        options.push(optionMatch[0].trim()); // Push the full option line
+                        currentPart = 'options';
+                    } else {
+                        // If the line is not an option, answer or explanation, append it to the current part
+                        if (currentPart === 'question') {
+                            questionText += (questionText ? '\n' : '') + line;
+                        } else if (currentPart === 'explanation') {
+                            // Append to explanation if it's multi-line
+                            explanationText += ' ' + line.trim();
+                        }
+                        // We ignore extraneous lines after options or the answer if they aren't explanations.
                     }
                 }
                 
-                // A block is considered valid only if all parts are present
-                if (questionLines.length > 0 && options.length > 0 && answerLine && explanationLine) {
-                    const question = questionLines.join('\n').replace(/^Question:\s*/i, '').trim();
-                    const processedOptions = options.map(opt => opt.replace(optionRegex, '$2').trim());
-                    
-                    const answerMatch = answerLine.match(answerRegex);
-                    const answerLetter = answerMatch[1].toUpperCase();
-                    const correctAnswerIndex = "ABCD".indexOf(answerLetter);
+                // Clean up the collected question text
+                questionText = questionText.replace(questionRegex, '').trim();
+                
+                // Process options
+                const processedOptions = options.map(opt => {
+                    const match = opt.match(optionRegex);
+                    return match ? match[2].trim() : '';
+                }).filter(Boolean); // Filter out any empty options that might result from faulty regex
 
-                    const explanation = explanationLine.replace(explanationRegex, '$1').trim();
+                const correctAnswerIndex = answerLetter ? "ABCD".indexOf(answerLetter) : -1;
 
-                    if (processedOptions.length >= 2 && correctAnswerIndex !== -1) {
-                        parsedQuizData.push({
-                            question,
-                            options: processedOptions,
-                            correctAnswerIndex,
-                            explanation
-                        });
-                    }
+                // **Validation:** A question is valid if it has text, at least 2 options, and a valid answer.
+                // Explanation is optional.
+                if (questionText && processedOptions.length >= 2 && correctAnswerIndex !== -1) {
+                    parsedQuizData.push({
+                        question: questionText,
+                        options: processedOptions,
+                        correctAnswerIndex: correctAnswerIndex,
+                        explanation: explanationText
+                    });
                 }
             }
-            
+
             if (parsedQuizData.length === 0) {
-                 throw new Error("Could not parse any valid questions. Please check the text format (it needs Question/Options/Answer/Explanation for each entry separated by '---').");
+                throw new Error("Could not parse any valid questions. Please check the text format. Each question needs a 'Question:', at least two options (e.g., 'A) ...'), and an 'Answer:' line.");
             }
 
-            // If we reach here with at least one valid question, start the quiz.
-            // This inherently handles cases where some questions are complete and others are not.
             startQuiz(parsedQuizData);
         } catch (error) {
             jsonErrorMessage.textContent = `Parsing Error: ${error.message}`;
