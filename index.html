@@ -846,41 +846,12 @@
     /* --- Multiplayer Specific Styles (FROM FILE 174) --- */
     #mode-selection-container, #multiplayer-selection-container { text-align: center; }
     #mode-selection-container h2, #multiplayer-selection-container h2 { margin-bottom: 2rem; }
-    
-    /* MODIFIED: Mode Options Layout */
-    .mode-options {
-        display: grid;
-        grid-template-columns: 1fr; /* Single column layout */
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-    .mode-options-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr; /* Two columns for smaller buttons */
-        gap: 1.5rem;
-    }
-
-    .mode-option-card, .multiplayer-option-card {
-        background-color: var(--component-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 1.5rem;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-        text-decoration: none;
-        color: inherit;
-        display: block;
-    }
+    .mode-options, .multiplayer-options { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .mode-option-card, .multiplayer-option-card { background-color: var(--component-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.2s ease-in-out; }
     .mode-option-card:hover, .multiplayer-option-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px var(--shadow-color); border-color: var(--accent-color); }
-    .mode-option-card .card-icon, .multiplayer-option-card .card-icon { font-size: 2.5rem; display: block; margin-bottom: 0.8rem; }
-    .mode-option-card h3, .multiplayer-option-card h3 { margin: 0.5rem 0; color: var(--accent-color); font-size: 1.1em; }
-    
-    @media (max-width: 600px) {
-        .mode-options-row, .multiplayer-options {
-            grid-template-columns: 1fr;
-        }
-    }
+    .mode-option-card .card-icon, .multiplayer-option-card .card-icon { font-size: 3rem; display: block; margin-bottom: 1rem; }
+    .mode-option-card h3, .multiplayer-option-card h3 { margin: 0.5rem 0; color: var(--accent-color); font-size: 1.2em; }
+    @media (max-width: 600px) { .mode-options, .multiplayer-options { grid-template-columns: 1fr; } }
 
     #lobby-container { text-align: center; }
     #lobby-players-list { list-style-type: none; padding: 0; margin: 2rem 0; }
@@ -1054,18 +1025,10 @@
                 <h3>Single Player Practice</h3>
                 <p>Create a set of questions on any topic and practice by yourself.</p>
             </div>
-            <!-- NESTED ROW FOR SMALLER BUTTONS -->
-            <div class="mode-options-row">
-                <div class="mode-option-card" id="select-multiplayer-btn">
-                    <span class="card-icon">👥</span>
-                    <h3>Multiplayer/ Practice With Friends</h3>
-                    <p>Create a room or join a friend's to practice together.</p>
-                </div>
-                 <a href="Testpdf.html" class="mode-option-card">
-                    <span class="card-icon">📚</span>
-                    <h3>Coaching TestSeries PDF / PYQs Book Pdf -&gt; Quiz</h3>
-                    <p>Convert PDF test papers and question banks into interactive quizzes.</p>
-                </a>
+            <div class="mode-option-card" id="select-multiplayer-btn">
+                <span class="card-icon">👥</span>
+                <h3>Multiplayer/ Practice With Friends</h3>
+                <p>Create a room or join a friend's to practice together.</p>
             </div>
         </div>
         
@@ -1133,6 +1096,10 @@
         <div id="topic-generator-workflow" class="hidden">
             <div class="step-header-container">
               <h3 class="step-header">Step 1: Define Your Questions</h3>
+              <div class="guide-container">
+                  <button class="btn guide-btn" data-guide-id="topic-step1" title="Show Guide">💁</button>
+                  <span class="guide-help-text">How to use</span>
+              </div>
             </div>
             <div class="input-group"><label for="prompt-topic" class="input-label">Add Primary Topic Name or Formula of Physics or Mathematics or other subject</label><input type="text" id="prompt-topic" class="input-field" placeholder="e.g., The Solar System, World War II"></div>
             <div class="input-group"><label for="prompt-num-questions-topic" class="input-label">Number of Questions</label><input type="number" id="prompt-num-questions-topic" class="input-field" placeholder="e.g., 10" min="1" max="50"></div>
@@ -1149,6 +1116,10 @@
         <div id="text-generator-workflow" class="hidden">
             <div class="step-header-container">
               <h3 class="step-header">Step 1: Build Your Mock Test Sections</h3>
+              <div class="guide-container">
+                  <button class="btn guide-btn" data-guide-id="text-step1" title="Show Guide">💁</button>
+                  <span class="guide-help-text">How to use</span>
+              </div>
             </div>
             
             <!-- NEW DYNAMIC BUILDER UI -->
@@ -1164,6 +1135,10 @@
 
             <div class="step-header-container">
               <h3 class="step-header">Step 2: Define Global Settings</h3>
+              <div class="guide-container">
+                  <button class="btn guide-btn" data-guide-id="text-step2" title="Show Guide">💁</button>
+                  <span class="guide-help-text">How to use</span>
+              </div>
             </div>
             
             <div class="input-group"><label for="prompt-language-text" class="input-label">Language</label><select id="prompt-language-text" class="input-field"><option value="English" selected>English</option><option value="Hindi">Hindi</option><option value="Spanish">Spanish</option><option value="French">French</option><option value="German">German</option></select></div>
@@ -1190,6 +1165,10 @@
             </div>
             <div class="step-header-container">
               <h3 class="step-header">Step 1: Choose Document Language</h3>
+              <div class="guide-container">
+                  <button class="btn guide-btn" data-guide-id="image-step1" title="Show Guide">💁</button>
+                  <span class="guide-help-text">How to use</span>
+              </div>
             </div>
              <div class="input-group">
                 <div class="lang-selector-pills" id="image-lang-selector-container">
@@ -1214,6 +1193,7 @@
             <div id="image-quiz-definition-area" class="hidden fade-in-slide-up">
                 <div class="step-header-container">
                   <h3 class="step-header">Step 3: Define Your Questions</h3>
+                  <div class="guide-container"><button class="btn guide-btn" data-guide-id="image-step3" title="Show Guide">💁</button><span class="guide-help-text">How to use</span></div>
                 </div>
                 <textarea id="source-text-image" style="display: none;"></textarea>
                 <div class="input-group"><label for="prompt-num-questions-image" class="input-label">Number of Questions</label><input type="number" id="prompt-num-questions-image" class="input-field" placeholder="e.g., 5" min="1" max="50"></div>
@@ -1231,6 +1211,10 @@
         <div id="pdf-generator-workflow" class="hidden">
             <div class="step-header-container">
               <h3 class="step-header">Step 1: Choose Document Language</h3>
+              <div class="guide-container">
+                  <button class="btn guide-btn" data-guide-id="pdf-step1" title="Show Guide">💁</button>
+                  <span class="guide-help-text">How to use</span>
+              </div>
             </div>
              <div class="input-group">
                 <div class="lang-selector-pills" id="pdf-lang-selector-container">
@@ -1271,6 +1255,10 @@
              <div id="pdf-quiz-definition-area" class="hidden fade-in-slide-up">
                 <div class="step-header-container">
                   <h3 class="step-header">Step 3: Define Your Questions</h3>
+                  <div class="guide-container">
+                      <button class="btn guide-btn" data-guide-id="pdf-step2" title="Show Guide">💁</button>
+                      <span class="guide-help-text">How to use</span>
+                  </div>
                 </div>
                 <textarea id="source-text-pdf" style="display: none;"></textarea>
                 <div class="input-group"><label for="prompt-num-questions-pdf" class="input-label">Number of Questions</label><input type="number" id="prompt-num-questions-pdf" class="input-field" placeholder="e.g., 10" min="1" max="50"></div>
@@ -1398,9 +1386,6 @@
             <div id="score-performance-chart-container"></div>
             <div id="quiz-summary-details"></div>
         </div>
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <button id="start-new-practice-btn" class="btn hard-reset-btn fire-animation">🚀 Start New Practice</button>
-        </div>
         <div class="share-buttons">
             <div class="share-buttons-row">
                 <button id="share-pdf-btn" class="btn">📄 Download PDF</button>
@@ -1408,6 +1393,7 @@
                 <button id="copy-all-btn" class="btn">📋 Copy All</button>
                 <button id="share-whatsapp-btn" class="btn" style="background-color: #25D366;">💬 Share on WhatsApp</button>
                 <button id="share-site-btn" class="btn" style="background-color: #5865f2;">📢 Share Website</button>
+                <button id="restart-quiz-btn" class="btn">🔄 Take Another Assessment</button>
             </div>
             <div id="results-page-telegram-opener">
                 <div class="telegram-input-group">
@@ -1423,6 +1409,9 @@
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0;">
         <h3 >Review Your Answers:</h3>
         <div id="results-review"></div>
+        <div class="hard-reset-container">
+            <button id="hard-reset-btn-single" class="btn hard-reset-btn fire-animation">🔥 Go to Home & Delete All Data 🔥</button>
+        </div>
     </div>
 
      <!-- ===== MULTIPLAYER RESULTS (MODIFIED) ===== -->
@@ -1575,6 +1564,18 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     // This is used for the 'mix' format option.
     const LEGACY_FORMAT_TEXT = [MCQ_EXAMPLE, AR_EXAMPLE, STATEMENT_EXAMPLE, MATH_EXAMPLE, TF_EXAMPLE, FILL_BLANK_EXAMPLE].join('\n\n');
 
+
+    const commonGuideAfterInput = `<div class="guide-step"><strong>Step 2: Fill Question Details</strong><p>Fill in the details like Number of Questions, Subject, Language, Difficulty, Exam, and Question Format.</p><p class="hindi-text">(चरण 2: क्विज़ का विवरण भरें - प्रश्नों की संख्या, विषय, भाषा, कठिनाई, परीक्षा और प्रश्न प्रारूप जैसे विवरण भरें।)</p></div><div class="guide-step"><strong>Step 3: Generate Prompt & Open AI</strong><p>Click the big "Start 🚀" button. This automatically copies the instructions for the AI and opens the Gemini website in a new tab.</p><p class="hindi-text">(चरण 3: 'Start 🚀' बटन पर क्लिक करें - यह AI के लिए निर्देश अपने आप कॉपी कर लेगा और एक नए टैब में Gemini वेबसाइट खोल देगा।)</p></div><div class="guide-step"><strong>Step 4: Use the AI (Gemini)</strong><p>In the Gemini website, just paste the prompt into the message box and send it. Wait for the AI to generate all the questions.</p><p class="hindi-text">(चरण 4: AI (Gemini) का उपयोग करें - Gemini वेबसाइट में, बस प्रॉम्प्ट को मैसेज बॉक्स में पेस्ट करें और भेजें। AI द्वारा सभी प्रश्न बनाने तक प्रतीक्षा करें।)</p></div><div class="guide-step"><strong>Step 5: Copy AI's Response</strong><p>After the questions are generated, copy the entire response. There are two ways to copy from Gemini: 1) Click the copy icon (like a clipboard 📋) below the answer. 2) Click the three dots (...) at the top-right of the response and select 'Copy'.</p><p class="hindi-text">(चरण 5: AI की प्रतिक्रिया कॉपी करें - प्रश्न बन जाने के बाद, पूरी प्रतिक्रिया कॉपी करें। Gemini से कॉपी करने के 2 तरीके हैं: 1) उत्तर के नीचे कॉपी आइकन (📋) पर क्लिक करें। 2) प्रतिक्रिया के ऊपर-दाईं ओर तीन डॉट्स (...) पर क्लिक करें और 'कॉपी करें' चुनें।)</p></div><div class="guide-step"><strong>Step 6: Return to Examyatri</strong><p>You have two choices: 1) Simply switch tabs from Gemini back to examyatri. 2) On mobile, you can press your phone's 'Back' navigation button twice. The questions will be created automatically!</p><p class="hindi-text">(चरण 6: Examyatri पर वापस आएं - आपके पास 2 विकल्प हैं: 1) बस Gemini से Gemini टैब पर वापस स्विच करें। 2) मोबाइल पर, आप अपने फोन का 'बैक' नेविगेशन बटन दो बार दबा सकते हैं। क्विज़ अपने आप बन जाएगा!)</p></div>`;
+
+    const GUIDE_DATA = {
+        'topic-step1':{title:'Guide: Create Questions from Topic',content:`<div class="guide-step"><strong>Step 1: Enter Your Topic</strong><p>First, fill in the "Primary Topic" field. For example: "World War II" or "Solar System".</p><p class="hindi-text">(चरण 1: अपना विषय दर्ज करें - सबसे पहले, "Primary Topic" फ़ील्ड भरें। उदाहरण के लिए: "द्वितीय विश्व युद्ध" या "सौर मंडल"।)</p></div>${commonGuideAfterInput}`},
+        'text-step1':{title:'Guide: Create Questions from Text',content:`<div class="guide-step"><strong>Step 1: Paste Your Text</strong><p>Find any article, notes, or paragraph you want to make questions from. Copy that text and paste it into the big text box here.</p><p class="hindi-text">(चरण 1: अपना टेक्स्ट पेस्ट करें - कोई भी लेख, नोट्स या पैराग्राफ खोजें जिससे आप प्रश्न बनाना चाहते हैं। उस टेक्स्ट को कॉपी करें और यहां बड़े टेक्स्ट बॉक्स में पेस्ट करें।)</p></div>${commonGuideAfterInput}`},
+        'text-step2':{title:'Guide: Create Questions from Text',content:`<div class="guide-step"><strong>Step 1: Paste Your Text</strong><p>Find any article, notes, or paragraph you want to make questions from. Copy that text and paste it into the big text box here.</p><p class="hindi-text">(चरण 1: अपना टेक्स्ट पेस्ट करें - कोई भी लेख, नोट्स या पैराग्राफ खोजें जिससे आप प्रश्न बनाना चाहते हैं। उस टेक्स्ट को कॉपी करें और यहां बड़े टेक्स्ट बॉक्स में पेस्ट करें।)</p></div>${commonGuideAfterInput}`},
+        'image-step1':{title:'Guide: Create Questions from Image',content:`<div class="guide-step"><strong>Step 1: Upload Your Images</strong><p>Click "Select Images" and choose pictures of your book pages or notes. The app will automatically detect the correct text orientation and extract the text for you.</p><p class="hindi-text">(चरण 1: अपनी इमेज अपलोड करें - "Select Images" पर क्लिक करें और अपनी किताब के पन्नों या नोट्स की तस्वीरें चुनें। ऐप अपने आप टेक्स्ट की सही दिशा का पता लगा लेगा और आपके लिए टेक्स्ट निकाल देगा।)</p></div>${commonGuideAfterInput}`},
+        'image-step3':{title:'Guide: Create Questions from Image',content:`<div class="guide-step"><strong>Step 1: Upload Your Images</strong><p>Click "Select Images" and choose pictures of your book pages or notes. The app will automatically detect the correct text orientation and extract the text for you.</p><p class="hindi-text">(चरण 1: अपनी इमेज अपलोड करें - "Select Images" पर क्लिक करें और अपनी किताब के पन्नों या नोट्स की तस्वीरें चुनें। ऐप अपने आप टेक्स्ट की सही दिशा का पता लगा लेगा और आपके लिए टेक्स्ट निकाल देगा।)</p></div>${commonGuideAfterInput}`},
+        'pdf-step1':{title:'Guide: Create Questions from PDF',content:`<div class="guide-step"><strong>Step 1: Select Your PDF</strong><p>Click "Select PDF" and choose the PDF file from your phone or computer.</p><p class="hindi-text">(चरण 1: अपनी PDF चुनें - "Select PDF" पर क्लिक करें और अपने फोन या कंप्यूटर से PDF फाइल चुनें।)</p></div><div class="guide-step"><strong>Step 2: Choose Options & Extract Text</strong><p>You can extract all pages or a specific range. <strong>Important:</strong> If your PDF is a scanned copy or has images of text, check the "Force OCR" box for best results. Then click "Extract Text from PDF".</p><p class="hindi-text">(चरण 2: विकल्प चुनें और टेक्स्ट निकालें - आप सभी पृष्ठ या एक विशिष्ट रेंज निकाल सकते हैं। <strong>महत्वपूर्ण:</strong> यदि आपकी PDF एक स्कैन की हुई कॉपी है या उसमें टेक्स्ट की तस्वीरें हैं, तो सर्वोत्तम परिणामों के लिए "Force OCR" बॉक्स को चेक करें। फिर "Extract Text from PDF" पर क्लिक करें।)</p></div>${commonGuideAfterInput}`},
+        'pdf-step2':{title:'Guide: Create Questions from a PDF',content:`<div class="guide-step"><strong>Step 1: Select Your PDF</strong><p>Click "Select PDF" and choose the PDF file from your phone or computer.</p><p class="hindi-text">(चरण 1: अपनी PDF चुनें - "Select PDF" पर क्लिक करें और अपने फोन या कंप्यूटर से PDF फाइल चुनें।)</p></div><div class="guide-step"><strong>Step 2: Choose Options & Extract Text</strong><p>You can extract all pages or a specific range. <strong>Important:</strong> If your PDF is a scanned copy or has images of text, check the "Force OCR" box for best results. Then click "Extract Text from PDF".</p><p class="hindi-text">(चरण 2: विकल्प चुनें और टेक्स्ट निकालें - आप सभी पृष्ठ या एक विशिष्ट रेंज निकाल सकते हैं। <strong>महत्वपूर्ण:</strong> यदि आपकी PDF एक स्कैन की हुई कॉपी है या उसमें टेक्स्ट की तस्वीरें हैं, तो सर्वोत्तम परिणामों के लिए "Force OCR" बॉक्स को चेक करें। फिर "Extract Text from PDF" पर क्लिक करें।)</p></div>${commonGuideAfterInput}`}
+    };
 
     const FORM_STATE_KEY = 'examyatriFormState';
     const SCROLL_POS_KEY = 'examyatriScrollPos';
@@ -1739,7 +1740,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
     let isShakeReminderEnabled = true;
     let pressureTextCounter = 1;
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
     const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A-BAAGvbnAAAAAIAAAARYAAAAYwBvAG4AZgBuAG8AcgBtAGEAbAAgACgASQBDAEUAIAAgAGMAaQBjAGUAbABhAG4AZABhACAAQwByAGUAZQBtAGkQByACkALgAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJABMAcwBvAHUAbgBkACAARgBvAHIAZwBlACAAWABQAAANAAAAAGQAYQB0AGE');
     
     // --- INITIALIZATION ---
@@ -2063,12 +2064,13 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             if (effectiveId === 'copy-all-btn') { copyQuizContent(false); return; }
             if (effectiveId === 'share-whatsapp-btn') { shareOnWhatsApp(); return; }
             if (effectiveId === 'share-site-btn') { shareWebsite(); return; }
-            if (effectiveId === 'start-new-practice-btn') { handleHardReset(); return; }
+            if (effectiveId === 'restart-quiz-btn') { restartQuiz(); return; }
             if (effectiveId === 'results-page-open-telegram-btn') { openTelegramWithBookmarks(); return; }
-            if (effectiveId === 'hard-reset-btn-multi') { handleHardReset(); return; }
+            if (effectiveId === 'hard-reset-btn-single' || effectiveId === 'hard-reset-btn-multi') { handleHardReset(); return; }
 
             // --- Modals and Misc UI ---
             if (effectiveId === 'theme-toggle-btn') { toggleTheme(); return; }
+            if (target.closest('.guide-btn')) { showFlowchartGuide(target.closest('.guide-btn').dataset.guideId); return; }
             if (target.closest('.modal-close-btn-top') || effectiveId === 'flowchart-modal-close-btn') { target.closest('.modal-overlay').classList.add('hidden'); return; }
             if (effectiveId === 'telegram-backup-guide-btn') { elements.telegramBackupModalOverlay.classList.remove('hidden'); return; }
             if (effectiveId === 'telegram-backup-close-btn') { elements.telegramBackupModalOverlay.classList.add('hidden'); return; }
@@ -2164,7 +2166,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     // --- PARSER, VALIDATOR, AND QUIZ START LOGIC ---
     function handlePasteAndParse() {
         const gameMode = sessionStorage.getItem('gameMode');
-        let text = elements.quizDataInput.value.trim();
+        const text = elements.quizDataInput.value.trim();
         if (!text) { alert('Please paste the response into the box.'); return; }
 
         sessionStorage.removeItem('gameMode');
@@ -2175,45 +2177,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         } else {
             // Single Player Logic
             if (!quizMetaData || Object.keys(quizMetaData).length === 0) { quizMetaData = { topic: '', subject: '' }; }
-            
-            let parsedQuestions = [];
-            
-            // *** MODIFIED: More flexible JSON-first parsing logic ***
-            let jsonText = text;
-            const startIndex = text.indexOf('[');
-            const endIndex = text.lastIndexOf(']');
-            if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-                jsonText = text.substring(startIndex, endIndex + 1);
-            }
-
-            try {
-                const jsonData = JSON.parse(jsonText);
-                const questionsArray = Array.isArray(jsonData) ? jsonData : [jsonData];
-                
-                // Validate and map JSON to our internal structure
-                parsedQuestions = questionsArray.map(q => {
-                    if (!q.question || !q.options || typeof q.correctAnswerIndex === 'undefined' || !q.explanation) {
-                        throw new Error('Invalid JSON: A question object is missing required fields.');
-                    }
-                     if (q.correctAnswerIndex < 0 || q.correctAnswerIndex >= q.options.length) {
-                        throw new Error('Invalid JSON: correctAnswerIndex is out of bounds for the options array.');
-                    }
-                    return {
-                        question: q.question,
-                        options: q.options,
-                        correctAnswerIndex: q.correctAnswerIndex, // Use the index directly
-                        explanation: q.explanation,
-                        statements: [], // JSON format doesn't have statements currently
-                        image: null
-                    };
-                });
-
-            } catch (e) {
-                // If JSON parsing fails, fall back to the legacy text parser using the ORIGINAL text
-                console.warn("Could not parse as JSON, falling back to legacy text parser. Error:", e.message);
-                parsedQuestions = flexibleParser(text);
-            }
-            
+            const parsedQuestions = flexibleParser(text);
             if (!parsedQuestions || parsedQuestions.length === 0) { alert('Parsing Failed: Could not find any valid questions. Please check the text from the AI.'); return; }
             
             quizData = parsedQuestions;
@@ -2324,8 +2288,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             }
     
             // Start the quiz for all players if status changes to 'playing'
-            const myData = roomData.players?.[currentPlayerId];
-            if (roomData.status === 'playing' && elements.multiplayerQuizPlayerContainer.classList.contains('hidden') && myData && !myData.isFinished) {
+            if (roomData.status === 'playing' && elements.multiplayerQuizPlayerContainer.classList.contains('hidden')) {
                  startMultiplayerQuiz(roomData);
             }
     
@@ -2365,18 +2328,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     
     function startMultiplayerQuiz(roomData) {
         const quizText = roomData.quizText;
-        // Dual format support for multiplayer as well
-        try {
-            const jsonData = JSON.parse(quizText);
-            const questionsArray = Array.isArray(jsonData) ? jsonData : [jsonData];
-            quizData = questionsArray.map(q => {
-                 if (!q.question || !q.options || typeof q.correctAnswerIndex === 'undefined' || !q.explanation) throw new Error();
-                return { question: q.question, options: q.options, correctAnswerIndex: q.correctAnswerIndex, explanation: q.explanation };
-            });
-        } catch (e) {
-            quizData = flexibleParser(quizText);
-        }
-
+        quizData = flexibleParser(quizText); // Use new parser
         mpCurrentQuestionIndex = 0;
         mpSelectedOptionIndex = null;
         showScreen('mpPlayer');
@@ -2592,7 +2544,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     }
     
     async function submitMultiplayerQuiz(isAutoSubmit = false) {
-    
         if (!isAutoSubmit) {
             if (!confirm("Are you sure you want to submit? You cannot change your answers after submitting.")) return;
         }
@@ -2994,7 +2945,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
             try {
                 const text = await navigator.clipboard.readText();
-                if (text && text.trim() && (text.includes("Question:") || text.includes("?")) || text.trim().startsWith('{') || text.trim().startsWith('[')) {
+                if (text && text.trim() && (text.includes("Question:") || text.includes("?"))) {
                     elements.quizDataInput.value = text;
                     showPasteNotification('✨ Auto-pasted! Processing...');
                     handlePasteAndParse();
@@ -3030,6 +2981,8 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         }
     }
     
+    function showFlowchartGuide(guideId) { const guideContent = GUIDE_DATA[guideId]; if (guideContent) { elements.flowchartModalTitle.textContent = guideContent.title; elements.flowchartModalContent.innerHTML = guideContent.content; elements.flowchartModalOverlay.classList.remove('hidden'); } else { console.error('No guide found for ID:', guideId); } }
+    
     function generatePrompt(source, sourceType) {
         const { numQuestions, topic, subject, difficulty, language, formatKey, exam, sourceText } = source;
 
@@ -3037,28 +2990,29 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         if ((sourceType !== 'topic' && !sourceText) || !numQuestions) { alert('Please ensure you have provided source material and the number of questions.'); return null; }
         if (!exam) { alert("Please select a target exam before generating questions."); return null; }
         
-        let prompt = `You are an expert quiz generator. Your task is to create high-quality assessment questions based on the parameters below.
+        let sampleFormat = "";
+        switch (formatKey) {
+            case 'mcq': sampleFormat = MCQ_EXAMPLE; break;
+            case 'statement': sampleFormat = STATEMENT_EXAMPLE; break;
+            case 'assertion-reason': sampleFormat = AR_EXAMPLE; break;
+            case 'math-physics': sampleFormat = MATH_EXAMPLE; break;
+            case 'true-false': sampleFormat = TF_EXAMPLE; break;
+            case 'fill-blank': sampleFormat = FILL_BLANK_EXAMPLE; break;
+            default: sampleFormat = LEGACY_FORMAT_TEXT; break;
+        }
 
-**CRITICAL INSTRUCTIONS: YOU MUST FOLLOW THESE RULES. NO EXCEPTIONS.**
-1.  **JSON-ONLY OUTPUT:** Your entire response MUST be a single, valid JSON array of objects. NEVER, EVER, under any circumstances, write any text, explanation, or markdown before or after the JSON array. Your response MUST begin with the character \`[\` and end with the character \`]\`.
-2.  **NO MARKDOWN:** Do not wrap the JSON in markdown code blocks like \`\`\`json ... \`\`\`. The response must be raw, plain text.
-3.  **STRICT JSON STRUCTURE:** Each question object in the array MUST follow this exact structure:
-    \`\`\`
-    {
-      "question": "The full text of the question.",
-      "options": ["Option A text", "Option B text", "Option C text", "Option D text"],
-      "correctAnswerIndex": 0,
-      "explanation": "A detailed explanation for why the answer is correct."
-    }
-    \`\`\`
-4.  **QUESTION FORMATTING:** Pay close attention to the requested "Question Format" parameter below. The text for the "question" key should be formatted accordingly:
-    *   **For 'Multiple Choice (MCQ)':** The question should be a direct question. Example: "What is the capital of France?"
-    *   **For 'Statement-Based':** The question should introduce several statements (e.g., using numbers or bullet points) and then ask which are correct/incorrect. Use '\\n' for line breaks. Example: "Consider the following statements about the solar system:\\n1. Mars is the largest planet.\\n2. Venus has a thick, toxic atmosphere.\\nWhich of the above statements is/are correct?"
-    *   **For 'Assertion-Reason':** The question must contain both an Assertion (A) and a Reason (R). Use '\\n' for line breaks. The options should be the standard a), b), c), d) for A-R questions. Example: "Assertion (A): The sky appears blue.\\nReason (R): The atmosphere scatters blue light more than other colors."
-5.  **CORRECT ANSWER INDEX:** The value for \`correctAnswerIndex\` MUST be the zero-based integer index of the correct option in the \`options\` array (e.g., 0 for the first option, 1 for the second, etc.).
-6.  **COMPLETENESS:** Every question object MUST have all four keys: \`question\`, \`options\`, \`correctAnswerIndex\`, and \`explanation\`.
-7.  **MATH/PHYSICS SYMBOLS:** If generating math or physics questions, use valid LaTeX for all formulas within the JSON strings. Enclose inline math with \\( ... \\) delimiters and display math with \\[ ... \\].
-        
+        let prompt = `You are an expert at generating high-quality assessment questions in plain text format. Your responses must be very fast and precise.
+
+CRITICAL INSTRUCTIONS (MUST be followed):
+1.  **Output Format:** Provide the entire response as a single block of plain text. DO NOT use Markdown, JSON, code blocks, or any other formatting.
+2.  **Strict Format Adherence:** You MUST generate questions that EXACTLY match the requested "Question Format" parameter below. For example, if asked for "Multiple Choice (MCQ)", you MUST generate ONLY MCQs.
+3.  **Question Structure:** STRICTLY follow the sample format provided below for every single question.
+4.  **Statement Formatting:** For Statement-Based questions, individual statements MUST be preceded by an asterisk (*) and a space. DO NOT number the statements (e.g., use "* Statement text" NOT "1. Statement text"). The provided sample for Statement-Based questions demonstrates this correct format.
+5.  **Correct Answer Line:** The 'Correct Answer:' line MUST contain ONLY the letter of the correct option (e.g., "Correct Answer: c"). DO NOT include the text of the answer.
+6.  **Completeness:** Each question MUST have a question, all options, a single correct answer letter, and a detailed explanation.
+7.  **Math/Physics Symbols:** Use valid LaTeX for all formulas. Enclose all inline math with \\( ... \\) delimiters (e.g., \\(x^2\\)) and all display math with \\[ ... \\]. DO NOT use $ or $$.
+8.  **Terminology:** Use the term "questions" or "assessment". DO NOT use the word "quiz".
+
 --- ASSESSMENT PARAMETERS ---
 *   **Number of Questions:** ${numQuestions}
 *   **Primary Topic:** ${topic || (sourceType === 'text' ? 'Multiple Topics' : 'Not specified')}
@@ -3067,28 +3021,37 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 *   **Language:** ${language}
 *   **Question Format:** ${QUESTION_FORMATS[formatKey].name}
 *   **Target Exam:** ${exam}
-*   **Target Exam Instructions:** Generate questions relevant to the syllabus, pattern, and difficulty of the '${exam}' exam.
-        
+*   **Target Exam Instructions:** Generate questions based on analysis of previous year questions that are relevant, and match the syllabus, question pattern, and difficulty level of the '${exam}' exam.
+
 --- SOURCE MATERIAL INSTRUCTIONS ---
 `;
 
-        if (sourceType === 'pdf' || sourceType === 'image') {
-            prompt += `*   **Knowledge Base:** Generate questions PRIMARILY based on the "Source Material" provided below. Use it as the main context. Use your external knowledge only to frame questions that match the target exam's style and difficulty, but do not introduce facts or topics unrelated to the source material.
-            
---- START OF SOURCE MATERIAL ---
-${sourceText}
---- END OF SOURCE MATERIAL ---`;
-        } else { // For topic, text
-            prompt += `*   **Knowledge Base:** Use your internal knowledge. The "Primary Topic" and "Subject" are your guide. For 'Custom Mock Tests', use the provided section details. Your goal is to create new questions matching the '${exam}' exam's standard.
-            
-${sourceText ? `--- CUSTOM MOCK TEST DETAILS ---
-${sourceText}
---- END OF DETAILS ---` : ''}`;
+        if (sourceType === 'pdf') {
+            prompt += `*   **Knowledge Base:** You MUST generate questions based primarily on the "Source Material" provided below. Use the provided text as the core context and factual basis for the questions.
+    *   For 'Easy' difficulty, generate questions directly from the lines and facts present.
+    *   For 'Medium', 'Hard', and 'Expert' difficulties, increase the conceptual depth of the questions, but they MUST remain grounded in the information provided in the source material.
+    *   You may use your external knowledge ONLY to properly frame the questions, ensure they are conceptually sound, and match the difficulty and style of the specified target exam. DO NOT introduce facts or topics completely unrelated to the source material.`;
+        } else { // For topic, text, image
+            prompt += `*   **Knowledge Base:** Use your own internal knowledge to create the questions. The "Primary Topic", "Subject", and "Source Material" (if provided) should be used as a guide and context. Your primary goal is to create new, high-quality questions that accurately match the standard, syllabus, and difficulty level of the specified target exam.`;
         }
 
         prompt += `
 
-Now, generate the JSON array of questions based on all the instructions above. Remember: Your response must be ONLY the JSON array, starting with \`[\` and ending with \`]\`.`;
+--- REQUIRED QUESTION SAMPLE FORMAT (Follow Strictly) ---
+${sampleFormat}
+-------------------------------------------------------
+`;
+
+        if (sourceText) {
+            prompt += `
+Now, generate the questions based on all the instructions above and the following source material/details:
+--- START OF SOURCE MATERIAL ---
+${sourceText}
+--- END OF SOURCE MATERIAL ---`;
+        } else {
+             prompt += `
+Now, generate the questions based on all the instructions above.`;
+        }
 
         promptForGemini = prompt;
         elements.geminiInstructionsModalOverlay.classList.remove('hidden');
@@ -3371,44 +3334,9 @@ Now, generate the JSON array of questions based on all the instructions above. R
     function showPasteNotification(message) { elements.pasteNotification.textContent=message;elements.pasteNotification.classList.add('show');setTimeout(()=>elements.pasteNotification.classList.remove('show'),3000)}
     function toggleTheme(){document.body.classList.toggle('dark-mode');const isDarkMode=document.body.classList.contains('dark-mode');localStorage.setItem('quizTheme',isDarkMode?'dark':'light');document.getElementById('theme-toggle-btn').textContent=isDarkMode?'☀️':'🌙'}
     function applyInitialTheme(){ if(localStorage.getItem('quizTheme') === 'light'){ document.body.classList.remove('dark-mode'); } const isDarkMode = document.body.classList.contains('dark-mode'); document.getElementById('theme-toggle-btn').textContent = isDarkMode ? '☀️' : '🌙'; }
-    
-    function shareOnWhatsApp() {
-        const totalQuestions = originalQuizData.length;
-        const correctCount = userAnswers.filter(ans => ans.isCorrect).length;
-        const incorrectCount = userAnswers.filter(ans => ans.status === 'answered' && !ans.isCorrect).length;
-        const skippedCount = totalQuestions - correctCount - incorrectCount;
-        const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
-        const timeDiff = Math.round(((new Date()) - quizStartTime) / 1000);
-        const avgTime = totalQuestions > 0 ? (timeDiff / totalQuestions) : 0;
-
-        let text = `*🏆 My Examyatri Quiz Results! 🏆*\n\n`;
-        text += `*Final Score:* ${percentage.toFixed(1)}%\n`;
-        text += `*Correct:* ${correctCount} / ${totalQuestions}\n`;
-        text += `*Incorrect:* ${incorrectCount}\n`;
-        text += `*Skipped:* ${skippedCount}\n`;
-        text += `*Avg. Time/Q:* ${avgTime.toFixed(1)}s\n\n`;
-        text += `Think you can do better? Create your own free mock tests on any topic here:\n`;
-        text += window.location.href.split('#')[0];
-
-        const encodedText = encodeURIComponent(text);
-        window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
-    }
-
+    function shareOnWhatsApp() { const totalQuestions = originalQuizData.length; const correctCount = userAnswers.filter(ans => ans.isCorrect).length; const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0; const text = `I just took a quiz on EXAMYATRI! 🚀\n\n*My Score:* ${correctCount} out of ${totalQuestions} (${percentage.toFixed(1)}%).\n\nThink you can beat me? Create your own free mock tests here:\n${window.location.href}`; const encodedText = encodeURIComponent(text); window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank'); }
     async function shareWebsite() { const shareData = { title: 'EXAMYATRI - Free Mock Test Generator', text: 'Create unlimited topic-wise mock tests for any exam, completely free! Generate questions from topics, text, images, or PDFs with AI. 🚀', url: window.location.href }; try { if (navigator.share) { await navigator.share(shareData); } else { await copyTextToClipboard(shareData.url); showPasteNotification('✅ Website link copied to clipboard!'); } } catch (err) { console.error('Error sharing website:', err); await copyTextToClipboard(shareData.url); showPasteNotification('Sharing failed. Link copied to clipboard instead!'); } }
-    
-    // *** TASK 3: TELEGRAM BUTTON FIX ***
-    function openTelegramWithBookmarks() {
-        const username = elements.resultsPageTelegramInput.value.trim();
-        if (!username) {
-            alert("Please enter your public Telegram channel username.");
-            return;
-        }
-        // No need to copy text here, the user is instructed to do it manually.
-        // This function's sole purpose is to open the URL.
-        const telegramUrl = `https://t.me/${username}`;
-        window.open(telegramUrl, '_blank', 'noopener,noreferrer');
-    }
-    
+    async function openTelegramWithBookmarks() { /* ... implementation ... */ }
     async function generatePDF() { showLoading("Generating PDF..."); const { jsPDF } = window.jspdf; const doc = new jsPDF(); const totalQuestions = originalQuizData.length; const correctCount = userAnswers.filter(ans => ans.isCorrect).length; const incorrectCount = userAnswers.filter(ans => ans.status === 'answered' && !ans.isCorrect).length; const skippedCount = totalQuestions - correctCount - incorrectCount; const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0; const timeDiff = Math.round(((new Date()) - quizStartTime) / 1000); const timeTaken = `${String(Math.floor(timeDiff / 60)).padStart(2, '0')}:${String(timeDiff % 60).padStart(2, '0')}`; let y = 15; const x = 15; const margin = 15; const pageHeight = doc.internal.pageSize.height; const pageWidth = doc.internal.pageSize.width; const addText = (text, X, Y, options = {}) => { doc.setFontSize(options.fontSize || 10); const maxWidth = pageWidth - (margin * 2); const lines = doc.splitTextToSize(text, maxWidth); doc.text(lines, X, Y, options); return y + (lines.length * (options.fontSize || 10) * 0.35); }; const checkPageBreak = (currentY, neededHeight = 20) => { if (currentY + neededHeight > pageHeight - margin) { doc.addPage(); return margin; } return currentY; }; doc.setFontSize(20); doc.setFont("helvetica", "bold"); y = addText("EXAMYATRI - Assessment Results", x, y, { fontSize: 20 }); doc.setLineWidth(0.5); doc.line(x, y, pageWidth - x, y); y += 10; doc.setFontSize(14); doc.setFont("helvetica", "bold"); y = addText("Summary:", x, y, { fontSize: 14 }); y += 5; doc.setFontSize(11); doc.setFont("helvetica", "normal"); y = addText(`Final Score: ${correctCount} / ${totalQuestions} (${percentage.toFixed(1)}%)`, x, y, { fontSize: 11 }); y = addText(`Correct Answers: ${correctCount}`, x, y, { fontSize: 11 }); y = addText(`Incorrect Answers: ${incorrectCount}`, x, y, { fontSize: 11 }); y = addText(`Skipped Questions: ${skippedCount}`, x, y, { fontSize: 11 }); y = addText(`Time Taken: ${timeTaken}`, x, y, { fontSize: 11 }); y += 10; doc.line(x, y, pageWidth - x, y); y += 10; y = checkPageBreak(y); doc.setFontSize(14); doc.setFont("helvetica", "bold"); y = addText("Answer Review:", x, y, { fontSize: 14 }); y += 5; for (let i = 0; i < originalQuizData.length; i++) { y = checkPageBreak(y, 40); const q = originalQuizData[i]; const answer = userAnswers[i]; doc.setFontSize(12); doc.setFont("helvetica", "bold"); const questionText = `Q${i + 1}: ${q.question.replace(/<[^>]*>/g, '').replace(/\n/g, ' ')}`; y = addText(questionText, x, y, { fontSize: 12 }); y += 2; if (q.statements && q.statements.length > 0) { y = checkPageBreak(y, q.statements.length * 5); doc.setFontSize(10); doc.setFont("helvetica", "italic"); q.statements.forEach(stmt => { y = addText(`• ${stmt}`, x + 5, y, { fontSize: 10 }); }); y += 2; } y = checkPageBreak(y, q.options.length * 5); doc.setFontSize(10); doc.setFont("helvetica", "normal"); q.options.forEach((opt, oi) => { let prefix = ''; const optionLetter = String.fromCharCode(97 + oi); const isUserAnswer = answer.status === 'answered' && oi === answer.selected; const isCorrectAnswer = oi === q.correctAnswerIndex; if (isUserAnswer && isCorrectAnswer) { doc.setFont("helvetica", "bold"); prefix = `(Your Correct Answer) `; } else if (isUserAnswer) { doc.setFont("helvetica", "bold"); prefix = `(Your Answer) `; } else if (isCorrectAnswer) { prefix = `(Correct Answer) `; } y = addText(`${optionLetter}) ${prefix}${opt.replace(/<[^>]*>/g, '')}`, x + 5, y, { fontSize: 10 }); doc.setFont("helvetica", "normal"); }); y += 4; y = checkPageBreak(y, 20); doc.setFontSize(10); doc.setFont("helvetica", "bold"); y = addText("Explanation:", x + 5, y, { fontSize: 10 }); doc.setFont("helvetica", "normal"); y = addText(q.explanation.replace(/<[^>]*>/g, ''), x + 5, y, { fontSize: 10 }); y += 8; if (i < originalQuizData.length - 1) { y = checkPageBreak(y, 10); doc.setDrawColor(200); doc.line(x, y, pageWidth - x, y); y += 8; } } const fileName = `Examyatri_Results_${new Date().toISOString().split('T')[0]}.pdf`; doc.save(fileName); hideLoading(); }
     function triggerCongratsAnimation() { elements.congratsAnimationContainer.innerHTML = ''; const emojis = ['🎉', '🤩', '🥳', '✨', '👍', '💯']; for (let i = 0; i < 30; i++) { const emojiSpan = document.createElement('span'); emojiSpan.className = 'congrats-emoji'; emojiSpan.textContent = emojis[Math.floor(Math.random() * emojis.length)]; const angle = Math.random() * Math.PI * 2; const radius = Math.random() * (window.innerWidth / 2); const endX = Math.cos(angle) * radius; const endY = Math.sin(angle) * radius; emojiSpan.style.setProperty('--transform-end', `translate(${endX}px, ${endY}px)`); elements.congratsAnimationContainer.appendChild(emojiSpan); } clapSound.currentTime = 0; clapSound.play(); }
     function showSadReaction() { const sadEmojis = ['😥', '😭', '🤦', '😫']; elements.sadReactionEmoji.textContent = sadEmojis[Math.floor(Math.random() * sadEmojis.length)]; elements.sadReactionOverlay.classList.remove('hidden'); setTimeout(() => { elements.sadReactionOverlay.classList.add('hidden'); }, 1500); }
@@ -3439,49 +3367,7 @@ Now, generate the JSON array of questions based on all the instructions above. R
     function selectOption(index){ if(userAnswers[currentQuestionIndex].status==='answered')return; optionClickSound.play(); selectedOptionIndex=index; document.querySelectorAll('.option').forEach((opt,i)=>opt.classList.toggle('selected',i===index)); const checkBtn = document.getElementById('check-answer-btn'); if(checkBtn) checkBtn.disabled=false; }
     function checkAnswer(){ if (selectedOptionIndex === null) return; const question=originalQuizData[currentQuestionIndex];const isCorrect=selectedOptionIndex===question.correctAnswerIndex;userAnswers[currentQuestionIndex]={selected:selectedOptionIndex,isCorrect:isCorrect,status:'answered'}; const pressureTextEl = document.getElementById('pressure-text-animation');if(pressureTextEl) pressureTextEl.classList.add('hidden');document.getElementById('pressure-mode-toggle-btn').classList.remove('hidden'); if(isCorrect) triggerCongratsAnimation(); else showSadReaction(); updateQuestionUI(originalQuizData[currentQuestionIndex]); updateOptionsAndExplanationState(); updateQuizActions(); if (window.MathJax) MathJax.typesetPromise([elements.quizPlayerContainer]); }
     function animateCountUp(el, end, duration = 1000) { let start = 0; const final = parseInt(end, 10); if (isNaN(final)) { el.textContent = end; return; } let startTimestamp = null; const step = (timestamp) => { if (!startTimestamp) startTimestamp = timestamp; const progress = Math.min((timestamp - startTimestamp) / duration, 1); el.textContent = Math.floor(progress * (final - start) + start); if (progress < 1) window.requestAnimationFrame(step); }; window.requestAnimationFrame(step); }
-    
-    function showResults(){
-        showScreen('results');
-        if(timerId) clearInterval(timerId);
-        const totalQuestions = originalQuizData.length;
-        const correctCount = userAnswers.filter(ans => ans.isCorrect).length;
-        const incorrectCount = userAnswers.filter(ans => ans.status === 'answered' && !ans.isCorrect).length;
-        const skippedCount = totalQuestions - correctCount - incorrectCount;
-        const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
-        let remark = percentage >= 90 ? "Excellent!" : percentage >= 75 ? "Great Job!" : percentage >= 50 ? "Good Effort!" : "Needs Improvement";
-        const timeDiff = Math.round(((new Date()) - quizStartTime) / 1000);
-        const timeTaken = `${String(Math.floor(timeDiff/60)).padStart(2,'0')}:${String(timeDiff%60).padStart(2,'0')}`;
-        const avgTime = totalQuestions > 0 ? (timeDiff / totalQuestions) : 0;
-        
-        elements.scoreSummary.textContent = `You scored ${correctCount} out of ${totalQuestions}!`;
-        setTimeout(() => { elements.scoreSummary.classList.add('visible'); }, 100);
-        
-        elements.scorePerformanceChartContainer.innerHTML = '';
-        elements.quizSummaryDetails.innerHTML = `
-            <div class="summary-item"> <span class="summary-label">Status</span> <span class="summary-value remark">${remark}</span> </div>
-            <div class="summary-item"> <span class="summary-label">Final Score</span> <span class="summary-value">${percentage.toFixed(1)}%</span> </div>
-            <div class="summary-item"> <span class="summary-label">Correct Answers</span> <span class="summary-value" style="color: var(--correct-color);">${correctCount} / ${totalQuestions}</span> </div>
-            <div class="summary-item"> <span class="summary-label">Incorrect Answers</span> <span class="summary-value" style="color: var(--incorrect-color);">${incorrectCount}</span> </div>
-            <div class="summary-item"> <span class="summary-label">Skipped Questions</span> <span class="summary-value" style="color: var(--skipped-color);">${skippedCount}</span> </div>
-            <div class="summary-item"> <span class="summary-label">Time Taken</span> <span class="summary-value">${timeTaken}</span> </div>
-            <div class="summary-item"> <span class="summary-label">Avg. Time / Q</span> <span class="summary-value">${avgTime.toFixed(1)}s</span> </div>
-        `;
-        
-        document.querySelectorAll('.count-up').forEach(el => animateCountUp(el, el.dataset.value));
-        
-        elements.resultsReview.innerHTML = originalQuizData.map((q,i) => {
-            const answer = userAnswers[i];
-            const optionsHtml = q.options.map((opt,oi) => {
-                let classes = 'result-option';
-                if(answer.status === 'answered' && oi === answer.selected) classes += ' user-selected';
-                if(oi === q.correctAnswerIndex) classes += ' correct-answer';
-                return `<li class="${classes}">${opt}</li>`
-            }).join('');
-            return `<div class="result-item"><p class="result-question"><strong>Q${i + 1}:</strong> ${q.question.replace(/<[^>]*>/g, '')}<span class="bookmark-indicator ${bookmarkedQuestions.has(i)?'visible':''}">⭐</span></p><ul class="result-options-list">${optionsHtml}</ul><div class="result-explanation"><h5>Explanation</h5><p>${q.explanation}</p></div></div>`
-        }).join('');
-        
-        if (window.MathJax) MathJax.typesetPromise([elements.resultsScreen]);
-    }
+    function showResults(){ showScreen('results'); if(timerId) clearInterval(timerId); const totalQuestions = originalQuizData.length; const correctCount = userAnswers.filter(ans => ans.isCorrect).length; const incorrectCount = userAnswers.filter(ans => ans.status === 'answered' && !ans.isCorrect).length; const skippedCount = totalQuestions - correctCount - incorrectCount; const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0; let remark=percentage>=90?"Excellent!":percentage>=75?"Great Job!":percentage>=50?"Good Effort!":"Needs Improvement"; const timeDiff=Math.round(((new Date())-quizStartTime)/1000); const timeTaken=`${String(Math.floor(timeDiff/60)).padStart(2,'0')}:${String(timeDiff%60).padStart(2,'0')}`; elements.scoreSummary.textContent=`You scored ${correctCount} out of ${totalQuestions}!`; setTimeout(() => { elements.scoreSummary.classList.add('visible'); }, 100); elements.scorePerformanceChartContainer.innerHTML = ''; elements.quizSummaryDetails.innerHTML=` <div class="summary-item"> <span class="summary-label">Status</span> <span class="summary-value remark">${remark}</span> </div> <div class="summary-item"> <span class="summary-label">Final Score</span> <span class="summary-value">${percentage.toFixed(1)}%</span> </div> <div class="summary-item"> <span class="summary-label">Correct Answers</span> <span class="summary-value" style="color: var(--correct-color);">${correctCount} / ${totalQuestions}</span> </div> <div class="summary-item"> <span class="summary-label">Incorrect Answers</span> <span class="summary-value" style="color: var(--incorrect-color);">${incorrectCount}</span> </div> <div class="summary-item"> <span class="summary-label">Skipped Questions</span> <span class="summary-value" style="color: var(--skipped-color);">${skippedCount}</span> </div> <div class="summary-item"> <span class="summary-label">Time Taken</span> <span class="summary-value">${timeTaken}</span> </div>`; document.querySelectorAll('.count-up').forEach(el => animateCountUp(el, el.dataset.value)); elements.resultsReview.innerHTML=originalQuizData.map((q,i)=>{const answer=userAnswers[i];const optionsHtml=q.options.map((opt,oi)=>{let classes='result-option';if(answer.status==='answered'&&oi===answer.selected)classes+=' user-selected';if(oi===q.correctAnswerIndex)classes+=' correct-answer';return`<li class="${classes}">${opt}</li>`}).join('');return`<div class="result-item"><p class="result-question"><strong>Q${i + 1}:</strong> ${q.question.replace(/<[^>]*>/g, '')}<span class="bookmark-indicator ${bookmarkedQuestions.has(i)?'visible':''}">⭐</span></p><ul class="result-options-list">${optionsHtml}</ul><div class="result-explanation"><h5>Explanation</h5><p>${q.explanation}</p></div></div>`}).join(''); if (window.MathJax) MathJax.typesetPromise([elements.resultsScreen]); }
 
     // --- NEW: DYNAMIC PROMPT BUILDER LOGIC ---
     function setupDynamicPromptBuilder() {
