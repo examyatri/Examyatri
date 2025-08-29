@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en" class="dark"> <!-- Dark theme is now permanent -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExamYatri - PDF to MCQ Quiz Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- REQUIRED LIBRARIES -->
+    <script src="https://mozilla.github.io/pdf.js/build/pdf.mjs" type="module"></script>
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+    <!-- MathJax for rendering mathematical equations -->
+    <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']]
+          },
+          svg: {
+            fontCache: 'global'
+          }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+    <style>
+        /* Complete Dark Theme */
+        html.dark {
+          --bg-primary: #121212;
+          --bg-secondary: #1E1E1E;
+          --bg-component: #282828;
+          --text-heading: #FFFFFF;
+          --text-body: #E0E0E0;
+          --text-muted: #A0A0A0;
+          --border-color: #404040;
+          --accent-color: #3b82f6;
+          --accent-hover: #2563eb;
+          --incorrect-color: #ef4444;
+          --correct-color: #22c55e;
+        }
+        body { background-color: var(--bg-primary); color: var(--text-body); font-family: sans-serif; }
+        .main-view { background-color: var(--bg-secondary); padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); border: 1px solid var(--border-color); }
+        h1, h2, h3 { color: var(--text-heading); }
+        .btn { background-color: var(--accent-color); color: white; padding: 0.65rem 1.25rem; border-radius: 0.375rem; font-weight: 600; text-align: center; border: none; cursor: pointer; transition: background-color 0.2s ease-in-out; }
+        .btn:hover { background-color: var(--accent-hover); }
+        .btn:disabled { background-color: #555; color: #999; cursor: not-allowed; }
+        .btn-danger { background-color: var(--incorrect-color); }
+        .btn-secondary { background-color: var(--bg-component); color: var(--text-body); border: 1px solid var(--border-color); }
+        .input-field { width: 100%; margin-top: 0.25rem; border-radius: 0.375rem; background-color: var(--bg-component); border: 1px solid var(--border-color); color: var(--text-heading); padding: 0.5rem 0.75rem; }
+        .file-input::file-selector-button { margin-right: 1rem; padding: 0.5rem 1rem; border-radius: 9999px; border: 0; font-weight: 600; background-color: var(--bg-component); color: var(--accent-color); }
+        .lang-pill { padding: 0.5rem 1rem; margin: 0 0.25rem; border-radius: 9999px; cursor: pointer; background-color: var(--bg-component); border: 1px solid var(--border-color); color: var(--text-muted); font-weight: 500; }
+        .lang-pill.selected { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .loader { border: 5px solid var(--bg-component); border-top-color: var(--accent-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: var(--bg-secondary); color: var(--text-body); padding: 2rem; border-radius: 0.5rem; max-width: 800px; width: 90%; max-height: 90vh; display: flex; flex-direction: column; border: 1px solid var(--border-color); }
+        .modal-textarea { width: 100%; flex-grow: 1; font-family: monospace; background-color: var(--bg-primary); color: var(--text-body); border: 1px solid var(--border-color); border-radius: 0.25rem; padding: 0.5rem; }
+        
+        /* Quiz Styles */
+        .option-btn { display: flex; align-items: center; width: 100%; text-align: left; padding: 0.75rem 1rem; margin-bottom: 0.5rem; border: 1px solid var(--border-color); background-color: var(--bg-component); border-radius: 0.375rem; cursor: pointer; transition: all 0.2s ease; }
+        .option-btn:hover:not(:disabled) { border-color: var(--accent-color); background-color: #333; }
+        .option-btn.correct { background-color: var(--correct-color); color: white; border-color: var(--correct-color); }
+        .option-btn.incorrect { background-color: var(--incorrect-color); color: white; border-color: var(--incorrect-color); }
+        .option-btn:disabled { cursor: not-allowed; }
+        .option-emoji { margin-right: 0.75rem; font-size: 1.2rem; }
+        #explanation-container { background-color: var(--bg-component); padding: 1rem; margin-top: 1rem; border-radius: 0.375rem; border-left: 4px solid var(--accent-color); }
+        
+        .quiz-info-box {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            background-color: var(--bg-component);
+        }
+        #timer-display { font-size: 1.25rem; font-weight: 700; color: var(--accent-color); }
+
+        /* Results Styles */
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; text-align: center; margin-bottom: 2rem; }
+        .result-card { background-color: var(--bg-component); padding: 1rem; border-radius: 0.375rem; }
+        .result-card h3 { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .result-card p { font-size: 1.5rem; font-weight: bold; }
+        #detailed-results-container { text-align: left; margin-top: 2rem; }
+        .detailed-result-item { background-color: var(--bg-component); padding: 0.75rem 1rem; border-radius: 0.25rem; margin-bottom: 0.5rem; border-left: 3px solid; }
+        .detailed-result-item.correct { border-left-color: var(--correct-color); }
+        .detailed-result-item.incorrect { border-left-color: var(--incorrect-color); }
+        .detailed-result-item.skipped { border-left-color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <div class="container mx-auto p-4 max-w-5xl">
+        <div class="flex justify-between items-start mb-6 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold">ExamYatri</h1>
+                <p class="text-muted mt-1">Convert Coaching Test series PDF / PYQs Book PDF to MCQ Quiz with Detailed explanation</p>
+            </div>
+            <button id="global-reset-btn" class="btn btn-danger flex-shrink-0">Take Another Quiz</button>
+        </div>
+
+        <main id="app-container">
+            <!-- Step 1 & 2 -->
+            <div id="upload-view" class="main-view">
+                <h2 class="text-xl font-semibold mb-4 text-center">Step 1: Select Document Language</h2>
+                <div id="language-selection" class="flex justify-center mb-6">
+                    <div class="lang-pill selected" data-lang="eng">English</div>
+                    <div class="lang-pill" data-lang="hin">Hindi</div>
+                </div>
+                <h2 class="text-xl font-semibold mb-2 text-center">Step 2: Upload your Quiz PDF</h2>
+                <input type="file" id="file-upload" accept="application/pdf" class="file-input block w-full text-sm">
+            </div>
+
+            <!-- Step 3 -->
+            <div id="page-selection-view" class="main-view hidden">
+                <h2 class="text-xl font-semibold mb-4">Step 3: Select Page Range for Extraction</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="start-page" class="block text-sm font-medium mb-1">Start Page</label>
+                        <input type="number" id="start-page" min="1" value="1" class="input-field">
+                    </div>
+                    <div>
+                        <label for="end-page" class="block text-sm font-medium mb-1">End Page</label>
+                        <input type="number" id="end-page" min="1" placeholder="Last page" class="input-field">
+                    </div>
+                </div>
+                <button id="extract-text-btn" class="w-full btn">Extract Text & Generate Prompt</button>
+            </div>
+
+            <!-- Step 4 -->
+            <div id="quiz-start-view" class="main-view hidden">
+                <h2 class="text-xl font-semibold mb-2">Step 4: Get Quiz from Gemini</h2>
+                <p class="mb-4 text-sm text-muted">After returning from Gemini, paste the JSON array below if it doesn't appear automatically. The quiz will start once the JSON is detected.</p>
+                <textarea id="json-paste-area" class="modal-textarea" rows="10" placeholder="[{...}]"></textarea>
+                <div class="mt-4 flex items-center gap-4">
+                    <button id="start-quiz-btn" class="btn">Start Quiz</button>
+                    <button id="start-over-btn" class="btn btn-danger">Start Over</button>
+                </div>
+            </div>
+
+            <!-- Quiz View -->
+            <div id="quiz-view" class="main-view hidden">
+                 <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold">Quiz in Progress</h2>
+                    <div class="flex items-center gap-4">
+                        <div class="quiz-info-box">
+                            <p id="quiz-progress" class="font-medium text-muted"></p>
+                        </div>
+                        <div class="quiz-info-box">
+                            <div id="timer-display">0</div>
+                        </div>
+                    </div>
+                </div>
+                <p id="question-text" class="text-lg mb-6"></p>
+                <div id="options-container"></div>
+                <div id="explanation-container" class="hidden mt-6"><p id="explanation-text"></p></div>
+                <div id="quiz-controls" class="flex items-center gap-4 mt-6">
+                    <button id="skip-question-btn" class="w-full btn btn-secondary">Skip</button>
+                    <button id="next-question-btn" class="w-full btn hidden">Next Question</button>
+                    <button id="submit-quiz-btn" class="w-full btn btn-danger">Submit Quiz</button>
+                </div>
+            </div>
+
+            <!-- Results View -->
+            <div id="results-view" class="main-view hidden">
+                <h2 class="text-2xl font-bold mb-4">Quiz Complete!</h2>
+                <p id="final-score" class="text-xl mb-6"></p>
+                <div class="results-grid">
+                    <div class="result-card"><h3 class="font-semibold">Percentage</h3><p id="percentage-result" class="text-2xl font-bold" style="color: var(--accent-color);">0%</p></div>
+                    <div class="result-card"><h3 class="font-semibold">Correct</h3><p id="correct-answers-result" class="text-2xl font-bold" style="color: var(--correct-color);">0</p></div>
+                    <div class="result-card"><h3 class="font-semibold">Incorrect</h3><p id="incorrect-answers-result" class="text-2xl font-bold" style="color: var(--incorrect-color);">0</p></div>
+                    <div class="result-card"><h3 class="font-semibold">Skipped</h3><p id="skipped-questions-result" class="text-2xl font-bold" style="color: var(--text-muted);">0</p></div>
+                    <div class="result-card"><h3 class="font-semibold">Total Time</h3><p id="total-time-result" class="text-2xl font-bold">0s</p></div>
+                </div>
+                <div id="detailed-results-container"></div>
+                <button id="restart-quiz-btn" class="btn mt-6">Take Another Quiz</button>
+            </div>
+        </main>
+
+        <!-- Status & Modal overlays -->
+        <div id="status-container" class="hidden text-center mt-6"><div class="loader"></div><p id="status-text" class="font-medium text-lg"></p></div>
+        <div id="ai-prompt-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h3 class="text-xl font-semibold mb-2">Extraction Complete!</h3>
+                <p class="mb-4 text-sm text-muted">Copy the prompt below and paste it into Gemini. Return to this page with the JSON response to start the quiz.</p>
+                <p id="fallback-link" class="hidden mb-4 text-sm text-yellow-400">Could not open a new tab automatically. Please <a href="https://gemini.google.com/" target="_blank" class="underline">click here to open Gemini manually</a>.</p>
+                <textarea id="ai-prompt-textarea" class="modal-textarea" readonly></textarea>
+                <div class="mt-4 flex flex-wrap justify-end gap-2">
+                    <button id="copy-and-continue-btn" class="btn">Copy Prompt & Open Gemini</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    // --- SETUP ---
+    const { pdfjsLib } = globalThis;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://mozilla.github.io/pdf.js/build/pdf.worker.mjs`;
+    const getEl = id => document.getElementById(id);
+
+    // --- DOM ELEMENTS ---
+    const mainAppContainer = getEl('app-container');
+    const allViews = { 
+        upload: getEl('upload-view'), 
+        'page-selection': getEl('page-selection-view'), 
+        'quiz-start': getEl('quiz-start-view'), 
+        quiz: getEl('quiz-view'), 
+        results: getEl('results-view') 
+    };
+    const statusContainer = getEl('status-container'), statusText = getEl('status-text'), aiPromptModal = getEl('ai-prompt-modal');
+    const fileUpload = getEl('file-upload'), startPageEl = getEl('start-page'), endPageEl = getEl('end-page'), extractTextBtn = getEl('extract-text-btn');
+    const languageSelection = getEl('language-selection');
+    const jsonPasteArea = getEl('json-paste-area'), startQuizBtn = getEl('start-quiz-btn'), startOverBtn = getEl('start-over-btn'), restartQuizBtn = getEl('restart-quiz-btn');
+    const quizProgress = getEl('quiz-progress'), questionText = getEl('question-text'), optionsContainer = getEl('options-container'), explanationContainer = getEl('explanation-container'), explanationText = getEl('explanation-text'), nextQuestionBtn = getEl('next-question-btn'), skipQuestionBtn = getEl('skip-question-btn'), submitQuizBtn = getEl('submit-quiz-btn'), timerDisplay = getEl('timer-display');
+    const globalResetBtn = getEl('global-reset-btn');
+
+    // --- STATE VARIABLES ---
+    let pdfDoc = null, selectedLang = 'eng';
+    let quizData = [], currentQuestionIndex = 0, score = 0;
+    // MODIFIED: Timer logic changed to count up
+    let questionTimer = null, timeElapsed = 0;
+    let quizResults = [], quizStartTime = null, questionStartTime = null;
+    const happyEmojis = ['😊', '🎉', '👍', '✅', '🥳', '🤩', '👏', '💯'];
+    const sadEmojis = ['😢', '👎', '😭', '❌', '😩', '🤔'];
+
+    // --- INITIALIZATION & EVENT LISTENERS ---
+    initializeApp();
+    function initializeApp() {
+        window.addEventListener('hashchange', router);
+        window.addEventListener('load', router);
+        languageSelection.addEventListener('click', e => { 
+            if (e.target.classList.contains('lang-pill')) { 
+                document.querySelectorAll('.lang-pill').forEach(p => p.classList.remove('selected')); 
+                e.target.classList.add('selected'); 
+                selectedLang = e.target.dataset.lang;
+            }
+        });
+        fileUpload.addEventListener('change', handleFileUpload);
+        extractTextBtn.addEventListener('click', handlePageSelectionAndExtract);
+        getEl('copy-and-continue-btn').addEventListener('click', handleCopyAndContinue);
+        startQuizBtn.addEventListener('click', processAndStartQuiz);
+        nextQuestionBtn.addEventListener('click', () => handleAdvanceQuestion(false));
+        skipQuestionBtn.addEventListener('click', () => handleAdvanceQuestion(true));
+        submitQuizBtn.addEventListener('click', () => showResults(true));
+        startOverBtn.addEventListener('click', resetApp);
+        restartQuizBtn.addEventListener('click', resetApp);
+        globalResetBtn.addEventListener('click', resetApp);
+        jsonPasteArea.addEventListener('paste', () => setTimeout(processAndStartQuiz, 50));
+        window.addEventListener('focus', tryAutoPasteAndStart);
+    }
+
+    // --- App Reset Function ---
+    function resetApp() {
+        stopTimer();
+        pdfDoc = null;
+        selectedLang = 'eng';
+        quizData = [];
+        currentQuestionIndex = 0;
+        score = 0;
+        questionTimer = null;
+        timeElapsed = 0; // MODIFIED
+        quizResults = [];
+        quizStartTime = null;
+        questionStartTime = null;
+        fileUpload.value = '';
+        startPageEl.value = '1';
+        endPageEl.value = '';
+        endPageEl.placeholder = 'Last page';
+        jsonPasteArea.value = '';
+        document.querySelectorAll('.lang-pill').forEach(p => {
+            p.classList.remove('selected');
+            if (p.dataset.lang === 'eng') p.classList.add('selected');
+        });
+        navigateTo('upload');
+    }
+
+    // --- ROUTING LOGIC ---
+    function navigateTo(hash) {
+        window.location.hash = hash;
+    }
+
+    function router() {
+        const hash = window.location.hash.substring(1) || 'upload';
+        globalResetBtn.classList.toggle('hidden', hash === 'quiz');
+        Object.values(allViews).forEach(v => v.classList.add('hidden'));
+        if (allViews[hash]) {
+            allViews[hash].classList.remove('hidden');
+        } else {
+            allViews['upload'].classList.remove('hidden');
+        }
+    }
+
+    // --- CORE PDF & EXTRACTION WORKFLOW ---
+    async function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        showStatus("Loading PDF...");
+        try {
+            const typedarray = new Uint8Array(await file.arrayBuffer());
+            pdfDoc = await pdfjsLib.getDocument(typedarray).promise;
+            startPageEl.max = endPageEl.max = pdfDoc.numPages;
+            endPageEl.value = pdfDoc.numPages;
+            endPageEl.placeholder = `Last page (${pdfDoc.numPages})`;
+            navigateTo('page-selection');
+        } catch (error) {
+            alert(`Error loading PDF: ${error.message}`);
+            navigateTo('upload');
+        } finally {
+            hideStatus();
+        }
+    }
+
+    async function handlePageSelectionAndExtract() {
+        const startPage = parseInt(startPageEl.value, 10);
+        const endPage = parseInt(endPageEl.value, 10) || pdfDoc.numPages;
+        if (!startPage || startPage < 1 || startPage > pdfDoc.numPages || endPage < startPage) {
+            alert("Please enter a valid page range.");
+            return;
+        }
+        extractTextBtn.disabled = true;
+        await handleExtraction(startPage, endPage);
+        extractTextBtn.disabled = false;
+    }
+    
+    async function handleExtraction(startPage, endPage) { 
+        showStatus('Starting text extraction...');
+        let fullText = ''; 
+        for (let i = startPage; i <= endPage; i++) { 
+            showStatus(`Processing Page ${i} of ${endPage}...`); 
+            const page = await pdfDoc.getPage(i); 
+            const viewport = page.getViewport({ scale: 2.0 }); 
+            const tempCanvas = document.createElement('canvas'); 
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = viewport.width; 
+            tempCanvas.height = viewport.height; 
+            await page.render({ canvasContext: tempCtx, viewport }).promise; 
+            showStatus(`Running OCR on Page ${i}...`);
+            const { data: { text } } = await Tesseract.recognize(tempCanvas, selectedLang); 
+            fullText += text + '\n\n'; 
+        } 
+        hideStatus(); 
+        showAiPrompt(fullText); 
+    }
+    
+    function showAiPrompt(extractedText) {
+        const prompt = `You are a highly skilled data extraction AI. Your only function is to convert the user-provided text into a machine-readable JSON format.
+
+### CRITICAL INSTRUCTIONS - FOLLOW THESE EXACTLY ###
+1.  **JSON ONLY**: Your entire output must be a valid JSON array. Do NOT include any introductory text, closing remarks, or markdown formatting like \`\`\`json. Your response must begin with \`[\` and end with \`]\`.
+2.  **STRICT FORMAT**: Every object within the JSON array must strictly adhere to the following structure. Do not add, remove, or rename any keys.
+
+    \`\`\`json
+    {
+      "question": "The complete question text goes here, including all statements and formatting. Use \\n for line breaks.",
+      "options": [
+        "First possible answer.",
+        "Second possible answer.",
+        "Third possible answer.",
+        "Fourth possible answer."
+      ],
+      "correctAnswerIndex": 0,
+      "explanation": "A concise and accurate explanation for why the indexed answer is correct."
+    }
+    \`\`\`
+
+3.  **ACCURACY AND COMPLETION ARE KEY**: The provided text may be messy or incomplete.
+    *   If the text does not explicitly state the correct answer or an explanation, you **MUST** use your own knowledge to determine the correct \`correctAnswerIndex\` and write a factually correct, detailed \`explanation\`.
+    *   Clean up any OCR errors or formatting issues in the question and options. Ensure statement-based questions are fully captured in the "question" field.
+
+Now, process the following text and provide ONLY the JSON array as your response:
+---
+${extractedText.trim()}`;
+        getEl('ai-prompt-textarea').value = prompt;
+        aiPromptModal.classList.remove('hidden');
+    }
+
+    async function handleCopyAndContinue() {
+        try {
+            await navigator.clipboard.writeText(getEl('ai-prompt-textarea').value);
+            const geminiWindow = window.open('https://gemini.google.com/', '_blank');
+            if (!geminiWindow) getEl('fallback-link').classList.remove('hidden');
+        } catch (err) {
+            alert('Could not copy to clipboard.');
+        } finally {
+            aiPromptModal.classList.add('hidden');
+            navigateTo('quiz-start');
+        }
+    }
+
+    // --- QUIZ LOGIC & TIMER ---
+    async function tryAutoPasteAndStart() {
+        if (window.location.hash !== '#quiz-start' || !document.hasFocus()) return;
+        try {
+            const text = await navigator.clipboard.readText();
+            if (text.includes('[') && text.includes(']')) {
+                jsonPasteArea.value = text;
+                processAndStartQuiz();
+            }
+        } catch (err) { /* Silently fail if clipboard is not accessible */ }
+    }
+
+    function processAndStartQuiz() {
+        const jsonText = jsonPasteArea.value;
+        if (!jsonText.trim()) {
+            alert('Please paste the JSON content.');
+            return;
+        }
+        try {
+            const startIndex = jsonText.indexOf('[');
+            const endIndex = jsonText.lastIndexOf(']');
+            if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
+                throw new Error("Could not find a valid JSON array (missing '[' or ']').");
+            }
+            const cleanedJson = jsonText.substring(startIndex, endIndex + 1);
+            const data = JSON.parse(cleanedJson);
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new Error("JSON is not a valid, non-empty array.");
+            }
+            startQuiz(data);
+        } catch (error) {
+            alert(`Invalid JSON format.\nPlease check the copied text for errors.\nError: ${error.message}`);
+        }
+    }
+    
+    // MODIFIED: Timer now counts up from 0.
+    function startTimer() {
+        stopTimer(); 
+        timeElapsed = 0;
+        timerDisplay.textContent = timeElapsed;
+        questionStartTime = Date.now();
+        questionTimer = setInterval(() => {
+            timeElapsed++;
+            timerDisplay.textContent = timeElapsed;
+        }, 1000);
+    }
+    
+    function stopTimer() { clearInterval(questionTimer); }
+
+    function startQuiz(data) {
+        quizData = data;
+        currentQuestionIndex = 0;
+        score = 0;
+        quizResults = [];
+        quizStartTime = Date.now();
+        navigateTo('quiz');
+        displayQuestion();
+    }
+
+    async function displayQuestion() {
+        const question = quizData[currentQuestionIndex];
+        quizProgress.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+        
+        // MODIFIED: Use innerHTML and replace newlines with <br> to support complex questions.
+        questionText.innerHTML = question.question.replace(/\n/g, '<br>');
+
+        optionsContainer.innerHTML = '';
+        explanationContainer.classList.add('hidden');
+        nextQuestionBtn.classList.add('hidden');
+        skipQuestionBtn.classList.remove('hidden');
+        submitQuizBtn.classList.remove('hidden');
+
+        question.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.className = 'option-btn';
+            
+            const emojiSpan = document.createElement('span');
+            emojiSpan.className = 'option-emoji';
+            
+            const textSpan = document.createElement('span');
+            textSpan.textContent = option;
+            
+            button.appendChild(emojiSpan);
+            button.appendChild(textSpan);
+            
+            button.addEventListener('click', () => selectAnswer(index));
+            optionsContainer.appendChild(button);
+        });
+
+        if (window.MathJax) {
+            await MathJax.typesetPromise([questionText, optionsContainer]);
+        }
+        
+        startTimer();
+    }
+
+    function selectAnswer(selectedIndex) {
+        stopTimer();
+        const timeTaken = ((Date.now() - questionStartTime) / 1000).toFixed(1);
+        const question = quizData[currentQuestionIndex];
+        const correctIndex = question.correctAnswerIndex;
+        const optionButtons = optionsContainer.querySelectorAll('.option-btn');
+
+        optionButtons.forEach(button => button.disabled = true);
+        skipQuestionBtn.classList.add('hidden');
+        submitQuizBtn.classList.add('hidden');
+        
+        const randomHappy = happyEmojis[Math.floor(Math.random() * happyEmojis.length)];
+        const randomSad = sadEmojis[Math.floor(Math.random() * sadEmojis.length)];
+        
+        let result = {
+            question: question.question,
+            yourAnswer: question.options[selectedIndex],
+            correctAnswer: question.options[correctIndex],
+            timeTaken: `${timeTaken}s`,
+            status: 'incorrect'
+        };
+
+        if (selectedIndex === correctIndex) {
+            score++;
+            optionButtons[selectedIndex].classList.add('correct');
+            optionButtons[selectedIndex].querySelector('.option-emoji').textContent = randomHappy;
+            result.status = 'correct';
+        } else {
+            optionButtons[selectedIndex].classList.add('incorrect');
+            optionButtons[selectedIndex].querySelector('.option-emoji').textContent = randomSad;
+            if (correctIndex >= 0 && correctIndex < optionButtons.length) {
+                optionButtons[correctIndex].classList.add('correct');
+                optionButtons[correctIndex].querySelector('.option-emoji').textContent = randomHappy;
+            }
+        }
+        quizResults.push(result);
+
+        explanationText.textContent = `Explanation: ${question.explanation}`;
+        explanationContainer.classList.remove('hidden');
+        
+        nextQuestionBtn.textContent = (currentQuestionIndex < quizData.length - 1) ? 'Next Question' : 'Finish Quiz';
+        nextQuestionBtn.classList.remove('hidden');
+    }
+
+    function handleAdvanceQuestion(isSkipped = false) {
+        stopTimer();
+        
+        if(isSkipped) {
+            const question = quizData[currentQuestionIndex];
+            // MODIFIED: Record the actual time elapsed when skipping.
+            const timeTaken = ((Date.now() - questionStartTime) / 1000).toFixed(1);
+            quizResults.push({
+                question: question.question,
+                yourAnswer: 'Skipped',
+                correctAnswer: question.options[question.correctAnswerIndex],
+                timeTaken: `${timeTaken}s`,
+                status: 'skipped'
+            });
+        }
+        
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults(wasSubmitted = false) {
+        stopTimer();
+        navigateTo('results');
+
+        const totalTime = ((Date.now() - quizStartTime) / 1000).toFixed(1);
+        const totalQuestionsInQuiz = quizData.length;
+
+        const correctCount = quizResults.filter(r => r.status === 'correct').length;
+        const incorrectCount = quizResults.filter(r => r.status === 'incorrect').length;
+        const skippedCount = totalQuestionsInQuiz - (correctCount + incorrectCount);
+
+        const percentage = totalQuestionsInQuiz > 0 ? ((correctCount / totalQuestionsInQuiz) * 100).toFixed(1) : 0;
+        
+        getEl('final-score').textContent = `Your final score is ${correctCount} out of ${totalQuestionsInQuiz}.`;
+        getEl('percentage-result').textContent = `${percentage}%`;
+        getEl('correct-answers-result').textContent = correctCount;
+        getEl('incorrect-answers-result').textContent = incorrectCount;
+        getEl('skipped-questions-result').textContent = skippedCount;
+        getEl('total-time-result').textContent = `${totalTime}s`;
+
+        const detailedContainer = getEl('detailed-results-container');
+        detailedContainer.innerHTML = '<h3 class="text-xl font-semibold mb-4 text-left">Detailed Breakdown</h3>';
+        
+        for (let i = 0; i < totalQuestionsInQuiz; i++) {
+            const questionData = quizData[i];
+            const resultData = quizResults.find(r => r.question === questionData.question);
+            const status = resultData ? resultData.status : 'skipped';
+            const time = resultData ? resultData.timeTaken : 'N/A';
+            const item = document.createElement('div');
+            item.className = `detailed-result-item ${status}`;
+            item.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <p class="flex-1 mr-4">${i + 1}. ${questionData.question.replace(/\n/g, '<br>')}</p>
+                    <p class="font-semibold text-sm">(${time})</p>
+                </div>
+            `;
+            detailedContainer.appendChild(item);
+        }
+    }
+    
+    // --- UTILITY FUNCTIONS ---
+    function showStatus(message) {
+        statusText.textContent = message;
+        statusContainer.classList.remove('hidden');
+        mainAppContainer.classList.add('hidden');
+    }
+
+    function hideStatus() {
+        statusContainer.classList.add('hidden');
+        mainAppContainer.classList.remove('hidden');
+    }
+</script>
+</body>
+</html>
