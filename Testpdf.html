@@ -370,8 +370,14 @@
     async function handleExtraction(startPage, endPage) { 
         showStatus('Starting text extraction...');
         let fullText = ''; 
+        const totalPages = endPage - startPage + 1;
+
         for (let i = startPage; i <= endPage; i++) { 
-            showStatus(`Processing Page ${i} of ${endPage}...`); 
+            const processedPages = i - startPage;
+            const percentage = Math.round((processedPages / totalPages) * 100);
+            
+            showStatus(`Examyatri is reading page ${i} of ${endPage}... (${percentage}% Complete)`); 
+
             const page = await pdfDoc.getPage(i); 
             const viewport = page.getViewport({ scale: 2.0 }); 
             const tempCanvas = document.createElement('canvas'); 
@@ -379,7 +385,7 @@
             tempCanvas.width = viewport.width; 
             tempCanvas.height = viewport.height; 
             await page.render({ canvasContext: tempCtx, viewport }).promise; 
-            showStatus(`Running OCR on Page ${i}...`);
+            
             const { data: { text } } = await Tesseract.recognize(tempCanvas, selectedLang); 
             fullText += text + '\n\n'; 
         } 
@@ -387,6 +393,7 @@
         showAiPrompt(fullText); 
     }
     
+    // MODIFIED: Updated prompt with a strict word limit for explanations.
     function showAiPrompt(extractedText) {
         const prompt = `You are a highly skilled data extraction AI. Your only function is to convert the user-provided text into a machine-readable JSON format.
 
@@ -408,8 +415,10 @@
     }
     \`\`\`
 
-3.  **ACCURACY AND COMPLETION ARE KEY**: The provided text may be messy or incomplete.
-    *   If the text does not explicitly state the correct answer or an explanation, you **MUST** use your own knowledge to determine the correct \`correctAnswerIndex\` and write a factually correct, detailed \`explanation\`.
+3.  **ESCAPE CHARACTERS**: You MUST properly escape any special characters within the string values. Pay special attention to double quotes (\`) and backslashes (\\) inside the "question", "options", and "explanation" fields. For example, a quote inside an explanation must be written as \\". This is the most common reason for errors.
+4.  **EXPLANATION WORD LIMIT**: All explanations MUST be very concise. The maximum length for any explanation is 30 words. This is a strict limit. For questions involving formulas, state the primary formula and the result.
+5.  **ACCURACY AND COMPLETION ARE KEY**: The provided text may be messy or incomplete.
+    *   If the text does not explicitly state the correct answer or an explanation, you **MUST** use your own knowledge to determine the correct \`correctAnswerIndex\` and write a factually correct, detailed \`explanation\` (respecting the word limit).
     *   Clean up any OCR errors or formatting issues in the question and options. Ensure statement-based questions are fully captured in the "question" field.
 
 Now, process the following text and provide ONLY the JSON array as your response:
@@ -461,7 +470,7 @@ ${extractedText.trim()}`;
                 throw new Error("Could not find a valid JSON array (starting with '[' and ending with ']'). Please check the pasted text.");
             }
             let potentialJson = jsonMatch[0];
-
+            
             const sanitizedJson = potentialJson.replace(/\\(?!["\\/bfnrtu])/g, "\\\\");
 
             const data = JSON.parse(sanitizedJson);
@@ -517,7 +526,7 @@ ${extractedText.trim()}`;
             emojiSpan.className = 'option-emoji';
             
             const textSpan = document.createElement('span');
-            textSpan.innerHTML = option; // Use innerHTML to render potential math in options
+            textSpan.innerHTML = option;
             
             button.appendChild(emojiSpan);
             button.appendChild(textSpan);
@@ -570,10 +579,9 @@ ${extractedText.trim()}`;
         }
         quizResults.push(result);
 
-        explanationText.innerHTML = `Explanation: ${question.explanation}`; // Use innerHTML
+        explanationText.innerHTML = `Explanation: ${question.explanation}`;
         explanationContainer.classList.remove('hidden');
         
-        // FIXED: Re-render MathJax for the explanation container
         if(window.MathJax) {
             await MathJax.typesetPromise([explanationContainer]);
         }
@@ -642,7 +650,6 @@ ${extractedText.trim()}`;
             detailedContainer.appendChild(item);
         }
 
-        // FIXED: Re-render MathJax for the detailed results container
         if(window.MathJax) {
             await MathJax.typesetPromise([detailedContainer]);
         }
