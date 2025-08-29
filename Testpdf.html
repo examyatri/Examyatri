@@ -336,7 +336,6 @@
     }
 
     // --- CORE PDF & EXTRACTION WORKFLOW ---
-    // FIXED: Correctly get the first file from the FileList.
     async function handleFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -518,7 +517,7 @@ ${extractedText.trim()}`;
             emojiSpan.className = 'option-emoji';
             
             const textSpan = document.createElement('span');
-            textSpan.textContent = option;
+            textSpan.innerHTML = option; // Use innerHTML to render potential math in options
             
             button.appendChild(emojiSpan);
             button.appendChild(textSpan);
@@ -534,7 +533,7 @@ ${extractedText.trim()}`;
         startTimer();
     }
 
-    function selectAnswer(selectedIndex) {
+    async function selectAnswer(selectedIndex) {
         stopTimer();
         const timeTaken = ((Date.now() - questionStartTime) / 1000).toFixed(1);
         const question = quizData[currentQuestionIndex];
@@ -571,8 +570,13 @@ ${extractedText.trim()}`;
         }
         quizResults.push(result);
 
-        explanationText.textContent = `Explanation: ${question.explanation}`;
+        explanationText.innerHTML = `Explanation: ${question.explanation}`; // Use innerHTML
         explanationContainer.classList.remove('hidden');
+        
+        // FIXED: Re-render MathJax for the explanation container
+        if(window.MathJax) {
+            await MathJax.typesetPromise([explanationContainer]);
+        }
         
         nextQuestionBtn.textContent = (currentQuestionIndex < quizData.length - 1) ? 'Next Question' : 'Finish Quiz';
         nextQuestionBtn.classList.remove('hidden');
@@ -601,7 +605,7 @@ ${extractedText.trim()}`;
         }
     }
 
-    function showResults(wasSubmitted = false) {
+    async function showResults(wasSubmitted = false) {
         stopTimer();
         navigateTo('results');
 
@@ -636,6 +640,11 @@ ${extractedText.trim()}`;
                 </div>
             `;
             detailedContainer.appendChild(item);
+        }
+
+        // FIXED: Re-render MathJax for the detailed results container
+        if(window.MathJax) {
+            await MathJax.typesetPromise([detailedContainer]);
         }
     }
     
