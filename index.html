@@ -3421,5 +3421,26 @@ Now, generate the questions based on all the instructions above.`;
     }
 });
 </script>
+  <!-- Visitor Counter Start -->
+<div id="visitor-count" 
+     style="position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+            background: rgba(0,0,0,0.85); color: #fff; padding:8px 16px;
+            border-radius:12px; font-family:Arial,sans-serif; font-size:14px;
+            z-index:999; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            text-shadow: 0 0 4px #00f;">
+  Visitors: 0
+</div>
+
+<script>
+  fetch('https://api.countapi.xyz/hit/examyatri.live/visits')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('visitor-count').innerText = 'Visitors: ' + data.value;
+    })
+    .catch(err => {
+      console.error('Visitor counter failed:', err);
+    });
+</script>
+<!-- Visitor Counter End -->
 </body>
 </html>
