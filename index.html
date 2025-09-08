@@ -3432,7 +3432,7 @@ Now, generate the questions based on all the instructions above.`;
 </div>
 
 <script>
-  fetch('https://api.countapi.xyz/hit/examyatri.live/visits')
+  fetch('https://countapi-js.egoist.dev/hit/examyatri.live/visits')
     .then(res => res.json())
     .then(data => {
       document.getElementById('visitor-count').innerText = 'Visitors: ' + data.value;
