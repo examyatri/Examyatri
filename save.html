@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Practice Ready Quizzes - EXAMYATRI</title>
+  <style>
+    :root {
+      --primary-bg: #f0f4f8;
+      --secondary-bg: #ffffff;
+      --component-bg: #f8f9fa;
+      --text-color: #333;
+      --border-color: #dee2e6;
+      --shadow-color: rgba(0, 0, 0, 0.08);
+      --accent-color: #007bff;
+      --accent-hover: #0056b3;
+      --incorrect-color: #dc3545;
+    }
+
+    body.dark-mode {
+      --primary-bg: #121212;
+      --secondary-bg: #1e1e1e;
+      --component-bg: #2a2a2e;
+      --text-color: #e0e0e0;
+      --border-color: #44474b;
+      --shadow-color: rgba(255, 255, 255, 0.08);
+      --accent-color: #4dabf7;
+      --accent-hover: #1c7ed6;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--primary-bg);
+      color: var(--text-color);
+      margin: 0;
+      padding: 80px 20px 20px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn {
+        background-color: var(--accent-color);
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .btn:hover:not(:disabled) {
+        background-color: var(--accent-hover);
+        box-shadow: 0 4px 8px var(--shadow-color);
+        transform: translateY(-2px);
+    }
+    .btn-secondary { background-color: #6c757d; }
+    .btn-secondary:hover:not(:disabled) { background-color: #5a6268; }
+
+    #global-nav-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: var(--secondary-bg);
+        box-shadow: 0 2px 10px var(--shadow-color);
+        z-index: 10000;
+        box-sizing: border-box;
+    }
+
+    #global-home-btn {
+        font-size: 0.9em;
+        padding: 8px 15px;
+        animation: aqua-glow 2s infinite ease-in-out;
+    }
+
+    #global-how-to-use-btn {
+        font-size: 0.9em;
+        padding: 8px 15px;
+        animation: fire 1.5s infinite ease-in-out;
+        background-color: var(--incorrect-color);
+        border-color: #ffc107;
+    }
+
+    #theme-toggle-container {
+        position: fixed;
+        top: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10001;
+    }
+    
+    #theme-toggle-btn {
+        background: var(--component-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    #theme-toggle-btn:hover {
+        transform: rotate(15deg) scale(1.1);
+    }
+
+    .container {
+        width: 100%;
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 2rem;
+        background-color: var(--secondary-bg);
+        border-radius: 10px;
+        box-shadow: 0 4px 15px var(--shadow-color);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .header h1 {
+      color: var(--accent-color);
+    }
+
+    #filter-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      align-items: flex-end; /* Align items to the bottom */
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background-color: var(--component-bg);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .filter-group label {
+      margin-bottom: 8px;
+      font-weight: bold;
+      font-size: 0.9em;
+      color: var(--text-color);
+      opacity: 0.9;
+    }
+    .filter-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      box-sizing: border-box;
+      background-color: var(--primary-bg);
+      color: var(--text-color);
+      font-size: 1em;
+    }
+    .search-button-container {
+        grid-column: 1 / -1; /* Make button span full width on small screens */
+    }
+    @media (min-width: 850px) {
+        .search-button-container {
+            grid-column: auto; /* Revert to auto column on wider screens */
+        }
+    }
+    #search-btn {
+        width: 100%;
+        padding: 12px;
+    }
+
+
+    #quiz-feed-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    .quiz-card {
+        background-color: var(--component-bg);
+        border: 1px solid var(--border-color);
+        border-left: 5px solid var(--accent-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .quiz-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px var(--shadow-color);
+    }
+    .quiz-card-header h3 {
+        margin: 0 0 0.5rem;
+        color: var(--accent-color);
+        font-size: 1.2em;
+    }
+    .quiz-card-details {
+        font-size: 0.9em;
+        opacity: 0.8;
+        margin-bottom: 1.5rem;
+    }
+    .quiz-card-details p {
+        margin: 0.3rem 0;
+    }
+    .quiz-card .start-quiz-btn {
+        width: 100%;
+        margin-top: auto;
+    }
+    
+    #loader, #no-quiz-found {
+        text-align: center;
+        padding: 2rem;
+        font-size: 1.2em;
+        font-style: italic;
+    }
+    .hidden {
+        display: none;
+    }
+    .spinner {
+        border: 6px solid rgba(128, 128, 128, 0.3);
+        border-top: 6px solid var(--accent-color);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    @keyframes fire {
+        0% { box-shadow: 0 0 10px #ffc107, 0 0 20px #ffc107, 0 0 30px #ff8c00, 0 0 40px #ff4500, inset 0 0 5px #ffc107; }
+        50% { box-shadow: 0 0 15px #ffc107, 0 0 25px #ffc107, 0 0 35px #ff8c00, 0 0 45px #ff4500, inset 0 0 10px #ff8c00; }
+        100% { box-shadow: 0 0 10px #ffc107, 0 0 20px #ffc107, 0 0 30px #ff8c00, 0 0 40px #ff4500, inset 0 0 5px #ffc107; }
+    }
+    
+    @keyframes aqua-glow {
+      0% { box-shadow: 0 0 5px #007bff, 0 0 10px #007bff, 0 0 15px #00bfff, 0 0 20px #00bfff, inset 0 0 5px #00bfff; }
+      50% { box-shadow: 0 0 10px #007bff, 0 0 20px #007bff, 0 0 30px #00bfff, 0 0 40px #00bfff, inset 0 0 10px #00bfff; }
+      100% { box-shadow: 0 0 5px #007bff, 0 0 10px #007bff, 0 0 15px #00bfff, 0 0 20px #00bfff, inset 0 0 5px #00bfff; }
+    }
+  </style>
+</head>
+<body class="dark-mode">
+
+<div id="global-nav-bar">
+    <button id="global-home-btn" class="btn btn-secondary">🏠 Home</button>
+    <div id="theme-toggle-container">
+        <button id="theme-toggle-btn" title="Toggle Dark/Light Mode">🌙</button>
+    </div>
+    <a href="https://m.youtube.com/@ExamYatrimocktest/videos" target="_blank" id="global-how-to-use-btn" class="btn">🔥 How to Use 🔥</a>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h1>Practice Zone</h1>
+        <p>Search our library of ready-to-use quizzes.</p>
+    </div>
+
+    <div id="filter-container">
+        <div class="filter-group">
+            <label for="exam-input">Exam Name</label>
+            <input type="text" id="exam-input" placeholder="e.g., UPSC, SSC, NEET" list="exam-suggestions">
+            <datalist id="exam-suggestions"></datalist>
+        </div>
+        <div class="filter-group">
+            <label for="subject-input">Subject</label>
+            <input type="text" id="subject-input" placeholder="e.g., Physics, History">
+        </div>
+        <div class="filter-group">
+            <label for="topic-input">Topic</label>
+            <input type="text" id="topic-input" placeholder="e.g., Thermodynamics">
+        </div>
+        <div class="search-button-container">
+            <button id="search-btn" class="btn">Search</button>
+        </div>
+    </div>
+
+    <div id="loader">
+        <div class="spinner"></div>
+        <p>Fetching latest quizzes from our library...</p>
+    </div>
+
+    <div id="quiz-feed-container">
+        <!-- Quiz cards will be dynamically inserted here -->
+    </div>
+
+    <div id="no-quiz-found" class="hidden">
+        <p>😔 No quizzes found matching your criteria.</p>
+        <a href="https://examyatri.live/#manualGenerator" class="btn">Create Your Own Quiz</a>
+    </div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- CONFIGURATION ---
+    const BOT_TOKEN = "6821389018:AAGxV8sdIE-kLz2P0u_agf61en55pT3u55w";
+    const CHANNEL_ID = "-1002146955383"; 
+    const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=-100&limit=100&chat_id=${CHANNEL_ID}`;
+    const MAIN_WEBSITE_URL = 'https://examyatri.live/';
+    const QUIZ_PLAYER_HASH = '#player';
+    const QUIZ_DATA_STORAGE_KEY = 'examyatriQuizState';
+    const COMMON_EXAMS = [
+        "UPSC CSE", "UPSC IES / ESE", "UPSC CDS", "UPSC NDA", "UPSC CAPF", "UPSC IFoS", "UPSC IES/ISS", "UPSC CMS", "NEET", "JEE Main", "JEE Advanced",
+        "GATE", "CAT", "CLAT", "XAT", "LSAT", "IBPS PO", "IBPS SO", "IBPS Clerk", "SBI PO", "RBI Grade B", "FCI Exam", "SSC CGL", "SSC CHSL", "SSC MTS",
+        "SSC JE", "NRA CET", "CEED", "UCEED", "UGC NET", "NABARD Grade A", "NABARD Grade B", "SEBI Grade A", "PFRDA Exam", "EPFO EO/AO", "LIC AAO",
+        "NPS Trust Exam", "RRB NTPC", "RRB JE", "RRB ALP", "AFCAT", "SSB Interview", "CDS OTA", "Indian Navy SSR", "Indian Army TES", "ICG AC", "MPSC",
+        "UPPSC", "BPSC", "MPPSC", "RPSC", "HPSC", "KPSC", "TNPSC", "APPSC", "TSPSC", "WBPSC", "GPSC", "OPSC", "UKPSC", "JPSC", "CGPSC", "HPPSC",
+        "JKPSC", "SPSC", "NPSC", "APSC", "TRPSC", "Arunachal PSC", "Mizoram PSC", "CBSE", "ICSE", "TBSE", "MSBSHSE", "UPMSP", "BSEB", "GSEB",
+        "HSCAP Kerala", "PSEB", "WBBSE", "CGBSE", "RBSE", "SEBA", "NBSE", "MPBSE", "HBSE", "JKBOSE", "TS Board", "APBIE", "Meghalaya MBOSE",
+        "CA (ICAI)", "CS (ICSI)", "CMA (ICMAI)", "NATA", "ACTEX", "IIFT", "SNAP", "TISSNET", "CMAT", "MAT"
+    ];
+
+    // --- DOM ELEMENTS ---
+    const elements = {
+        loader: document.getElementById('loader'),
+        quizFeedContainer: document.getElementById('quiz-feed-container'),
+        noQuizFound: document.getElementById('no-quiz-found'),
+        examInput: document.getElementById('exam-input'),
+        subjectInput: document.getElementById('subject-input'),
+        topicInput: document.getElementById('topic-input'),
+        searchBtn: document.getElementById('search-btn'),
+        homeBtn: document.getElementById('global-home-btn'),
+        themeToggleBtn: document.getElementById('theme-toggle-btn')
+    };
+
+    // --- STATE ---
+    let allQuizzes = [];
+
+    // --- INITIALIZATION ---
+    function init() {
+        applyInitialTheme();
+        setupEventListeners();
+        populateExamDatalist();
+        fetchQuizzes();
+    }
+
+    // --- THEME MANAGEMENT ---
+    function toggleTheme() { document.body.classList.toggle('dark-mode'); const isDarkMode = document.body.classList.contains('dark-mode'); localStorage.setItem('quizTheme', isDarkMode ? 'dark' : 'light'); updateThemeIcon(isDarkMode); }
+    function applyInitialTheme() { const savedTheme = localStorage.getItem('quizTheme'); const isDarkMode = savedTheme ? savedTheme === 'dark' : true; if (!isDarkMode) { document.body.classList.remove('dark-mode'); } updateThemeIcon(isDarkMode); }
+    function updateThemeIcon(isDarkMode) { elements.themeToggleBtn.textContent = isDarkMode ? '☀️' : '🌙'; }
+
+    // --- EVENT LISTENERS ---
+    function setupEventListeners() {
+        elements.searchBtn.addEventListener('click', handleSearch);
+        [elements.examInput, elements.subjectInput, elements.topicInput].forEach(input => {
+            input.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') {
+                    handleSearch();
+                }
+            });
+        });
+        elements.homeBtn.addEventListener('click', handleHomeRedirect);
+        elements.themeToggleBtn.addEventListener('click', toggleTheme);
+    }
+    
+    // --- DATA FETCHING & PARSING ---
+    async function fetchQuizzes() {
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error(`Telegram API error: ${response.statusText}`);
+            const data = await response.json();
+            
+            if (data.ok && data.result) {
+                allQuizzes = data.result
+                    .map(update => update.channel_post)
+                    .filter(post => post && post.text && post.text.trim().startsWith('{'))
+                    .map(msg => {
+                        try {
+                            const quizData = JSON.parse(msg.text);
+                            quizData.id = msg.message_id; 
+                            return quizData;
+                        } catch (e) {
+                            console.warn('Could not parse a message from Telegram:', msg.text, e);
+                            return null;
+                        }
+                    }).filter(quiz => quiz !== null);
+                
+                // Initially render all quizzes
+                handleSearch(); 
+            } else {
+                 throw new Error(`Telegram response not OK: ${data.description}`);
+            }
+        } catch (error) {
+            console.error("Failed to fetch quizzes:", error);
+            elements.loader.innerHTML = `<p style="color: var(--incorrect-color);">⚠️ Could not load quizzes. Please check your connection and try again.</p>`;
+        } finally {
+            elements.loader.classList.add('hidden');
+        }
+    }
+
+    // --- SEARCH & FILTER LOGIC ---
+    function populateExamDatalist() {
+        const datalist = document.getElementById('exam-suggestions');
+        COMMON_EXAMS.forEach(exam => {
+            const option = document.createElement('option');
+            option.value = exam;
+            datalist.appendChild(option);
+        });
+    }
+
+    function handleSearch() {
+        const searchTerms = {
+            exam: elements.examInput.value.trim().toLowerCase(),
+            subject: elements.subjectInput.value.trim().toLowerCase(),
+            topic: elements.topicInput.value.trim().toLowerCase()
+        };
+        renderQuizzes(searchTerms);
+    }
+
+    /**
+     * Calculates the Levenshtein distance between two strings (for fuzzy matching).
+     * @param {string} s1 The first string.
+     * @param {string} s2 The second string.
+     * @returns {number} The number of edits to change s1 to s2.
+     */
+    function levenshtein(s1, s2) {
+      if (s1.length < s2.length) { return levenshtein(s2, s1); }
+      if (s2.length === 0) { return s1.length; }
+      let previousRow = Array.from({ length: s2.length + 1 }, (_, i) => i);
+      for (let i = 0; i < s1.length; i++) {
+        let currentRow = [i + 1];
+        for (let j = 0; j < s2.length; j++) {
+          let insertions = previousRow[j + 1] + 1;
+          let deletions = currentRow[j] + 1;
+          let substitutions = previousRow[j] + (s1[i] !== s2[j] ? 1 : 0);
+          currentRow.push(Math.min(insertions, deletions, substitutions));
+        }
+        previousRow = currentRow;
+      }
+      return previousRow[s2.length];
+    }
+
+    /**
+     * Checks if a data field matches a search term using flexible logic.
+     * @param {string} dataField The text from the quiz data (e.g., quiz.subject).
+     * @param {string} searchTerm The text from the user's input.
+     * @returns {boolean} True if it's a match.
+     */
+    function isMatch(dataField, searchTerm) {
+        if (!dataField || !searchTerm) return false;
+
+        const data = dataField.toLowerCase();
+
+        // 1. Check for partial match (handles aliases like "ssc" in "ssc cgl")
+        if (data.includes(searchTerm)) {
+            return true;
+        }
+
+        // 2. Fuzzy match for spelling mistakes
+        const threshold = searchTerm.length <= 4 ? 1 : Math.floor(searchTerm.length / 3.5);
+        if (levenshtein(data, searchTerm) <= threshold) {
+            return true;
+        }
+        
+        // 3. Check individual words for a fuzzy match
+        const dataWords = data.split(' ');
+        for (const word of dataWords) {
+            if (levenshtein(word, searchTerm) <= (word.length <= 4 ? 1 : 2)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    // --- UI RENDERING ---
+    function renderQuizzes(searchTerms) {
+        elements.quizFeedContainer.innerHTML = '';
+        
+        let filteredQuizzes = allQuizzes;
+        
+        if (searchTerms.exam) {
+            filteredQuizzes = filteredQuizzes.filter(quiz => isMatch(quiz.exam, searchTerms.exam));
+        }
+        if (searchTerms.subject) {
+            filteredQuizzes = filteredQuizzes.filter(quiz => isMatch(quiz.subject, searchTerms.subject));
+        }
+        if (searchTerms.topic) {
+            filteredQuizzes = filteredQuizzes.filter(quiz => isMatch(quiz.topic, searchTerms.topic));
+        }
+
+        if (filteredQuizzes.length === 0) {
+            elements.noQuizFound.classList.remove('hidden');
+        } else {
+            elements.noQuizFound.classList.add('hidden');
+            filteredQuizzes.forEach(quiz => {
+                const card = createQuizCard(quiz);
+                elements.quizFeedContainer.appendChild(card);
+            });
+        }
+    }
+
+    function createQuizCard(quiz) {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+        const questionCount = quiz.questions ? quiz.questions.length : 0;
+        card.innerHTML = `
+            <div class="quiz-card-header"><h3>${quiz.topic || 'General Quiz'}</h3></div>
+            <div class="quiz-card-details">
+                <p><strong>Exam:</strong> ${quiz.exam || 'N/A'}</p>
+                <p><strong>Subject:</strong> ${quiz.subject || 'N/A'}</p>
+                <p><strong>Questions:</strong> ${questionCount}</p>
+            </div>
+            <button class="btn start-quiz-btn" data-quiz-id="${quiz.id}">Start Quiz</button>
+        `;
+        card.querySelector('.start-quiz-btn').addEventListener('click', () => startQuiz(quiz.id));
+        return card;
+    }
+    
+    // --- QUIZ START & REDIRECTION ---
+    function startQuiz(quizId) {
+        const selectedQuiz = allQuizzes.find(q => q.id === quizId);
+        if (!selectedQuiz) { alert('Error: Could not find the selected quiz.'); return; }
+
+        const formattedQuizData = selectedQuiz.questions.map(q => ({
+            question: q.question,
+            options: q.options,
+            correctAnswerIndex: q.options.findIndex(opt => opt === q.answer),
+            explanation: q.explanation || 'No explanation provided.',
+            statements: [],
+            image: null
+        }));
+        
+        const quizStateForPlayer = {
+            originalQuizData: formattedQuizData,
+            userAnswers: [],
+            currentQuestionIndex: 0,
+            bookmarkedQuestions: [],
+            quizStartTime: new Date().toISOString(),
+            quizMetaData: { topic: selectedQuiz.topic || '', subject: selectedQuiz.subject || '' }
+        };
+        
+        const dbRequest = indexedDB.open('examyatriDB', 1);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const transaction = db.transaction(['sessionState'], 'readwrite');
+            const store = transaction.objectStore('sessionState');
+            const putRequest = store.put(quizStateForPlayer, QUIZ_DATA_STORAGE_KEY);
+            putRequest.onsuccess = () => { window.location.href = MAIN_WEBSITE_URL + QUIZ_PLAYER_HASH; };
+            putRequest.onerror = () => { alert('Could not prepare the quiz. Please try again.'); };
+        };
+        dbRequest.onerror = () => { alert('Could not access storage to start the quiz. Please enable storage access for this site.'); };
+        dbRequest.onupgradeneeded = (event) => {
+             const db = event.target.result;
+             if (!db.objectStoreNames.contains('sessionState')) { db.createObjectStore('sessionState'); }
+        };
+    }
+    
+    // --- NAVIGATION ---
+    function handleHomeRedirect() {
+        const dbRequest = indexedDB.open('examyatriDB', 1);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            db.transaction(['sessionState'], 'readwrite').objectStore('sessionState').put(null, QUIZ_DATA_STORAGE_KEY);
+        };
+        localStorage.clear();
+        window.location.href = MAIN_WEBSITE_URL;
+    }
+
+    // --- START THE APP ---
+    init();
+});
+</script>
+
+</body>
+</html>
