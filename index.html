@@ -1007,30 +1007,19 @@
         <h2>❤️Generate Topicwise, Chapterwise, Subjectwise Mock Test/ Quiz❤️</h2>
         <p>Completely FREE</p>
         <div class="mode-options">
-            <!-- MODIFICATION START: Renamed Single Player Section -->
             <div class="mode-option-card" id="select-single-player-btn">
                 <span class="card-icon">👤</span>
-                <h3>Create Question and Start Practicing</h3>
+                <h3>Single Player Practice</h3>
                 <p>Create a set of questions on any topic and practice by yourself.</p>
             </div>
-            <!-- MODIFICATION END -->
-
-            <!-- MODIFICATION START: Renamed Multiplayer Section -->
             <div class="mode-option-card" id="select-multiplayer-btn">
                 <span class="card-icon">👥</span>
-                <h3>Create Question for Practice with Friends</h3>
+                <h3>Multiplayer/ Practice With Friends</h3>
                 <p>Create a room or join a friend's to practice together.</p>
             </div>
-            <!-- MODIFICATION END -->
         </div>
         
-        <!-- MODIFICATION START: Added New "Practice" Button -->
-        <a href="save.html" id="practice-ready-questions-btn" class="btn glowing" style="margin: 2rem auto 1rem; display: block; width: 100%; max-width: 400px; text-decoration: none; border: 2px solid var(--accent-hover); animation: glow 1.5s infinite, fire 2s infinite alternate; font-size: 1.1em; padding: 15px;">
-            Practice Ready-to-Use Questions
-        </a>
-        <!-- MODIFICATION END -->
-
-        <a href="Testpdf.html" id="coaching-pdf-to-quiz-btn" class="btn glowing" style="margin: 1rem auto; display: block; width: 100%; max-width: 400px; text-decoration: none;">Coaching Test series Pdf/ PYQs Book Pdf to Quiz</a>
+        <a href="Testpdf.html" id="coaching-pdf-to-quiz-btn" class="btn glowing" style="margin: 2rem auto; display: block; width: 100%; max-width: 400px; text-decoration: none;">Coaching Test series Pdf/ PYQs Book Pdf to Quiz</a>
 
         <!-- NEW: BLOGGER POSTS SECTION -->
         <div id="blog-section">
@@ -1458,77 +1447,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- MODIFICATION START: Added Telegram integration function ---
-    /**
-     * Saves the generated quiz data to a Telegram channel in JSON format.
-     * This is a "fire-and-forget" function; it won't block the UI.
-     *
-     * SECURITY WARNING: Hardcoding the bot token in client-side JavaScript is
-     * highly insecure. Anyone can view the page source and steal your token,
-     * giving them full control of your bot. It is strongly recommended to
-     * move this functionality to a server-side endpoint (e.g., a cloud function)
-     * that you call from the client, keeping the token safe on the server.
-     * This implementation is provided as requested by the user prompt.
-     *
-     * @param {Array} questionsData - The array of question objects.
-     * @param {Object} metadata - An object containing exam, subject, and topic.
-     */
-    async function saveQuizToTelegram(questionsData, metadata) {
-        if (!questionsData || questionsData.length === 0) {
-            console.log("Telegram Sync: No questions to save.");
-            return;
-        }
-
-        const BOT_TOKEN = "8380685395:AAGwzKMHR1yrX00_8NcL-3i3gqW5YS9StC0";
-        const CHANNEL_ID = "-1002941383294"; // Or use "@myexamyatri"
-        const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-
-        const exam = metadata.exam || "General";
-        const subject = metadata.subject || "Mixed";
-        const topic = metadata.topic || "General";
-
-        // Construct the JSON payload as per the specified structure
-        const payload = {
-            exam: exam,
-            subject: subject,
-            topic: topic,
-            questions: questionsData.map(q => ({
-                question: q.question,
-                options: q.options,
-                // Save the correct answer TEXT, not the index, for easier use later
-                answer: q.options[q.correctAnswerIndex],
-                explanation: q.explanation,
-            }))
-        };
-        
-        // The message to send is the JSON payload, stringified
-        const messageText = JSON.stringify(payload, null, 2); // Pretty-print JSON
-
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    chat_id: CHANNEL_ID,
-                    text: messageText,
-                }),
-            });
-
-            const result = await response.json();
-            if (result.ok) {
-                console.log("Quiz successfully saved to Telegram.", result);
-            } else {
-                console.error("Failed to save quiz to Telegram:", result.description);
-            }
-        } catch (error) {
-            console.error("Error sending quiz to Telegram:", error);
-        }
-    }
-    // --- MODIFICATION END ---
-
-
     // --- CONSTANTS ---
     const QUESTION_FORMATS = {
         'mcq': { name: 'Multiple Choice (MCQ)' },
@@ -1767,7 +1685,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
     let isShakeReminderEnabled = true;
     let pressureTextCounter = 1;
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
     const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8á');
     
     // --- INITIALIZATION ---
@@ -2240,19 +2158,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         const quizText = localStorage.getItem('multiplayerQuizText');
         if (!hostName) { alert('Please enter your name.'); return; }
         if (!quizText) { alert('Error: Question text not found. Please go back and create the questions.'); return; }
-
-        // --- MODIFICATION START: Save multiplayer quiz to Telegram ---
-        // We need to parse the text back into data to save it correctly.
-        const parsedQuizDataForTelegram = flexibleParser(quizText);
-        // We don't have multiplayer-specific metadata here, so we send what we can.
-        const metadataForTelegram = {
-            exam: "Multiplayer Game",
-            subject: "Mixed",
-            topic: "User Generated"
-        };
-        saveQuizToTelegram(parsedQuizDataForTelegram, metadataForTelegram);
-        // --- MODIFICATION END ---
-
 
         isHost = true;
         currentRoomCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -3041,11 +2946,6 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         if ((sourceType !== 'topic' && !sourceText) || !numQuestions) { alert('Please ensure you have provided source material and the number of questions.'); return null; }
         if (!exam) { alert("Please select a target exam before generating questions."); return null; }
         
-        // --- MODIFICATION START: Store the exam name in quizMetaData ---
-        // This ensures it's available when we save to Telegram later.
-        quizMetaData.exam = exam;
-        // --- MODIFICATION END ---
-
         let sampleFormat = "";
         switch (formatKey) {
             case 'mcq': sampleFormat = MCQ_EXAMPLE; break;
@@ -3462,24 +3362,7 @@ Now, generate the questions based on all the instructions above.`;
     function showSadReaction() { const sadEmojis = ['😥', '😭', '🤦', '😫']; elements.sadReactionEmoji.textContent = sadEmojis[Math.floor(Math.random() * sadEmojis.length)]; elements.sadReactionOverlay.classList.remove('hidden'); setTimeout(() => { elements.sadReactionOverlay.classList.add('hidden'); }, 1500); }
     function loadPressureModeSettings() { const shakeEnabled = localStorage.getItem('shakeReminderEnabled'); isShakeReminderEnabled = shakeEnabled === null ? true : shakeEnabled === 'true'; elements.shakeReminderToggle.checked = isShakeReminderEnabled; }
     function resetAndStartQuestionTimer() { clearInterval(timerId); questionStartTime = new Date(); const emojiSequence = [elements.faces.happy, elements.faces.worried, elements.faces.sad, elements.faces.crying]; const updateTimerDisplay = () => { if (!questionStartTime) return; const elapsedTime = Math.round((new Date() - questionStartTime) / 1000); elements.timerText.textContent = `${String(Math.floor(elapsedTime / 60)).padStart(2, '0')}:${String(elapsedTime % 60).padStart(2, '0')}`; const emojiIntervalIndex = Math.floor(elapsedTime / 15); const currentEmoji = emojiSequence[emojiIntervalIndex % emojiSequence.length]; if (currentEmoji && !currentEmoji.classList.contains('visible')) { emojiSequence.forEach(face => face.classList.remove('visible')); currentEmoji.classList.add('visible'); } const pressureTextEl = document.getElementById('pressure-text-animation'); if (elapsedTime >= 45 && userAnswers[currentQuestionIndex].status !== 'answered') { if (isShakeReminderEnabled) { const checkBtn = document.getElementById('check-answer-btn'); if (checkBtn) checkBtn.classList.add('vibrating'); } if (pressureTextEl) { document.getElementById('pressure-mode-toggle-btn').classList.add('hidden'); pressureTextEl.classList.remove('hidden'); pressureTextEl.textContent = `Tik Tik ${pressureTextCounter}`; pressureTextCounter++; } } }; updateTimerDisplay(); timerId = setInterval(updateTimerDisplay, 1000); }
-    
-    // --- MODIFICATION START: Integrated Telegram save on quiz start ---
-    function startQuiz(){ 
-        showScreen('player'); 
-        quizStartTime=new Date(); 
-        currentQuestionIndex=0; 
-        userAnswers=quizData.map((q, i)=>({selected:null,isCorrect:null,status:'unseen', startTime: null, endTime: null})); 
-        bookmarkedQuestions.clear(); 
-        originalQuizData=JSON.parse(JSON.stringify(quizData));
-        
-        // This is the new call to save the quiz data.
-        // It uses the `originalQuizData` and the globally stored `quizMetaData`.
-        saveQuizToTelegram(originalQuizData, quizMetaData);
-
-        loadQuestion(0); 
-    }
-    // --- MODIFICATION END ---
-    
+    function startQuiz(){ showScreen('player'); quizStartTime=new Date(); currentQuestionIndex=0; userAnswers=quizData.map((q, i)=>({selected:null,isCorrect:null,status:'unseen', startTime: null, endTime: null})); bookmarkedQuestions.clear(); originalQuizData=JSON.parse(JSON.stringify(quizData)); loadQuestion(0); }
     function loadQuestion(index){ if(index<0||index>=originalQuizData.length)return; currentQuestionIndex=index;selectedOptionIndex=null; const question=originalQuizData[currentQuestionIndex]; const answer=userAnswers[currentQuestionIndex]; elements.congratsAnimationContainer.innerHTML = ''; if (!clapSound.paused) { clapSound.pause(); clapSound.currentTime = 0; } pressureTextCounter = 1; const pressureTextEl = document.getElementById('pressure-text-animation'); if(pressureTextEl) pressureTextEl.classList.add('hidden'); document.getElementById('pressure-mode-toggle-btn').classList.remove('hidden'); if(answer.status==='answered'){ clearInterval(timerId); elements.timerText.textContent="--:--"; Object.values(elements.faces).forEach(face=>face.classList.remove('visible')) } else { resetAndStartQuestionTimer() } updateQuestionUI(question); updateOptionsAndExplanationState(); updateQuizActions(); if (window.MathJax) MathJax.typesetPromise([elements.quizPlayerContainer]); }
     function updateQuestionUI(q) {
         elements.questionTopic.textContent = quizMetaData.topic || "";
