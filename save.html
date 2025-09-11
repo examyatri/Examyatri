@@ -1,580 +1,582 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Practice Ready Quizzes - EXAMYATRI</title>
-  <style>
-    :root {
-      --primary-bg: #f0f4f8;
-      --secondary-bg: #ffffff;
-      --component-bg: #f8f9fa;
-      --text-color: #333;
-      --border-color: #dee2e6;
-      --shadow-color: rgba(0, 0, 0, 0.08);
-      --accent-color: #007bff;
-      --accent-hover: #0056b3;
-      --incorrect-color: #dc3545;
-    }
-
-    body.dark-mode {
-      --primary-bg: #121212;
-      --secondary-bg: #1e1e1e;
-      --component-bg: #2a2a2e;
-      --text-color: #e0e0e0;
-      --border-color: #44474b;
-      --shadow-color: rgba(255, 255, 255, 0.08);
-      --accent-color: #4dabf7;
-      --accent-hover: #1c7ed6;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--primary-bg);
-      color: var(--text-color);
-      margin: 0;
-      padding: 80px 20px 20px;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .btn {
-        background-color: var(--accent-color);
-        color: white;
-        padding: 10px 18px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1em;
-        font-weight: 600;
-        text-align: center;
-        text-decoration: none;
-        transition: all 0.3s;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
-    .btn:hover:not(:disabled) {
-        background-color: var(--accent-hover);
-        box-shadow: 0 4px 8px var(--shadow-color);
-        transform: translateY(-2px);
-    }
-    .btn-secondary { background-color: #6c757d; }
-    .btn-secondary:hover:not(:disabled) { background-color: #5a6268; }
-
-    #global-nav-bar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 20px;
-        background-color: var(--secondary-bg);
-        box-shadow: 0 2px 10px var(--shadow-color);
-        z-index: 10000;
-        box-sizing: border-box;
-    }
-
-    #global-home-btn {
-        font-size: 0.9em;
-        padding: 8px 15px;
-        animation: aqua-glow 2s infinite ease-in-out;
-    }
-
-    #global-how-to-use-btn {
-        font-size: 0.9em;
-        padding: 8px 15px;
-        animation: fire 1.5s infinite ease-in-out;
-        background-color: var(--incorrect-color);
-        border-color: #ffc107;
-    }
-
-    #theme-toggle-container {
-        position: fixed;
-        top: 15px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 10001;
-    }
-    
-    #theme-toggle-btn {
-        background: var(--component-bg);
-        border: 1px solid var(--border-color);
-        color: var(--text-color);
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        font-size: 1.5rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    #theme-toggle-btn:hover {
-        transform: rotate(15deg) scale(1.1);
-    }
-
-    .container {
-        width: 100%;
-        max-width: 900px;
-        margin: 20px auto;
-        padding: 2rem;
-        background-color: var(--secondary-bg);
-        border-radius: 10px;
-        box-shadow: 0 4px 15px var(--shadow-color);
-    }
-
-    .header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    .header h1 {
-      color: var(--accent-color);
-    }
-
-    #filter-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1rem;
-      align-items: flex-end; /* Align items to the bottom */
-      margin-bottom: 2rem;
-      padding: 1.5rem;
-      background-color: var(--component-bg);
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-    }
-    .filter-group {
-      display: flex;
-      flex-direction: column;
-    }
-    .filter-group label {
-      margin-bottom: 8px;
-      font-weight: bold;
-      font-size: 0.9em;
-      color: var(--text-color);
-      opacity: 0.9;
-    }
-    .filter-group input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid var(--border-color);
-      border-radius: 5px;
-      box-sizing: border-box;
-      background-color: var(--primary-bg);
-      color: var(--text-color);
-      font-size: 1em;
-    }
-    .search-button-container {
-        grid-column: 1 / -1; /* Make button span full width on small screens */
-    }
-    @media (min-width: 850px) {
-        .search-button-container {
-            grid-column: auto; /* Revert to auto column on wider screens */
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Quiz Zone - EXAMYATRI</title>
+    <!-- MathJax Configuration -->
+    <script>
+        MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$']] } };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+    <style>
+        :root {
+            --primary-bg: #121212; --secondary-bg: #1e1e1e; --component-bg: #2a2a2e; --text-color: #e0e0e0; --border-color: #44474b; --shadow-color: rgba(255, 255, 255, 0.08); --accent-color: #4dabf7; --accent-hover: #1c7ed6; --correct-color: #28a745; --incorrect-color: #dc3545; --yellow-color: #ffc107; --blue-color: #007bff;
         }
-    }
-    #search-btn {
-        width: 100%;
-        padding: 12px;
-    }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--primary-bg); color: var(--text-color); margin: 0; padding: 20px; box-sizing: border-box; }
+        .hidden { display: none !important; }
 
+        /* --- Global & Shared Styles --- */
+        .btn { color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em; font-weight: 600; text-align: center; text-decoration: none; transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn:hover:not(:disabled) { box-shadow: 0 4px 8px var(--shadow-color); transform: translateY(-2px); }
+        .btn:disabled { background-color: #555; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-accent { background-color: var(--accent-color); }
+        .btn-accent:hover:not(:disabled) { background-color: var(--accent-hover); }
+        .btn-red { background-color: var(--incorrect-color); }
+        .btn-red:hover:not(:disabled) { background-color: #c82333; }
+        .btn-blue { background-color: var(--blue-color); }
+        .btn-blue:hover:not(:disabled) { background-color: #0056b3; }
+        .btn-yellow { background-color: var(--yellow-color); color: #121212;}
+        .btn-yellow:hover:not(:disabled) { background-color: #e0a800; }
+        .btn-green { background-color: var(--correct-color); }
+        .btn-green:hover:not(:disabled) { background-color: #218838; }
 
-    #quiz-feed-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-    }
-    .quiz-card {
-        background-color: var(--component-bg);
-        border: 1px solid var(--border-color);
-        border-left: 5px solid var(--accent-color);
-        border-radius: 8px;
-        padding: 1.5rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .quiz-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px var(--shadow-color);
-    }
-    .quiz-card-header h3 {
-        margin: 0 0 0.5rem;
-        color: var(--accent-color);
-        font-size: 1.2em;
-    }
-    .quiz-card-details {
-        font-size: 0.9em;
-        opacity: 0.8;
-        margin-bottom: 1.5rem;
-    }
-    .quiz-card-details p {
-        margin: 0.3rem 0;
-    }
-    .quiz-card .start-quiz-btn {
-        width: 100%;
-        margin-top: auto;
-    }
-    
-    #loader, #no-quiz-found {
-        text-align: center;
-        padding: 2rem;
-        font-size: 1.2em;
-        font-style: italic;
-    }
-    .hidden {
-        display: none;
-    }
-    .spinner {
-        border: 6px solid rgba(128, 128, 128, 0.3);
-        border-top: 6px solid var(--accent-color);
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 1rem;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .main-container { width: 100%; max-width: 900px; margin: 80px auto 20px; padding: 2rem; background-color: var(--secondary-bg); border-radius: 10px; box-shadow: 0 4px 15px var(--shadow-color); box-sizing: border-box; }
+        #global-nav-bar { position: fixed; top: 0; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: var(--secondary-bg); box-shadow: 0 2px 10px var(--shadow-color); z-index: 10000; box-sizing: border-box; }
+        #global-home-btn, #how-to-use-btn { font-size: 1em; padding: 10px 18px; }
+        
+        /* FIX: Text wrapping for all content */
+        #question-text, #explanation-box, .option-btn, #question-preamble p, .review-question p, .review-explanation {
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+        }
 
-    @keyframes fire {
-        0% { box-shadow: 0 0 10px #ffc107, 0 0 20px #ffc107, 0 0 30px #ff8c00, 0 0 40px #ff4500, inset 0 0 5px #ffc107; }
-        50% { box-shadow: 0 0 15px #ffc107, 0 0 25px #ffc107, 0 0 35px #ff8c00, 0 0 45px #ff4500, inset 0 0 10px #ff8c00; }
-        100% { box-shadow: 0 0 10px #ffc107, 0 0 20px #ffc107, 0 0 30px #ff8c00, 0 0 40px #ff4500, inset 0 0 5px #ffc107; }
-    }
-    
-    @keyframes aqua-glow {
-      0% { box-shadow: 0 0 5px #007bff, 0 0 10px #007bff, 0 0 15px #00bfff, 0 0 20px #00bfff, inset 0 0 5px #00bfff; }
-      50% { box-shadow: 0 0 10px #007bff, 0 0 20px #007bff, 0 0 30px #00bfff, 0 0 40px #00bfff, inset 0 0 10px #00bfff; }
-      100% { box-shadow: 0 0 5px #007bff, 0 0 10px #007bff, 0 0 15px #00bfff, 0 0 20px #00bfff, inset 0 0 5px #00bfff; }
-    }
-  </style>
+        /* --- Search View Styles --- */
+        #search-view .header { text-align: center; margin-bottom: 2rem; }
+        #search-view .header h1 { color: var(--accent-color); }
+        #filter-container { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: flex-end; margin-bottom: 2rem; padding: 1.5rem; background-color: var(--component-bg); border-radius: 8px; border: 1px solid var(--border-color); }
+        .filter-group { display: flex; flex-direction: column; }
+        .filter-group label { margin-bottom: 8px; font-weight: bold; }
+        .filter-group input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 5px; box-sizing: border-box; background-color: var(--primary-bg); color: var(--text-color); font-size: 1em; }
+        #quiz-feed-container { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        .quiz-card { background-color: var(--component-bg); border: 1px solid var(--border-color); border-left: 5px solid var(--accent-color); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
+        .quiz-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px var(--shadow-color); }
+        .quiz-card h3 { margin: 0 0 0.5rem; color: var(--accent-color); font-size: 1.3em; }
+        .quiz-card p { margin: 0.4rem 0; font-size: 1em; opacity: 0.9; }
+        .quiz-card .start-quiz-btn { width: 100%; margin-top: 1.5rem; }
+        #loader, #no-quiz-found, #search-prompt { text-align: center; padding: 2rem; font-size: 1.2em; font-style: italic; }
+        #no-quiz-found .btn { margin-top: 1.5rem; }
+        .spinner { border: 6px solid rgba(128, 128, 128, 0.3); border-top: 6px solid var(--accent-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- Player View Styles --- */
+        #player-view { margin-top: 20px; } /* Adjust margin for when nav bar is hidden */
+        .quiz-header { padding: 1.5rem; background-color: var(--component-bg); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .quiz-header h2 { margin: 0; color: var(--accent-color); }
+        #progress, #timer { font-weight: bold; font-size: 1.2em; background-color: var(--primary-bg); padding: 5px 10px; border-radius: 5px; }
+        .question-body { padding: 1.5rem; }
+        #question-preamble { background-color: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid var(--yellow-color); }
+        #question-preamble p { margin: 0.5rem 0; }
+        #question-text { font-size: 1.3em; margin-bottom: 2rem; line-height: 1.6; }
+        .options-container { display: flex; flex-direction: column; gap: 1rem; }
+        .option-btn { width: 100%; padding: 15px; text-align: left; background-color: var(--component-bg); border: 2px solid var(--border-color); color: var(--text-color); border-radius: 8px; cursor: pointer; font-size: 1.1em; transition: all 0.3s; }
+        .option-btn:hover:not(.disabled) { border-color: var(--accent-color); background-color: #3a3a3e; }
+        .option-btn.correct { background-color: var(--correct-color) !important; color: white !important; border-color: var(--correct-color) !important; }
+        .option-btn.incorrect { background-color: var(--incorrect-color) !important; color: white !important; border-color: var(--incorrect-color) !important; }
+        .option-btn.disabled { cursor: not-allowed; }
+        #fitb-container { gap: 1rem; }
+        #fitb-input { width: 100%; padding: 15px; border: 2px solid var(--border-color); border-radius: 8px; background-color: var(--primary-bg); color: var(--text-color); font-size: 1.1em; }
+        #explanation-box { background-color: #2f3e46; padding: 1rem; border-radius: 8px; margin-top: 1.5rem; font-style: italic; border-left: 4px solid var(--accent-color); }
+        .navigation-footer { padding: 1.5rem; border-top: 1px solid var(--border-color); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        #prev-btn { grid-column: 1; } #next-btn { grid-column: 2; }
+        #submit-btn { grid-column: 1; } #skip-btn { grid-column: 2; }
+
+        /* --- Result Screen Styles --- */
+        #result-screen h2 { color: var(--accent-color); font-size: 2.2em; text-align: center; }
+        #result-screen .score-text { font-size: 1.5em; text-align: center; margin-bottom: 2rem; }
+        .score-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; margin: 2rem 0; text-align: center; }
+        .summary-item { background-color: var(--component-bg); padding: 1.5rem; border-radius: 8px; }
+        .summary-item h3 { margin: 0 0 0.5rem; font-size: 1.1em; opacity: 0.8; }
+        .summary-item p { margin: 0; font-size: 2em; font-weight: bold; }
+        #score-correct { color: var(--correct-color); } #score-incorrect { color: var(--incorrect-color); } #score-percentage { color: var(--accent-color); }
+        #review-section { margin-top: 2.5rem; }
+        #review-section h3 { border-bottom: 2px solid var(--accent-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem; text-align: left;}
+        .review-question { background-color: var(--component-bg); padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; text-align: left; border-left: 4px solid var(--border-color); }
+        .review-question p { margin: 0.5rem 0; font-size: 1.1em; }
+        .review-question .user-answer.correct { color: var(--correct-color); font-weight: bold; }
+        .review-question .user-answer.incorrect { color: var(--incorrect-color); text-decoration: line-through; }
+        .review-explanation { margin-top: 10px; opacity: 0.9; font-size: 0.95em; }
+        .result-actions { text-align: center; margin-top: 2rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+
+        /* --- Emoji Reaction Styles --- */
+        #emoji-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 9999; pointer-events: none; }
+        .emoji { position: absolute; left: 50%; top: 50%; font-size: 2rem; animation: spread 1.5s ease-out forwards; will-change: transform, opacity; }
+        @keyframes spread { 0% { transform: translate(-50%, -50%) scale(0); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(1.5); opacity: 0; } }
+    </style>
 </head>
-<body class="dark-mode">
-
+<body>
+<div id="emoji-container"></div>
 <div id="global-nav-bar">
-    <button id="global-home-btn" class="btn btn-secondary">🏠 Home</button>
-    <div id="theme-toggle-container">
-        <button id="theme-toggle-btn" title="Toggle Dark/Light Mode">🌙</button>
-    </div>
-    <a href="https://m.youtube.com/@ExamYatrimocktest/videos" target="_blank" id="global-how-to-use-btn" class="btn">🔥 How to Use 🔥</a>
+    <button id="global-home-btn" class="btn btn-accent">🏠 Home</button>
+    <button id="how-to-use-btn" class="btn btn-red">How to Use</button>
 </div>
 
-<div class="container">
+<!-- =========== SEARCH VIEW =========== -->
+<div id="search-view" class="main-container">
     <div class="header">
         <h1>Practice Zone</h1>
-        <p>Search our library of ready-to-use quizzes.</p>
+        <p>Search for a quiz topic to begin your practice.</p>
     </div>
-
     <div id="filter-container">
         <div class="filter-group">
-            <label for="exam-input">Exam Name</label>
-            <input type="text" id="exam-input" placeholder="e.g., UPSC, SSC, NEET" list="exam-suggestions">
-            <datalist id="exam-suggestions"></datalist>
-        </div>
-        <div class="filter-group">
-            <label for="subject-input">Subject</label>
-            <input type="text" id="subject-input" placeholder="e.g., Physics, History">
-        </div>
-        <div class="filter-group">
             <label for="topic-input">Topic</label>
-            <input type="text" id="topic-input" placeholder="e.g., Thermodynamics">
+            <input type="text" id="topic-input" placeholder="Enter your topic name">
         </div>
-        <div class="search-button-container">
-            <button id="search-btn" class="btn">Search</button>
-        </div>
+        <button id="search-btn" class="btn btn-accent">Search</button>
     </div>
-
-    <div id="loader">
+    <div id="loader" class="hidden">
         <div class="spinner"></div>
-        <p>Fetching latest quizzes from our library...</p>
+        <p>Searching for quizzes in the library...</p>
     </div>
-
-    <div id="quiz-feed-container">
-        <!-- Quiz cards will be dynamically inserted here -->
+    <div id="search-prompt">
+        <p>Please enter a topic and click Search to find quizzes.</p>
     </div>
-
+    <div id="quiz-feed-container"></div>
     <div id="no-quiz-found" class="hidden">
-        <p>😔 No quizzes found matching your criteria.</p>
-        <a href="https://examyatri.live/#manualGenerator" class="btn">Create Your Own Quiz</a>
+        <p>😔 No quizzes found for the topic you searched.</p>
+        <a href="https://examyatri.live/#manualGenerator" class="btn btn-green">Create your own question and start practice</a>
     </div>
+</div>
 
+<!-- =========== PLAYER VIEW =========== -->
+<div id="player-view" class="main-container hidden">
+    <div id="quiz-screen">
+        <div class="quiz-header">
+            <h2 id="quiz-topic">Quiz Topic</h2>
+            <div><span id="progress">Q 1/10</span> | <span id="timer">00:00</span></div>
+        </div>
+        <div class="question-body">
+            <div id="question-preamble" class="hidden"></div>
+            <p id="question-text">Loading question...</p>
+            <div id="fitb-container" class="options-container hidden">
+                <input type="text" id="fitb-input" placeholder="Type your answer here">
+                <button id="fitb-check-btn" class="btn btn-accent">Check Answer</button>
+            </div>
+            <div id="options-container" class="options-container"></div>
+            <div id="explanation-box" class="hidden"></div>
+        </div>
+        <div class="navigation-footer">
+            <button id="prev-btn" class="btn btn-blue">Previous Question</button>
+            <button id="next-btn" class="btn btn-blue">Next Question</button>
+            <button id="submit-btn" class="btn btn-red">Submit Quiz</button>
+            <button id="skip-btn" class="btn btn-yellow">Skip</button>
+        </div>
+    </div>
+    <!-- Results Screen -->
+    <div id="result-screen" class="hidden">
+        <!-- Dynamic result content -->
+    </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-
     // --- CONFIGURATION ---
-    const BOT_TOKEN = "6821389018:AAGxV8sdIE-kLz2P0u_agf61en55pT3u55w";
-    const CHANNEL_ID = "-1002146955383"; 
-    const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=-100&limit=100&chat_id=${CHANNEL_ID}`;
-    const MAIN_WEBSITE_URL = 'https://examyatri.live/';
-    const QUIZ_PLAYER_HASH = '#player';
-    const QUIZ_DATA_STORAGE_KEY = 'examyatriQuizState';
-    const COMMON_EXAMS = [
-        "UPSC CSE", "UPSC IES / ESE", "UPSC CDS", "UPSC NDA", "UPSC CAPF", "UPSC IFoS", "UPSC IES/ISS", "UPSC CMS", "NEET", "JEE Main", "JEE Advanced",
-        "GATE", "CAT", "CLAT", "XAT", "LSAT", "IBPS PO", "IBPS SO", "IBPS Clerk", "SBI PO", "RBI Grade B", "FCI Exam", "SSC CGL", "SSC CHSL", "SSC MTS",
-        "SSC JE", "NRA CET", "CEED", "UCEED", "UGC NET", "NABARD Grade A", "NABARD Grade B", "SEBI Grade A", "PFRDA Exam", "EPFO EO/AO", "LIC AAO",
-        "NPS Trust Exam", "RRB NTPC", "RRB JE", "RRB ALP", "AFCAT", "SSB Interview", "CDS OTA", "Indian Navy SSR", "Indian Army TES", "ICG AC", "MPSC",
-        "UPPSC", "BPSC", "MPPSC", "RPSC", "HPSC", "KPSC", "TNPSC", "APPSC", "TSPSC", "WBPSC", "GPSC", "OPSC", "UKPSC", "JPSC", "CGPSC", "HPPSC",
-        "JKPSC", "SPSC", "NPSC", "APSC", "TRPSC", "Arunachal PSC", "Mizoram PSC", "CBSE", "ICSE", "TBSE", "MSBSHSE", "UPMSP", "BSEB", "GSEB",
-        "HSCAP Kerala", "PSEB", "WBBSE", "CGBSE", "RBSE", "SEBA", "NBSE", "MPBSE", "HBSE", "JKBOSE", "TS Board", "APBIE", "Meghalaya MBOSE",
-        "CA (ICAI)", "CS (ICSI)", "CMA (ICMAI)", "NATA", "ACTEX", "IIFT", "SNAP", "TISSNET", "CMAT", "MAT"
-    ];
+    const BOT_TOKEN = "8048748246:AAHTQNq9tHJE7sSFgESMhSAMn-MGd9SPWsQ";
+    const CHANNEL_ID = "-1002941383294"; 
+    const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?limit=100&offset=-100&chat_id=${CHANNEL_ID}`;
 
     // --- DOM ELEMENTS ---
     const elements = {
+        searchView: document.getElementById('search-view'),
+        playerView: document.getElementById('player-view'),
+        globalNavBar: document.getElementById('global-nav-bar'),
         loader: document.getElementById('loader'),
+        searchPrompt: document.getElementById('search-prompt'),
         quizFeedContainer: document.getElementById('quiz-feed-container'),
         noQuizFound: document.getElementById('no-quiz-found'),
-        examInput: document.getElementById('exam-input'),
-        subjectInput: document.getElementById('subject-input'),
         topicInput: document.getElementById('topic-input'),
         searchBtn: document.getElementById('search-btn'),
         homeBtn: document.getElementById('global-home-btn'),
-        themeToggleBtn: document.getElementById('theme-toggle-btn')
+        howToUseBtn: document.getElementById('how-to-use-btn'),
+        quizScreen: document.getElementById('quiz-screen'),
+        resultScreen: document.getElementById('result-screen'),
+        quizTopic: document.getElementById('quiz-topic'),
+        progress: document.getElementById('progress'),
+        timer: document.getElementById('timer'),
+        questionPreamble: document.getElementById('question-preamble'),
+        questionText: document.getElementById('question-text'),
+        fitbContainer: document.getElementById('fitb-container'),
+        fitbInput: document.getElementById('fitb-input'),
+        fitbCheckBtn: document.getElementById('fitb-check-btn'),
+        optionsContainer: document.getElementById('options-container'),
+        explanationBox: document.getElementById('explanation-box'),
+        prevBtn: document.getElementById('prev-btn'),
+        skipBtn: document.getElementById('skip-btn'),
+        nextBtn: document.getElementById('next-btn'),
+        submitBtn: document.getElementById('submit-btn'),
+        emojiContainer: document.getElementById('emoji-container'),
     };
 
     // --- STATE ---
-    let allQuizzes = [];
+    let currentQuizData = null;
+    let userAnswers = [];
+    let questionTimers = [];
+    let currentQuestionIndex = 0;
+    let questionTimerInterval = null;
+    let secondsElapsed = 0;
 
-    // --- INITIALIZATION ---
-    function init() {
-        applyInitialTheme();
-        setupEventListeners();
-        populateExamDatalist();
-        fetchQuizzes();
+    // =========== VIEW MANAGEMENT & ROUTING ===========
+    function showSearchView() {
+        elements.playerView.classList.add('hidden');
+        elements.searchView.classList.remove('hidden');
+        elements.globalNavBar.classList.remove('hidden');
+        document.body.scrollTop = 0; document.documentElement.scrollTop = 0;
     }
 
-    // --- THEME MANAGEMENT ---
-    function toggleTheme() { document.body.classList.toggle('dark-mode'); const isDarkMode = document.body.classList.contains('dark-mode'); localStorage.setItem('quizTheme', isDarkMode ? 'dark' : 'light'); updateThemeIcon(isDarkMode); }
-    function applyInitialTheme() { const savedTheme = localStorage.getItem('quizTheme'); const isDarkMode = savedTheme ? savedTheme === 'dark' : true; if (!isDarkMode) { document.body.classList.remove('dark-mode'); } updateThemeIcon(isDarkMode); }
-    function updateThemeIcon(isDarkMode) { elements.themeToggleBtn.textContent = isDarkMode ? '☀️' : '🌙'; }
-
-    // --- EVENT LISTENERS ---
-    function setupEventListeners() {
-        elements.searchBtn.addEventListener('click', handleSearch);
-        [elements.examInput, elements.subjectInput, elements.topicInput].forEach(input => {
-            input.addEventListener('keyup', (e) => {
-                if (e.key === 'Enter') {
-                    handleSearch();
-                }
-            });
-        });
-        elements.homeBtn.addEventListener('click', handleHomeRedirect);
-        elements.themeToggleBtn.addEventListener('click', toggleTheme);
+    function showPlayerView() {
+        elements.searchView.classList.add('hidden');
+        elements.globalNavBar.classList.add('hidden');
+        elements.playerView.classList.remove('hidden');
+        document.body.scrollTop = 0; document.documentElement.scrollTop = 0;
     }
-    
-    // --- DATA FETCHING & PARSING ---
-    async function fetchQuizzes() {
+
+    function router() {
+        const hash = window.location.hash;
+        // The player view should only show if a quiz is actively loaded
+        if (hash === '#player' && currentQuizData) {
+            showPlayerView();
+        } else {
+            // Default to search view for any other case
+            window.location.hash = '';
+            currentQuizData = null; // Clear quiz data if navigating away
+            showSearchView();
+        }
+    }
+
+    // =========== SEARCH AND DATA FETCHING LOGIC ===========
+    async function handleSearch() {
+        const searchTerm = elements.topicInput.value.trim().toLowerCase();
+        if (!searchTerm) { alert('Please enter a topic to search.'); return; }
+
+        elements.loader.classList.remove('hidden');
+        elements.quizFeedContainer.innerHTML = '';
+        elements.noQuizFound.classList.add('hidden');
+        elements.searchPrompt.classList.add('hidden');
+
         try {
             const response = await fetch(API_URL);
-            if (!response.ok) throw new Error(`Telegram API error: ${response.statusText}`);
+            if (!response.ok) throw new Error(`API error: ${response.statusText}`);
             const data = await response.json();
             
             if (data.ok && data.result) {
-                allQuizzes = data.result
+                const fullQuizData = data.result
                     .map(update => update.channel_post)
                     .filter(post => post && post.text && post.text.trim().startsWith('{'))
-                    .map(msg => {
+                    .map(post => {
                         try {
-                            const quizData = JSON.parse(msg.text);
-                            quizData.id = msg.message_id; 
-                            return quizData;
-                        } catch (e) {
-                            console.warn('Could not parse a message from Telegram:', msg.text, e);
-                            return null;
-                        }
-                    }).filter(quiz => quiz !== null);
+                            return { ...JSON.parse(post.text), date: new Date(post.date * 1000) };
+                        } catch (e) { return null; }
+                    })
+                    .filter(q => q && q.topic && q.topic.toLowerCase().includes(searchTerm));
                 
-                // Initially render all quizzes
-                handleSearch(); 
-            } else {
-                 throw new Error(`Telegram response not OK: ${data.description}`);
-            }
+                groupAndRenderQuizzes(fullQuizData);
+            } else { throw new Error(`Telegram response not OK: ${data.description}`); }
         } catch (error) {
             console.error("Failed to fetch quizzes:", error);
-            elements.loader.innerHTML = `<p style="color: var(--incorrect-color);">⚠️ Could not load quizzes. Please check your connection and try again.</p>`;
+            elements.noQuizFound.querySelector('p').textContent = '⚠️ Could not load quizzes. Please check your connection or try again later.';
+            elements.noQuizFound.classList.remove('hidden');
         } finally {
             elements.loader.classList.add('hidden');
         }
     }
+    
+    function groupAndRenderQuizzes(fullQuizData) {
+        elements.quizFeedContainer.innerHTML = '';
+        if (fullQuizData.length === 0) {
+            elements.noQuizFound.classList.remove('hidden');
+            return;
+        }
 
-    // --- SEARCH & FILTER LOGIC ---
-    function populateExamDatalist() {
-        const datalist = document.getElementById('exam-suggestions');
-        COMMON_EXAMS.forEach(exam => {
-            const option = document.createElement('option');
-            option.value = exam;
-            datalist.appendChild(option);
+        const sortedQuizzes = fullQuizData.sort((a, b) => a.date - b.date);
+        const quizBlocks = [];
+        if (sortedQuizzes.length > 0) {
+            let currentBlock = [sortedQuizzes[0]];
+            for (let i = 1; i < sortedQuizzes.length; i++) {
+                const timeDifference = (sortedQuizzes[i].date.getTime() - sortedQuizzes[i-1].date.getTime()) / (1000 * 60);
+                if (sortedQuizzes[i].topic.toLowerCase() === sortedQuizzes[i-1].topic.toLowerCase() && timeDifference < 15) {
+                    currentBlock.push(sortedQuizzes[i]);
+                } else {
+                    quizBlocks.push(currentBlock);
+                    currentBlock = [sortedQuizzes[i]];
+                }
+            }
+            quizBlocks.push(currentBlock);
+        }
+
+        quizBlocks.reverse().forEach((block, index) => {
+            const card = createQuizCard({
+                id: `quiz-block-${index}`,
+                topic: block[0].topic,
+                date: block[0].date.toLocaleString(),
+                questionCount: block.length,
+                questions: block
+            });
+            elements.quizFeedContainer.appendChild(card);
         });
     }
 
-    function handleSearch() {
-        const searchTerms = {
-            exam: elements.examInput.value.trim().toLowerCase(),
-            subject: elements.subjectInput.value.trim().toLowerCase(),
-            topic: elements.topicInput.value.trim().toLowerCase()
-        };
-        renderQuizzes(searchTerms);
-    }
-
-    /**
-     * Calculates the Levenshtein distance between two strings (for fuzzy matching).
-     * @param {string} s1 The first string.
-     * @param {string} s2 The second string.
-     * @returns {number} The number of edits to change s1 to s2.
-     */
-    function levenshtein(s1, s2) {
-      if (s1.length < s2.length) { return levenshtein(s2, s1); }
-      if (s2.length === 0) { return s1.length; }
-      let previousRow = Array.from({ length: s2.length + 1 }, (_, i) => i);
-      for (let i = 0; i < s1.length; i++) {
-        let currentRow = [i + 1];
-        for (let j = 0; j < s2.length; j++) {
-          let insertions = previousRow[j + 1] + 1;
-          let deletions = currentRow[j] + 1;
-          let substitutions = previousRow[j] + (s1[i] !== s2[j] ? 1 : 0);
-          currentRow.push(Math.min(insertions, deletions, substitutions));
-        }
-        previousRow = currentRow;
-      }
-      return previousRow[s2.length];
-    }
-
-    /**
-     * Checks if a data field matches a search term using flexible logic.
-     * @param {string} dataField The text from the quiz data (e.g., quiz.subject).
-     * @param {string} searchTerm The text from the user's input.
-     * @returns {boolean} True if it's a match.
-     */
-    function isMatch(dataField, searchTerm) {
-        if (!dataField || !searchTerm) return false;
-
-        const data = dataField.toLowerCase();
-
-        // 1. Check for partial match (handles aliases like "ssc" in "ssc cgl")
-        if (data.includes(searchTerm)) {
-            return true;
-        }
-
-        // 2. Fuzzy match for spelling mistakes
-        const threshold = searchTerm.length <= 4 ? 1 : Math.floor(searchTerm.length / 3.5);
-        if (levenshtein(data, searchTerm) <= threshold) {
-            return true;
-        }
-        
-        // 3. Check individual words for a fuzzy match
-        const dataWords = data.split(' ');
-        for (const word of dataWords) {
-            if (levenshtein(word, searchTerm) <= (word.length <= 4 ? 1 : 2)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-    
-    // --- UI RENDERING ---
-    function renderQuizzes(searchTerms) {
-        elements.quizFeedContainer.innerHTML = '';
-        
-        let filteredQuizzes = allQuizzes;
-        
-        if (searchTerms.exam) {
-            filteredQuizzes = filteredQuizzes.filter(quiz => isMatch(quiz.exam, searchTerms.exam));
-        }
-        if (searchTerms.subject) {
-            filteredQuizzes = filteredQuizzes.filter(quiz => isMatch(quiz.subject, searchTerms.subject));
-        }
-        if (searchTerms.topic) {
-            filteredQuizzes = filteredQuizzes.filter(quiz => isMatch(quiz.topic, searchTerms.topic));
-        }
-
-        if (filteredQuizzes.length === 0) {
-            elements.noQuizFound.classList.remove('hidden');
-        } else {
-            elements.noQuizFound.classList.add('hidden');
-            filteredQuizzes.forEach(quiz => {
-                const card = createQuizCard(quiz);
-                elements.quizFeedContainer.appendChild(card);
-            });
-        }
-    }
-
-    function createQuizCard(quiz) {
+    function createQuizCard(quizBlock) {
         const card = document.createElement('div');
         card.className = 'quiz-card';
-        const questionCount = quiz.questions ? quiz.questions.length : 0;
         card.innerHTML = `
-            <div class="quiz-card-header"><h3>${quiz.topic || 'General Quiz'}</h3></div>
-            <div class="quiz-card-details">
-                <p><strong>Exam:</strong> ${quiz.exam || 'N/A'}</p>
-                <p><strong>Subject:</strong> ${quiz.subject || 'N/A'}</p>
-                <p><strong>Questions:</strong> ${questionCount}</p>
-            </div>
-            <button class="btn start-quiz-btn" data-quiz-id="${quiz.id}">Start Quiz</button>
+            <h3>${quizBlock.topic}</h3>
+            <p><strong>Date Created:</strong> ${quizBlock.date}</p>
+            <p><strong>Questions Available:</strong> ${quizBlock.questionCount}</p>
+            <button class="btn btn-accent start-quiz-btn">Start Quiz</button>
         `;
-        card.querySelector('.start-quiz-btn').addEventListener('click', () => startQuiz(quiz.id));
+        card.querySelector('.start-quiz-btn').addEventListener('click', () => launchQuiz(quizBlock));
         return card;
     }
-    
-    // --- QUIZ START & REDIRECTION ---
-    function startQuiz(quizId) {
-        const selectedQuiz = allQuizzes.find(q => q.id === quizId);
-        if (!selectedQuiz) { alert('Error: Could not find the selected quiz.'); return; }
 
-        const formattedQuizData = selectedQuiz.questions.map(q => ({
-            question: q.question,
-            options: q.options,
-            correctAnswerIndex: q.options.findIndex(opt => opt === q.answer),
-            explanation: q.explanation || 'No explanation provided.',
-            statements: [],
-            image: null
-        }));
+    // =========== QUIZ PLAYER LOGIC ===========
+    function launchQuiz(quizBlock) {
+        currentQuizData = {
+            questions: quizBlock.questions.map(q => ({
+                question: q.question, options: q.options, correctAnswer: q.answer, explanation: q.explanation || 'No explanation provided.', type: q.type || 'mcq', assertion: q.assertion, reason: q.reason, statements: q.statements
+            })),
+            meta: { topic: quizBlock.topic, totalQuestions: quizBlock.questionCount }
+        };
+        userAnswers = new Array(currentQuizData.meta.totalQuestions).fill(null);
+        questionTimers = new Array(currentQuizData.meta.totalQuestions).fill(0);
+        currentQuestionIndex = 0;
+
+        elements.quizScreen.classList.remove('hidden');
+        elements.resultScreen.classList.add('hidden');
         
-        const quizStateForPlayer = {
-            originalQuizData: formattedQuizData,
-            userAnswers: [],
-            currentQuestionIndex: 0,
-            bookmarkedQuestions: [],
-            quizStartTime: new Date().toISOString(),
-            quizMetaData: { topic: selectedQuiz.topic || '', subject: selectedQuiz.subject || '' }
-        };
+        // Change hash to trigger router and show player
+        window.location.hash = 'player';
+        renderQuestion(0);
+    }
+
+    function renderQuestion(index) {
+        if (index < 0 || index >= currentQuizData.meta.totalQuestions) return;
+        currentQuestionIndex = index;
+        const q = currentQuizData.questions[index];
+        const userAnswer = userAnswers[index];
         
-        const dbRequest = indexedDB.open('examyatriDB', 1);
-        dbRequest.onsuccess = (event) => {
-            const db = event.target.result;
-            const transaction = db.transaction(['sessionState'], 'readwrite');
-            const store = transaction.objectStore('sessionState');
-            const putRequest = store.put(quizStateForPlayer, QUIZ_DATA_STORAGE_KEY);
-            putRequest.onsuccess = () => { window.location.href = MAIN_WEBSITE_URL + QUIZ_PLAYER_HASH; };
-            putRequest.onerror = () => { alert('Could not prepare the quiz. Please try again.'); };
-        };
-        dbRequest.onerror = () => { alert('Could not access storage to start the quiz. Please enable storage access for this site.'); };
-        dbRequest.onupgradeneeded = (event) => {
-             const db = event.target.result;
-             if (!db.objectStoreNames.contains('sessionState')) { db.createObjectStore('sessionState'); }
-        };
+        elements.quizTopic.textContent = currentQuizData.meta.topic;
+        elements.explanationBox.classList.add('hidden');
+        elements.questionPreamble.classList.add('hidden');
+        elements.optionsContainer.classList.add('hidden');
+        elements.fitbContainer.classList.add('hidden');
+
+        switch (q.type) {
+            case 'ar':
+                elements.questionPreamble.classList.remove('hidden');
+                elements.questionPreamble.innerHTML = `<p><strong>Assertion (A):</strong> ${q.assertion}</p><p><strong>Reason (R):</strong> ${q.reason}</p>`;
+                elements.questionText.textContent = q.question || "Regarding the assertion and reason, which is correct?";
+                renderOptions(q);
+                break;
+            case 'statement':
+                elements.questionPreamble.classList.remove('hidden');
+                elements.questionPreamble.innerHTML = q.statements.map((s, i) => `<p><strong>Statement ${i+1}:</strong> ${s}</p>`).join('');
+                elements.questionText.textContent = q.question;
+                renderOptions(q);
+                break;
+            case 'fitb':
+                elements.fitbContainer.classList.remove('hidden');
+                elements.questionText.textContent = q.question;
+                elements.fitbInput.value = '';
+                elements.fitbInput.disabled = false;
+                elements.fitbCheckBtn.disabled = false;
+                elements.fitbCheckBtn.onclick = () => handleFitbAnswer(q);
+                break;
+            default: // mcq, tf
+                elements.questionText.textContent = q.question;
+                renderOptions(q);
+                break;
+        }
+
+        if (window.MathJax) { MathJax.typesetPromise([elements.questionPreamble, elements.questionText, elements.optionsContainer]); }
+        
+        if (userAnswer) { restoreAnswerState(userAnswer, q); } 
+        else { startQuestionTimer(); }
+        
+        updateNavigation();
+    }
+
+    function renderOptions(question) {
+        elements.optionsContainer.classList.remove('hidden');
+        elements.optionsContainer.innerHTML = '';
+        (question.options || []).forEach((optionText) => {
+            const button = document.createElement('button');
+            button.className = 'option-btn';
+            button.textContent = optionText;
+            button.onclick = () => handleAnswerSelection(button, optionText, question);
+            elements.optionsContainer.appendChild(button);
+        });
+    }
+
+    function restoreAnswerState(userAnswer, question) {
+        stopQuestionTimer();
+        elements.timer.textContent = formatTime(questionTimers[currentQuestionIndex]);
+        if (question.type === 'fitb') {
+            elements.fitbInput.value = userAnswer.answer;
+            elements.fitbInput.disabled = true;
+            elements.fitbCheckBtn.disabled = true;
+        } else {
+            Array.from(elements.optionsContainer.children).forEach(btn => {
+                btn.classList.add('disabled'); btn.onclick = null;
+                if (btn.textContent === userAnswer.answer) { btn.classList.add(userAnswer.isCorrect ? 'correct' : 'incorrect'); }
+                if (btn.textContent === question.correctAnswer) { btn.classList.add('correct'); }
+            });
+        }
+        elements.explanationBox.innerHTML = `<strong>Explanation:</strong> ${question.explanation}`;
+        elements.explanationBox.classList.remove('hidden');
+        if (window.MathJax) { MathJax.typesetPromise([elements.explanationBox]); }
+    }
+
+    function handleAnswerSelection(selectedButton, selectedOption, question) {
+        if(userAnswers[currentQuestionIndex] !== null) return;
+        stopQuestionTimer();
+        questionTimers[currentQuestionIndex] = secondsElapsed;
+        const isCorrect = selectedOption === question.correctAnswer;
+        createReaction(isCorrect);
+        userAnswers[currentQuestionIndex] = { answer: selectedOption, isCorrect: isCorrect };
+        
+        Array.from(elements.optionsContainer.children).forEach(btn => {
+            btn.classList.add('disabled'); btn.onclick = null;
+            if (btn.textContent === question.correctAnswer) { btn.classList.add('correct'); }
+        });
+        selectedButton.classList.add(isCorrect ? 'correct' : 'incorrect');
+        elements.explanationBox.innerHTML = `<strong>Explanation:</strong> ${question.explanation}`;
+        elements.explanationBox.classList.remove('hidden');
+        if (window.MathJax) { MathJax.typesetPromise([elements.explanationBox]); }
     }
     
-    // --- NAVIGATION ---
-    function handleHomeRedirect() {
-        const dbRequest = indexedDB.open('examyatriDB', 1);
-        dbRequest.onsuccess = (event) => {
-            const db = event.target.result;
-            db.transaction(['sessionState'], 'readwrite').objectStore('sessionState').put(null, QUIZ_DATA_STORAGE_KEY);
-        };
-        localStorage.clear();
-        window.location.href = MAIN_WEBSITE_URL;
+    function handleFitbAnswer(question) {
+        if(userAnswers[currentQuestionIndex] !== null) return;
+        const userAnswer = elements.fitbInput.value.trim();
+        if (!userAnswer) { alert("Please enter an answer."); return; }
+
+        stopQuestionTimer();
+        questionTimers[currentQuestionIndex] = secondsElapsed;
+        const isCorrect = userAnswer.toLowerCase() === question.correctAnswer.toLowerCase();
+        createReaction(isCorrect);
+        userAnswers[currentQuestionIndex] = { answer: userAnswer, isCorrect: isCorrect };
+        
+        elements.fitbInput.disabled = true;
+        elements.fitbCheckBtn.disabled = true;
+
+        elements.explanationBox.innerHTML = `Your Answer: <strong>${userAnswer}</strong><br>Correct Answer: <strong>${question.correctAnswer}</strong><br><br><strong>Explanation:</strong> ${question.explanation}`;
+        elements.explanationBox.classList.remove('hidden');
+        if (window.MathJax) { MathJax.typesetPromise([elements.explanationBox]); }
+    }
+
+    function updateNavigation() {
+        elements.progress.textContent = `Q ${currentQuestionIndex + 1}/${currentQuizData.meta.totalQuestions}`;
+        elements.prevBtn.disabled = currentQuestionIndex === 0;
+        elements.nextBtn.disabled = currentQuestionIndex === currentQuizData.meta.totalQuestions - 1;
+    }
+
+    function startQuestionTimer() {
+        secondsElapsed = questionTimers[currentQuestionIndex] || 0;
+        elements.timer.textContent = formatTime(secondsElapsed);
+        if (questionTimerInterval) clearInterval(questionTimerInterval);
+        questionTimerInterval = setInterval(() => {
+            secondsElapsed++;
+            elements.timer.textContent = formatTime(secondsElapsed);
+        }, 1000);
+    }
+
+    function stopQuestionTimer() { clearInterval(questionTimerInterval); }
+    function formatTime(s) { return `${Math.floor(s/60)<10?'0':''}${Math.floor(s/60)}:${s%60<10?'0':''}${s%60}`; }
+    function goToNextQuestion() { renderQuestion(currentQuestionIndex + 1); }
+    function goToPrevQuestion() { renderQuestion(currentQuestionIndex - 1); }
+
+    function skipQuestion() {
+        if (userAnswers[currentQuestionIndex] === null) {
+            userAnswers[currentQuestionIndex] = { answer: 'Skipped', isCorrect: false };
+            questionTimers[currentQuestionIndex] = secondsElapsed;
+            stopQuestionTimer();
+        }
+        if (currentQuestionIndex < currentQuizData.meta.totalQuestions - 1) { goToNextQuestion(); }
+        else { submitQuiz(); }
+    }
+    
+    function submitQuiz() {
+        stopQuestionTimer();
+        elements.quizScreen.classList.add('hidden');
+        calculateAndRenderResults();
+        elements.resultScreen.classList.remove('hidden');
+    }
+
+    function calculateAndRenderResults() {
+        let correct = 0, incorrect = 0;
+        userAnswers.forEach(ans => { if(ans && ans.isCorrect) correct++; else incorrect++; });
+        const totalTime = questionTimers.reduce((a, b) => a + b, 0);
+        const percentage = currentQuizData.meta.totalQuestions > 0 ? ((correct / currentQuizData.meta.totalQuestions) * 100).toFixed(2) : 0;
+        
+        const reviewHTML = currentQuizData.questions.map((q, i) => {
+            const userAnswer = userAnswers[i];
+            const userAnswerText = userAnswer ? userAnswer.answer : 'Not Answered';
+            const isCorrect = userAnswer ? userAnswer.isCorrect : false;
+            return `<div class="review-question">
+                        <p><strong>Q${i+1}: ${q.question}</strong></p>
+                        <p>Time Taken: ${formatTime(questionTimers[i])}</p>
+                        <p>Your Answer: <span class="user-answer ${userAnswer ? (isCorrect ? 'correct' : 'incorrect') : ''}">${userAnswerText}</span></p>
+                        ${!isCorrect && userAnswerText !== 'Skipped' && userAnswerText !== 'Not Answered' ? `<p>Correct Answer: <span class="correct">${q.correctAnswer}</span></p>` : ''}
+                        <div class="review-explanation"><strong>Explanation:</strong> ${q.explanation}</div>
+                    </div>`;
+        }).join('');
+
+        elements.resultScreen.innerHTML = `
+            <h2>Quiz Complete!</h2>
+            <p class="score-text">Here is your performance summary.</p>
+            <div class="score-summary">
+                <div class="summary-item"><h3>Total Questions</h3><p>${currentQuizData.meta.totalQuestions}</p></div>
+                <div class="summary-item"><h3>Correct</h3><p id="score-correct">${correct}</p></div>
+                <div class="summary-item"><h3>Incorrect / Skipped</h3><p id="score-incorrect">${incorrect}</p></div>
+                <div class="summary-item"><h3>Total Time</h3><p>${formatTime(totalTime)}</p></div>
+                <div class="summary-item"><h3>Performance</h3><p id="score-percentage">${percentage}%</p></div>
+            </div>
+            <div class="result-actions">
+                <button class="btn btn-blue" id="another-quiz-btn">Search for Another Quiz</button>
+                <button class="btn btn-green" id="new-practice-btn">Start New Practice (External)</button>
+            </div>
+            <div id="review-section"><h3>Review Your Answers</h3>${reviewHTML}</div>
+        `;
+        // Attach event listeners for the new buttons on the result screen
+        document.getElementById('another-quiz-btn').addEventListener('click', () => { window.location.hash = ''; });
+        document.getElementById('new-practice-btn').addEventListener('click', handleResetAndRedirect);
+        if (window.MathJax) { MathJax.typesetPromise([elements.resultScreen]); }
+    }
+    
+    function handleResetAndRedirect() { localStorage.clear(); window.location.href = 'https://examyatri.live'; }
+
+    function createReaction(isCorrect) {
+        const emojis = isCorrect ? ['😊', '👍', '🎉', '✨', '💯'] : ['😟', '🤔', '😢', 'Try Again'];
+        for (let i = 0; i < 20; i++) {
+            const emoji = document.createElement('div');
+            emoji.className = 'emoji';
+            emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            emoji.style.setProperty('--x', `${(Math.random() - 0.5) * 2 * window.innerWidth}px`);
+            emoji.style.setProperty('--y', `${(Math.random() - 0.5) * 2 * window.innerHeight}px`);
+            elements.emojiContainer.appendChild(emoji);
+            setTimeout(() => emoji.remove(), 1500);
+        }
+    }
+
+    function setupEventListeners() {
+        elements.searchBtn.addEventListener('click', handleSearch);
+        elements.topicInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') handleSearch(); });
+        elements.homeBtn.addEventListener('click', handleResetAndRedirect);
+        elements.howToUseBtn.addEventListener('click', () => { window.open('https://m.youtube.com/@ExamYatri_mock_test/videos', '_blank'); });
+        elements.nextBtn.addEventListener('click', goToNextQuestion);
+        elements.prevBtn.addEventListener('click', goToPrevQuestion);
+        elements.skipBtn.addEventListener('click', skipQuestion);
+        elements.submitBtn.addEventListener('click', () => { if (confirm('Are you sure you want to submit?')) submitQuiz(); });
+        
+        // Listen to hash changes to route between views
+        window.addEventListener('hashchange', router);
     }
 
     // --- START THE APP ---
-    init();
+    setupEventListeners();
+    router(); // Initial route check on page load
 });
 </script>
-
 </body>
 </html>
