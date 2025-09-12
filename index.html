@@ -979,7 +979,7 @@
 <!-- NEW: Global Navigation Bar -->
 <div id="global-nav-bar" class="global-nav">
     <button id="global-home-btn" class="btn btn-secondary">🏠 Home</button>
-    <a href="https://m.youtube.com/@ExamYatri_mock_test/videos" target="_blank" id="global-how-to-use-btn" class="btn fire-animation">🔥 How to Use 🔥</a>
+    <a href="https://m.youtube.com/@ExamYatrimocktest/videos" target="_blank" id="global-how-to-use-btn" class="btn fire-animation">🔥 How to Use 🔥</a>
 </div>
 
 
@@ -1154,7 +1154,7 @@
             <h3 class="step-header">Step 2: Add Your Images</h3>
             <p>Select your images. The system will automatically extract the text.</p>
             
-            <div id="image-input-area"><button id="select-images-btn" class="btn btn-secondary glowing">📂 Select Images</button><input type="file" id="image-file-input" multiple accept="image/*" class="hidden"></div>
+            <div id="image-input-area"><button id="select-images-btn" class="btn btn-secondary glowing">📂 Select Images</button></div>
 
             <div class="handwriting-toggle-group">
                 <label for="handwriting-toggle">
@@ -1196,7 +1196,7 @@
             
             <div id="pdf-input-area">
                 <button id="select-pdf-btn" class="btn btn-secondary glowing">📂 Select PDF</button>
-                <input type="file" id="pdf-file-input" accept=".pdf" class="hidden">
+                <input type="file" id="pdf-file-input" accept=".pdf" class="hidden" style="display:none !important;">
                 <span id="pdf-file-name" style="align-self: center; margin-left: 15px; font-style: italic;"></span>
             </div>
             <div id="pdf-options-container" class="hidden fade-in-slide-up">
@@ -1565,7 +1565,19 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         // Image Workflow
         imageFormatGuide: document.getElementById('image-format-guide'),
         imageLangSelectorContainer: document.getElementById('image-lang-selector-container'),
-        imageFileInput: document.getElementById('image-file-input'),
+        imageFileInput: (function(){
+            let el = document.getElementById('image-file-input');
+            if (!el) {
+                el = document.createElement('input');
+                el.type = 'file';
+                el.id = 'image-file-input';
+                el.multiple = true;
+                el.accept = 'image/*';
+                el.style.display = 'none';
+                document.body.appendChild(el);
+            }
+            return el;
+        })(),
         imagePreviewContainer: document.getElementById('image-preview-container'),
         ocrStatus: document.getElementById('ocr-status'),
         imageQuizDefinitionArea: document.getElementById('image-quiz-definition-area'),
