@@ -7,13 +7,187 @@
   <!-- Cropper.js CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1HGZL93811"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1HGZL93811">
+// ✅ Show notification instead of displaying Quiz ID
+function showQuizSavedNotification() {
+    const note = document.createElement('div');
+    note.textContent = "✅ Quiz successfully saved to Google Sheet!";
+    note.style.position = "fixed";
+    note.style.bottom = "20px";
+    note.style.left = "50%";
+    note.style.transform = "translateX(-50%)";
+    note.style.backgroundColor = "#28a745";
+    note.style.color = "#fff";
+    note.style.padding = "12px 20px";
+    note.style.borderRadius = "8px";
+    note.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+    note.style.fontWeight = "bold";
+    note.style.zIndex = "99999";
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+}
+
+
+
+function fullResetAndRedirect() {
+    const redirectUrl = "https://examyatri.live";
+    // show loading overlay if available
+    try {
+        const lo = document.getElementById('loading-overlay');
+        if (lo) {
+            lo.classList.remove('hidden');
+            const lt = document.getElementById('loading-text');
+            if (lt) lt.innerText = 'Clearing browsing data...';
+        }
+    } catch(e){}
+
+    // 1) Clear storages
+    try { localStorage.clear(); } catch(e) {}
+    try { sessionStorage.clear(); } catch(e) {}
+
+    // 2) Delete cookies (best-effort)
+    try {
+        const cookies = document.cookie ? document.cookie.split(";") : [];
+        const hostname = location.hostname;
+        const hostParts = hostname ? hostname.split('.') : [];
+        const domainVariants = new Set();
+        if (hostname) {
+            domainVariants.add(hostname);
+            domainVariants.add('.' + hostname);
+            for (let i = 0; i < hostParts.length - 1; i++) {
+                domainVariants.add(hostParts.slice(i).join('.'));
+                domainVariants.add('.' + hostParts.slice(i).join('.'));
+            }
+            domainVariants.add('.www.' + hostname);
+        }
+        cookies.forEach(cookie => {
+            const eqPos = cookie.indexOf('=');
+            const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+            if (!name) return;
+            // try deleting on many domain variants and paths
+            const paths = ['/', '/;'];
+            domainVariants.forEach(domain => {
+                try {
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + domain + ";";
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;";
+                } catch(e){}
+            });
+            try { document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;"; } catch(e){}
+        });
+    } catch(e){}
+
+    // 3) Clear Cache Storage (Service Worker caches)
+    try {
+        if ('caches' in window) {
+            caches.keys().then(keys => {
+                return Promise.all(keys.map(k => caches.delete(k))).catch(() => {});
+            }).catch(()=>{});
+        }
+    } catch(e){}
+
+    // 4) Unregister service workers
+    try {
+        if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+            navigator.serviceWorker.getRegistrations().then(regs => {
+                regs.forEach(r => {
+                    try { r.unregister(); } catch(e){}
+                });
+            }).catch(()=>{});
+        }
+    } catch(e){}
+
+    // 5) Delete IndexedDB databases (best-effort)
+    try {
+        if (indexedDB && indexedDB.databases) {
+            indexedDB.databases().then(dbs => {
+                dbs.forEach(db => {
+                    try { indexedDB.deleteDatabase(db.name); } catch(e){}
+                });
+            }).catch(()=>{});
+        } else {
+            // fallback to deleting known DBs
+            try { indexedDB.deleteDatabase('examyatriDB'); } catch(e){}
+        }
+    } catch(e){}
+
+    // small delay to allow async deletions to start (best-effort)
+    setTimeout(() => {
+        try {
+            // final redirect (replace so user can't go back)
+            window.location.replace(redirectUrl);
+        } catch(e) {
+            window.location.href = redirectUrl;
+        }
+    }, 800);
+}
+catch(e) {}
+    try { sessionStorage.clear(); } catch(e) {}
+    if (typeof indexedDB !== 'undefined') {
+        // Clear all IndexedDB databases
+        if (indexedDB.databases) {
+            indexedDB.databases().then(dbs => {
+                dbs.forEach(db => { indexedDB.deleteDatabase(db.name); });
+            });
+        }
+    }
+    window.location.href = "https://examyatri.live";
+}
+
+
+// Attach full reset to important buttons (best-effort)
+(function attachFullResetButtons(){
+    const ids = ['start-new-practice-btn','global-home-btn','restart-quiz-btn','hard-reset-btn-single','hard-reset-btn','take-another-assessment-btn','restart-quiz-btn','take-another-assessment-btn','hard-reset-btn-single'];
+    ids.forEach(id => {
+        try {
+            const el = document.getElementById(id);
+            if (el && !el.dataset.examyatriResetAttached) {
+                el.addEventListener('click', function(ev){
+                    ev.preventDefault();
+                    try { fullResetAndRedirect(); } catch(e){ window.location.href = 'https://examyatri.live'; }
+                });
+                el.dataset.examyatriResetAttached = '1';
+            }
+        } catch(e){}
+    });
+    // Also attach by selector for buttons that contain certain texts
+    try {
+        document.querySelectorAll('button').forEach(btn => {
+            const txt = (btn.innerText || '').toLowerCase();
+            if (!btn.dataset.examyatriResetAttached && (txt.includes('take another assessment') || txt.includes('take another') || txt.includes('take another assessment') || txt.includes('go to home & delete all data') || txt.includes('go to home') )) {
+                btn.addEventListener('click', function(ev){ ev.preventDefault(); fullResetAndRedirect(); });
+                btn.dataset.examyatriResetAttached = '1';
+            }
+        });
+    } catch(e){}
+})();
+
+</script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
   gtag('config', 'G-1HGZL93811');
+
+// ✅ Show notification instead of displaying Quiz ID
+function showQuizSavedNotification() {
+    const note = document.createElement('div');
+    note.textContent = "✅ Quiz successfully saved to Google Sheet!";
+    note.style.position = "fixed";
+    note.style.bottom = "20px";
+    note.style.left = "50%";
+    note.style.transform = "translateX(-50%)";
+    note.style.backgroundColor = "#28a745";
+    note.style.color = "#fff";
+    note.style.padding = "12px 20px";
+    note.style.borderRadius = "8px";
+    note.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+    note.style.fontWeight = "bold";
+    note.style.zIndex = "99999";
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+}
+
 </script>
   <!-- ADDED: MathJax for Math/Physics Formula Rendering (CORRECTED CONFIG) -->
 <script>
@@ -32,8 +206,48 @@
       fontCache: 'global'
     }
   };
+
+// ✅ Show notification instead of displaying Quiz ID
+function showQuizSavedNotification() {
+    const note = document.createElement('div');
+    note.textContent = "✅ Quiz successfully saved to Google Sheet!";
+    note.style.position = "fixed";
+    note.style.bottom = "20px";
+    note.style.left = "50%";
+    note.style.transform = "translateX(-50%)";
+    note.style.backgroundColor = "#28a745";
+    note.style.color = "#fff";
+    note.style.padding = "12px 20px";
+    note.style.borderRadius = "8px";
+    note.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+    note.style.fontWeight = "bold";
+    note.style.zIndex = "99999";
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+}
+
 </script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+// ✅ Show notification instead of displaying Quiz ID
+function showQuizSavedNotification() {
+    const note = document.createElement('div');
+    note.textContent = "✅ Quiz successfully saved to Google Sheet!";
+    note.style.position = "fixed";
+    note.style.bottom = "20px";
+    note.style.left = "50%";
+    note.style.transform = "translateX(-50%)";
+    note.style.backgroundColor = "#28a745";
+    note.style.color = "#fff";
+    note.style.padding = "12px 20px";
+    note.style.borderRadius = "8px";
+    note.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+    note.style.fontWeight = "bold";
+    note.style.zIndex = "99999";
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+}
+
+</script>
 
   <style>
     /* --- Base & Theme Variables --- */
@@ -971,14 +1185,69 @@
     body.dark-mode .blog-content p {
         color: var(--text-color);
     }
+    
+    /* --- NEW: Search Screen styles --- */
+    #search-results-container .search-result-item {
+        background-color: var(--component-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+    #search-results-container .search-result-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px var(--shadow-color);
+        border-color: var(--accent-color);
+    }
+    #search-results-container .search-result-item h4 {
+        margin: 0 0 0.5rem 0;
+        color: var(--accent-color);
+        font-size: 1.1em;
+    }
+    #search-results-container .search-result-item p {
+        margin: 0;
+        font-size: 0.9em;
+        opacity: 0.8;
+    }
 
-  </style>
+  
+.flash-green {
+  background-color: #4CAF50 !important;
+  color: white !important;
+  animation: flash 1s infinite;
+}
+@keyframes flash {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+
+/* ✅ Hide Quiz ID display on results screen */
+#quiz-id-display, .quiz-id-display {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+
+/* 🚫 Force hide any quiz ID text */
+[id*="quiz-id"], [class*="quiz-id"], #backup-id-display, .backup-id-display {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+</style>
+<link rel="stylesheet" href="/index.css">
 </head>
 <body class="dark-mode">
 
 <!-- NEW: Global Navigation Bar -->
 <div id="global-nav-bar" class="global-nav">
-    <button id="global-home-btn" class="btn btn-secondary">🏠 Home</button>
+    <button id="global-home-btn" class="btn btn-secondary" onclick="fullResetAndRedirect()">🏠 Home</button>
     <a href="https://m.youtube.com/@ExamYatri_mock_test/videos" target="_blank" id="global-how-to-use-btn" class="btn fire-animation">🔥 How to Use 🔥</a>
 </div>
 
@@ -1009,23 +1278,48 @@
         <div class="mode-options">
             <div class="mode-option-card" id="select-single-player-btn">
                 <span class="card-icon">👤</span>
-                <h3>Single Player Practice</h3>
+                <h3>Create Question and Start Practice</h3>
                 <p>Create a set of questions on any topic and practice by yourself.</p>
             </div>
             <div class="mode-option-card" id="select-multiplayer-btn">
                 <span class="card-icon">👥</span>
-                <h3>Multiplayer/ Practice With Friends</h3>
+                <h3>Create Question and Start Practice With Friends</h3>
                 <p>Create a room or join a friend's to practice together.</p>
             </div>
         </div>
+        <!-- MODIFIED: Search Button -->
+        <div class="mode-option-card" id="search-practice-btn" style="margin-top: 1.5rem;">
+            <span class="card-icon">🔎</span>
+            <h3>Search Any Topic of Your Exam and Start Practice</h3>
+            <p>Find a previously saved quiz by topic or ID and practice again.</p>
+        </div>
         
-        <a href="Testpdf.html" id="coaching-pdf-to-quiz-btn" class="btn glowing" style="margin: 2rem auto; display: block; width: 100%; max-width: 400px; text-decoration: none;">Coaching Test series Pdf/ PYQs Book Pdf to Quiz</a>
+        <!-- MODIFIED: "Coaching PDF to Quiz" Button to Section -->
+        <a href="Testpdf.html" id="coaching-pdf-to-quiz-btn" class="mode-option-card" style="margin-top: 1.5rem; padding: 1.5rem; text-decoration: none; color: inherit; display: block;">
+            <span class="card-icon" style="font-size: 2.5rem;">🧠</span>
+            <h3 style="font-size: 1.1em;">Coaching Test series Pdf/ PYQs Book Pdf to Quiz</h3>
+            <p style="font-size: 0.85em;">Convert your existing PDF materials into interactive quizzes.</p>
+        </a>
 
         <!-- NEW: BLOGGER POSTS SECTION -->
         <div id="blog-section">
           <h2 style="text-align:center; margin-bottom: 1.5rem;">Latest from Our Blog</h2>
           <p style="text-align:center;">Loading latest posts...</p>
         </div>
+    </div>
+    
+    <!-- ===== NEW: SEARCH SAVED QUIZ CONTAINER ===== -->
+    <div id="search-container" class="hidden">
+        <h3>🔎 Search Saved Quizzes</h3>
+        <div class="input-group" style="margin-top: 2rem;">
+            <label for="search-input" class="input-label">Topic or Backup ID</label>
+            <input type="text" id="search-input" class="input-field" placeholder="Enter topic name or the ID you saved...">
+        </div>
+        <button id="perform-search-btn" class="btn btn-full-width">Search</button>
+        <div id="search-results-container" style="margin-top: 2rem; max-height: 40vh; overflow-y: auto;">
+            <!-- Results will be injected here -->
+        </div>
+        <button class="btn btn-secondary back-to-mode-selection-btn" style="margin-top: 1rem; width: 100%;">← Back</button>
     </div>
 
     <!-- ===== MULTIPLAYER SELECTION SCREEN (JOIN OR CREATE) ===== -->
@@ -1345,6 +1639,8 @@
     <!-- ===== SINGLE PLAYER RESULTS ===== -->
     <div id="results-screen" class="hidden">
         <div class="header"><h2>🏆 Assessment Results</h2></div>
+        <!-- MODIFIED: SAVE STATUS CONTAINER -->
+        <div id="save-status-container" style="text-align: center; margin-bottom: 1.5rem; padding: 1rem; border-radius: 8px; background-color: var(--component-bg); font-size: 0.95em;"></div>
         <div id="score-summary"></div>
         <div id="results-summary-wrapper">
             <div id="score-performance-chart-container"></div>
@@ -1352,7 +1648,8 @@
         </div>
         <div class="share-buttons">
             <div class="share-buttons-row">
-                <button id="share-pdf-btn" class="btn">📄 Download PDF</button>
+                <button id="start-new-practice-btn" class="btn flash-green" onclick="fullResetAndRedirect()">🚀 Start New Practice</button>
+        <button id="share-pdf-btn" class="btn">📄 Download PDF</button>
                 <button id="copy-bookmarks-btn" class="btn" style="background-color: var(--bookmarked-active-color);">⭐ Copy Bookmarked</button>
                 <button id="copy-all-btn" class="btn">📋 Copy All</button>
                 <button id="share-whatsapp-btn" class="btn" style="background-color: #25D366;">💬 Share on WhatsApp</button>
@@ -1434,14 +1731,134 @@
 
   // Expose to global scope for the main script
   window.firebase = { db, ref, set, get, onValue, push, onChildAdded, onChildRemoved, serverTimestamp, runTransaction, remove };
+
+// ✅ Show notification instead of displaying Quiz ID
+function showQuizSavedNotification() {
+    const note = document.createElement('div');
+    note.textContent = "✅ Quiz successfully saved to Google Sheet!";
+    note.style.position = "fixed";
+    note.style.bottom = "20px";
+    note.style.left = "50%";
+    note.style.transform = "translateX(-50%)";
+    note.style.backgroundColor = "#28a745";
+    note.style.color = "#fff";
+    note.style.padding = "12px 20px";
+    note.style.borderRadius = "8px";
+    note.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+    note.style.fontWeight = "bold";
+    note.style.zIndex = "99999";
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+}
+
 </script>
 
 <!-- Original Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-<script>pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js`;</script>
-<script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js">
+// ✅ Show notification instead of displaying Quiz ID
+function showQuizSavedNotification() {
+    const note = document.createElement('div');
+    note.textContent = "✅ Quiz successfully saved to Google Sheet!";
+    note.style.position = "fixed";
+    note.style.bottom = "20px";
+    note.style.left = "50%";
+    note.style.transform = "translateX(-50%)";
+    note.style.backgroundColor = "#28a745";
+    note.style.color = "#fff";
+    note.style.padding = "12px 20px";
+    note.style.borderRadius = "8px";
+    note.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+    note.style.fontWeight = "bold";
+    note.style.zIndex = "99999";
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+}
+
+</script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js`;
+// ✅ Show notification instead of displaying Quiz ID
+function showQuizSavedNotification() {
+    const note = document.createElement('div');
+    note.textContent = "✅ Quiz successfully saved to Google Sheet!";
+    note.style.position = "fixed";
+    note.style.bottom = "20px";
+    note.style.left = "50%";
+    note.style.transform = "translateX(-50%)";
+    note.style.backgroundColor = "#28a745";
+    note.style.color = "#fff";
+    note.style.padding = "12px 20px";
+    note.style.borderRadius = "8px";
+    note.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+    note.style.fontWeight = "bold";
+    note.style.zIndex = "99999";
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+}
+
+</script>
+<script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'>
+// ✅ Show notification instead of displaying Quiz ID
+function showQuizSavedNotification() {
+    const note = document.createElement('div');
+    note.textContent = "✅ Quiz successfully saved to Google Sheet!";
+    note.style.position = "fixed";
+    note.style.bottom = "20px";
+    note.style.left = "50%";
+    note.style.transform = "translateX(-50%)";
+    note.style.backgroundColor = "#28a745";
+    note.style.color = "#fff";
+    note.style.padding = "12px 20px";
+    note.style.borderRadius = "8px";
+    note.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+    note.style.fontWeight = "bold";
+    note.style.zIndex = "99999";
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+}
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+// ✅ Show notification instead of displaying Quiz ID
+function showQuizSavedNotification() {
+    const note = document.createElement('div');
+    note.textContent = "✅ Quiz successfully saved to Google Sheet!";
+    note.style.position = "fixed";
+    note.style.bottom = "20px";
+    note.style.left = "50%";
+    note.style.transform = "translateX(-50%)";
+    note.style.backgroundColor = "#28a745";
+    note.style.color = "#fff";
+    note.style.padding = "12px 20px";
+    note.style.borderRadius = "8px";
+    note.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+    note.style.fontWeight = "bold";
+    note.style.zIndex = "99999";
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+}
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js">
+// ✅ Show notification instead of displaying Quiz ID
+function showQuizSavedNotification() {
+    const note = document.createElement('div');
+    note.textContent = "✅ Quiz successfully saved to Google Sheet!";
+    note.style.position = "fixed";
+    note.style.bottom = "20px";
+    note.style.left = "50%";
+    note.style.transform = "translateX(-50%)";
+    note.style.backgroundColor = "#28a745";
+    note.style.color = "#fff";
+    note.style.padding = "12px 20px";
+    note.style.borderRadius = "8px";
+    note.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+    note.style.fontWeight = "bold";
+    note.style.zIndex = "99999";
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+}
+
+</script>
 
 <!-- MERGED & CORRECTED JAVASCRIPT LOGIC -->
 <script>
@@ -1547,6 +1964,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         lobbyContainer: document.getElementById('lobby-container'),
         multiplayerQuizPlayerContainer: document.getElementById('multiplayer-quiz-player-container'),
         multiplayerResultsContainer: document.getElementById('multiplayer-results-container'),
+        searchContainer: document.getElementById('search-container'),
 
 
         // Mode Selection Buttons
@@ -1625,6 +2043,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         quizSummaryDetails: document.getElementById('quiz-summary-details'),
         resultsReview: document.getElementById('results-review'),
         resultsPageTelegramInput: document.getElementById('results-page-telegram-input'),
+        saveStatusContainer: document.getElementById('save-status-container'),
 
         // Modals
         pasteNotification: document.getElementById('paste-notification'),
@@ -1655,6 +2074,10 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         waitingForSubmissionOverlay: document.getElementById('waiting-for-submission-overlay'),
         mpFaceHappy: document.getElementById('mp-face-happy'),
         mpFaceAngry: document.getElementById('mp-face-angry'),
+        
+        // Search & Practice
+        searchInput: document.getElementById('search-input'),
+        searchResultsContainer: document.getElementById('search-results-container'),
     };
 
     const dbHelper = {
@@ -1678,7 +2101,9 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     let cropper = null;
     let currentEditingImageId = null;
     let selectedExam = '';
-    let blogPostsLoaded = false; // NEW: Flag for blog posts
+    let blogPostsLoaded = false;
+    let isFromSearchPractice = false;
+    let creationWorkflow = null; // MODIFIED: To track how quiz was created
     
     // --- OCR State (FIX) ---
     let ocrWorker = null;
@@ -1697,7 +2122,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
 
     let isShakeReminderEnabled = true;
     let pressureTextCounter = 1;
-    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
+    const optionClickSound = new Audio('data:audio/mpeg;base64,UklGRkYAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhMgAAAP//AwD//wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v8CAP7/AwD+/wEAAQAAAAEAAAAA/v-');
     const clapSound = new Audio('data:audio/mpeg;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAAABkYXRhJAEAAAD///////8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8A//8á');
     
     // --- INITIALIZATION ---
@@ -1751,6 +2176,54 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     function setupAudio() { optionClickSound.volume = 0.7; clapSound.volume = 0.5; }
 
     init();
+    
+    // --- GOOGLE SHEET SERVICE ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDGcUoyB3xAsoI2yOURbEjbsEmiM7-dZgvvvTqEuXxu86gYC-JyvBV8G2z9JpEhYcR2g/exec";
+
+    async function saveQuizToSheet(quizData) {
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-cache',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8',
+          },
+          body: JSON.stringify(quizData),
+        });
+        const textResponse = await response.text();
+        return JSON.parse(textResponse);
+      } catch (error) {
+        console.error('Error saving quiz:', error);
+        return { status: 'error', uniqueID: '' };
+      }
+    }
+
+    async function searchQuizzesInSheet(query) {
+      try {
+        const response = await fetch(`${SCRIPT_URL}?topic=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error searching quizzes:', error);
+        return [];
+      }
+    }
+
+    async function getQuizByIdFromSheet(id) {
+      try {
+        const response = await fetch(`${SCRIPT_URL}?id=${encodeURIComponent(id)}`);
+        const data = await response.json();
+        if (data.error) {
+            console.error(data.error);
+            return null;
+        }
+        return data;
+      } catch (error) {
+        console.error('Error fetching quiz by ID:', error);
+        return null;
+      }
+    }
 
     // --- UI & SCREEN MANAGEMENT ---
     function showLoading(text) { elements.loadingText.textContent = text; elements.loadingOverlay.classList.remove('hidden'); }
@@ -1788,6 +2261,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             lobby: elements.lobbyContainer,
             mpPlayer: elements.multiplayerQuizPlayerContainer,
             mpResults: elements.multiplayerResultsContainer,
+            search: elements.searchContainer,
         };
 
         const isQuizScreen = screenName === 'player' || screenName === 'mpPlayer';
@@ -1828,7 +2302,7 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         const screenName = window.location.hash.substring(1);
 
         // All possible screens must have a corresponding container element
-        const allScreens = ['modeSelection', 'multiplayerSelection', 'manualGenerator', 'paste', 'player', 'results', 'joinRoom', 'configureRoom', 'lobby', 'mpPlayer', 'mpResults'];
+        const allScreens = ['modeSelection', 'multiplayerSelection', 'manualGenerator', 'paste', 'player', 'results', 'joinRoom', 'configureRoom', 'lobby', 'mpPlayer', 'mpResults', 'search'];
 
         if (!screenName || !allScreens.includes(screenName)) {
             _displayScreen('modeSelection');
@@ -1928,6 +2402,13 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             // --- Navigation and Mode Selection ---
             if (effectiveId === 'select-single-player-btn') { gameMode = 'singlePlayer'; showScreen('manualGenerator'); return; }
             if (effectiveId === 'select-multiplayer-btn') { gameMode = 'multiplayer'; showScreen('multiplayerSelection'); return; }
+            if (effectiveId === 'search-practice-btn') { showScreen('search'); return; }
+            if (effectiveId === 'perform-search-btn') { handlePerformSearch(); return; }
+            if (target.closest('.search-result-item')) {
+                const quizId = target.closest('.search-result-item').dataset.id;
+                if (quizId) handleStartQuizFromSearch(quizId);
+                return;
+            }
             if (target.classList.contains('back-to-mode-selection-btn')) { showScreen('modeSelection'); return; }
             if (target.classList.contains('back-to-multiplayer-selection-btn')) { showScreen('multiplayerSelection'); return; }
             if (target.classList.contains('back-to-creation-selection-btn')) { showCreationSelector(); return; }
@@ -2016,7 +2497,15 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             if (effectiveId === 'bookmark-btn') { handleBookmark(); return; }
 
             // --- Results Screen Actions ---
-            if (effectiveId === 'share-pdf-btn') { generatePDF(); return; }
+            
+    if (effectiveId === 'start-new-practice-btn') {
+        localStorage.clear();
+        sessionStorage.clear();
+        if (dbHelper && dbHelper.clear) { dbHelper.clear(); } // clear IndexedDB if used
+        location.href = window.location.origin + window.location.pathname; // reload home page
+        return;
+    }
+    if (effectiveId === 'share-pdf-btn') { generatePDF(); return; }
             if (effectiveId === 'copy-bookmarks-btn') { copyQuizContent(true); return; }
             if (effectiveId === 'copy-all-btn') { copyQuizContent(false); return; }
             if (effectiveId === 'share-whatsapp-btn') { shareOnWhatsApp(); return; }
@@ -2897,8 +3386,8 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         });
     }
 
-    async function saveQuizState() { if (quizData.length === 0 || elements.quizPlayerContainer.classList.contains('hidden')) { await dbHelper.set(QUIZ_STATE_KEY, null); return; } const state = { originalQuizData, userAnswers, currentQuestionIndex, bookmarkedQuestions: Array.from(bookmarkedQuestions), quizStartTime: quizStartTime.toISOString(), quizMetaData: quizMetaData }; await dbHelper.set(QUIZ_STATE_KEY, state); }
-    async function loadQuizState() { const state = await dbHelper.get(QUIZ_STATE_KEY); if (!state) return false; try { originalQuizData = state.originalQuizData; quizData = JSON.parse(JSON.stringify(originalQuizData)); userAnswers = state.userAnswers; currentQuestionIndex = state.currentQuestionIndex; bookmarkedQuestions = new Set(state.bookmarkedQuestions); quizStartTime = new Date(state.quizStartTime); quizMetaData = state.quizMetaData || {}; _displayScreen('player'); loadQuestion(currentQuestionIndex); showPasteNotification('✅ Your active assessment has been restored.'); return true; } catch (e) { console.error("Failed to load state:", e); await dbHelper.set(QUIZ_STATE_KEY, null); return false; } }
+    async function saveQuizState() { if (quizData.length === 0 || elements.quizPlayerContainer.classList.contains('hidden')) { await dbHelper.set(QUIZ_STATE_KEY, null); return; } const state = { originalQuizData, userAnswers, currentQuestionIndex, bookmarkedQuestions: Array.from(bookmarkedQuestions), quizStartTime: quizStartTime.toISOString(), quizMetaData: quizMetaData, creationWorkflow: creationWorkflow }; await dbHelper.set(QUIZ_STATE_KEY, state); }
+    async function loadQuizState() { const state = await dbHelper.get(QUIZ_STATE_KEY); if (!state) return false; try { originalQuizData = state.originalQuizData; quizData = JSON.parse(JSON.stringify(originalQuizData)); userAnswers = state.userAnswers; currentQuestionIndex = state.currentQuestionIndex; bookmarkedQuestions = new Set(state.bookmarkedQuestions); quizStartTime = new Date(state.quizStartTime); quizMetaData = state.quizMetaData || {}; creationWorkflow = state.creationWorkflow || null; _displayScreen('player'); loadQuestion(currentQuestionIndex); showPasteNotification('✅ Your active assessment has been restored.'); return true; } catch (e) { console.error("Failed to load state:", e); await dbHelper.set(QUIZ_STATE_KEY, null); return false; } }
     
     function setupPasteScreen() {
         const tryAutoPaste = async () => {
@@ -2952,11 +3441,16 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     
     // --- UPDATED PROMPT GENERATION FUNCTION ---
     function generatePrompt(source, sourceType) {
+        creationWorkflow = sourceType; // MODIFIED: Track the workflow
+        isFromSearchPractice = false; // Reset flag for new quizzes
         const { numQuestions, topic, subject, difficulty, language, formatKey, exam, sourceText } = source;
 
         if (sourceType === 'topic' && !topic) { alert('Please enter a Primary Topic.'); return null; }
         if ((sourceType !== 'topic' && !sourceText) || !numQuestions) { alert('Please ensure you have provided source material and the number of questions.'); return null; }
         if (!exam) { alert("Please select a target exam before generating questions."); return null; }
+        
+        // MODIFIED: Store the final exam name
+        quizMetaData.examName = exam;
         
         let sampleFormat = "";
         switch (formatKey) {
@@ -3319,7 +3813,7 @@ Now, generate the questions based on all the instructions above.`;
     }
 
     async function restartQuiz() { clearFormState(); await dbHelper.clear(); window.location.hash = ''; }
-    async function handleHardReset() { elements.mainContainer.classList.add('fade-out-and-shrink'); showLoading("Deleting all data and returning home..."); localStorage.clear(); sessionStorage.clear(); await dbHelper.clear(); if (gameMode === 'multiplayer' && currentRoomCode && window.firebase) { const { db, ref, remove } = window.firebase; const roomRef = ref(db, `rooms/${currentRoomCode}`); try { if (isHost) { await remove(roomRef); } else if(currentPlayerId) { await remove(ref(db, `rooms/${currentRoomCode}/players/${currentPlayerId}`)); } } catch (error) { console.error("Firebase deletion failed:", error); } } setTimeout(() => { window.location.href = window.location.pathname; }, 1000); }
+    async function handleHardReset() { isFromSearchPractice = false; elements.mainContainer.classList.add('fade-out-and-shrink'); showLoading("Deleting all data and returning home..."); localStorage.clear(); sessionStorage.clear(); await dbHelper.clear(); if (gameMode === 'multiplayer' && currentRoomCode && window.firebase) { const { db, ref, remove } = window.firebase; const roomRef = ref(db, `rooms/${currentRoomCode}`); try { if (isHost) { await remove(roomRef); } else if(currentPlayerId) { await remove(ref(db, `rooms/${currentRoomCode}/players/${currentPlayerId}`)); } } catch (error) { console.error("Firebase deletion failed:", error); } } setTimeout(() => { window.location.href = window.location.pathname; }, 1000); }
     function getFullQuizContent(bookmarksOnly) { let text = `🏆 EXAMYATRI Assessment Results 🏆\n\n`; const totalQuestions = originalQuizData.length; const correctCount = userAnswers.filter(ans => ans.isCorrect).length; const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0; const timeDiff = Math.round(((new Date()) - quizStartTime) / 1000); const timeTaken = `${String(Math.floor(timeDiff / 60)).padStart(2, '0')}:${String(timeDiff % 60).padStart(2, '0')}`; text += `Final Score: ${correctCount} / ${totalQuestions} (${percentage.toFixed(1)}%)\n`; text += `Time Taken: ${timeTaken}\n\n`; text += '------------------------------------\n\n'; const questionsToProcess = originalQuizData.map((q, i) => ({ ...q, originalIndex: i })).filter(q => !bookmarksOnly || bookmarkedQuestions.has(q.originalIndex)); if (questionsToProcess.length === 0) return null; questionsToProcess.forEach(q => { const userAnswer = userAnswers[q.originalIndex]; text += `Q${q.originalIndex + 1}: ${q.question.replace(/<br>/g, '\n')}\n\n`; if (q.statements && q.statements.length > 0) { q.statements.forEach(stmt => { text += `• ${stmt}\n`; }); text += '\n'; } q.options.forEach((opt, oi) => { text += `${String.fromCharCode(97 + oi)}) ${opt.replace(/<[^>]*>/g, '')}\n`; }); text += `\nCorrect Answer: ${String.fromCharCode(97 + q.correctAnswerIndex)})\n`; if (userAnswer.status === 'answered') { text += `Your Answer: ${String.fromCharCode(97 + userAnswer.selected)}) - ${userAnswer.isCorrect ? 'Correct' : 'Incorrect'}\n`; } else { text += `Your Answer: Skipped\n`; } text += `\nExplanation:\n${q.explanation}\n\n`; text += '------------------------------------\n\n'; }); return text; }
     function copyQuizContent(bookmarksOnly) { const fullTextToCopy = getFullQuizContent(bookmarksOnly); if (!fullTextToCopy) { showPasteNotification(`🤔 No ${bookmarksOnly ? 'bookmarked ' : ''}questions to copy!`); return; } copyTextToClipboard(fullTextToCopy).then(() => showPasteNotification(`✅ Summary & ${bookmarksOnly ? 'bookmarked ' : 'all '}questions copied!`)); }
     function copyTextToClipboard(text) { return new Promise((resolve, reject) => { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(resolve).catch(err => { console.warn('Modern clipboard API failed, falling back.', err); legacyCopy(reject); }); } else { legacyCopy(reject); } function legacyCopy(onFail) { const textArea = document.createElement("textarea"); textArea.value = text; textArea.style.position = "fixed"; textArea.style.top = "-9999px"; document.body.appendChild(textArea); textArea.focus(); textArea.select(); try { document.execCommand('copy') ? resolve() : onFail(new Error('Legacy copy command failed.')); } catch (err) { console.error('Legacy copy failed.', err); onFail(err); } finally { document.body.removeChild(textArea); } } }).catch(() => { showManualCopyModal(text); throw new Error("Manual intervention required for copy."); }); }
@@ -3443,7 +3937,106 @@ Now, generate the questions based on all the instructions above.`;
     function selectOption(index){ if(userAnswers[currentQuestionIndex].status==='answered')return; optionClickSound.play(); selectedOptionIndex=index; document.querySelectorAll('.option').forEach((opt,i)=>opt.classList.toggle('selected',i===index)); const checkBtn = document.getElementById('check-answer-btn'); if(checkBtn) checkBtn.disabled=false; }
     function checkAnswer(){ if (selectedOptionIndex === null) return; const question=originalQuizData[currentQuestionIndex];const isCorrect=selectedOptionIndex===question.correctAnswerIndex;userAnswers[currentQuestionIndex]={selected:selectedOptionIndex,isCorrect:isCorrect,status:'answered'}; const pressureTextEl = document.getElementById('pressure-text-animation');if(pressureTextEl) pressureTextEl.classList.add('hidden');document.getElementById('pressure-mode-toggle-btn').classList.remove('hidden'); if(isCorrect) triggerCongratsAnimation(); else showSadReaction(); updateQuestionUI(originalQuizData[currentQuestionIndex]); updateOptionsAndExplanationState(); updateQuizActions(); if (window.MathJax) MathJax.typesetPromise([elements.quizPlayerContainer]); }
     function animateCountUp(el, end, duration = 1000) { let start = 0; const final = parseInt(end, 10); if (isNaN(final)) { el.textContent = end; return; } let startTimestamp = null; const step = (timestamp) => { if (!startTimestamp) startTimestamp = timestamp; const progress = Math.min((timestamp - startTimestamp) / duration, 1); el.textContent = Math.floor(progress * (final - start) + start); if (progress < 1) window.requestAnimationFrame(step); }; window.requestAnimationFrame(step); }
-    function showResults(){ showScreen('results'); if(timerId) clearInterval(timerId); const totalQuestions = originalQuizData.length; const correctCount = userAnswers.filter(ans => ans.isCorrect).length; const incorrectCount = userAnswers.filter(ans => ans.status === 'answered' && !ans.isCorrect).length; const skippedCount = totalQuestions - correctCount - incorrectCount; const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0; let remark=percentage>=90?"Excellent!":percentage>=75?"Great Job!":percentage>=50?"Good Effort!":"Needs Improvement"; const timeDiff=Math.round(((new Date())-quizStartTime)/1000); const timeTaken=`${String(Math.floor(timeDiff/60)).padStart(2,'0')}:${String(timeDiff%60).padStart(2,'0')}`; elements.scoreSummary.textContent=`You scored ${correctCount} out of ${totalQuestions}!`; setTimeout(() => { elements.scoreSummary.classList.add('visible'); }, 100); elements.scorePerformanceChartContainer.innerHTML = ''; elements.quizSummaryDetails.innerHTML=` <div class="summary-item"> <span class="summary-label">Status</span> <span class="summary-value remark">${remark}</span> </div> <div class="summary-item"> <span class="summary-label">Final Score</span> <span class="summary-value">${percentage.toFixed(1)}%</span> </div> <div class="summary-item"> <span class="summary-label">Correct Answers</span> <span class="summary-value" style="color: var(--correct-color);">${correctCount} / ${totalQuestions}</span> </div> <div class="summary-item"> <span class="summary-label">Incorrect Answers</span> <span class="summary-value" style="color: var(--incorrect-color);">${incorrectCount}</span> </div> <div class="summary-item"> <span class="summary-label">Skipped Questions</span> <span class="summary-value" style="color: var(--skipped-color);">${skippedCount}</span> </div> <div class="summary-item"> <span class="summary-label">Time Taken</span> <span class="summary-value">${timeTaken}</span> </div>`; document.querySelectorAll('.count-up').forEach(el => animateCountUp(el, el.dataset.value)); elements.resultsReview.innerHTML=originalQuizData.map((q,i)=>{const answer=userAnswers[i];const optionsHtml=q.options.map((opt,oi)=>{let classes='result-option';if(answer.status==='answered'&&oi===answer.selected)classes+=' user-selected';if(oi===q.correctAnswerIndex)classes+=' correct-answer';return`<li class="${classes}">${opt}</li>`}).join('');return`<div class="result-item"><p class="result-question"><strong>Q${i + 1}:</strong> ${q.question.replace(/<[^>]*>/g, '')}<span class="bookmark-indicator ${bookmarkedQuestions.has(i)?'visible':''}">⭐</span></p><ul class="result-options-list">${optionsHtml}</ul><div class="result-explanation"><h5>Explanation</h5><p>${q.explanation}</p></div></div>`}).join(''); if (window.MathJax) MathJax.typesetPromise([elements.resultsScreen]); }
+    
+    function showResults(){
+        showScreen('results');
+        if(timerId) clearInterval(timerId);
+
+        // --- MODIFIED: Google Sheet Save Logic ---
+        const saveStatusContainer = elements.saveStatusContainer;
+        
+        // Only save if it's from the 'topic' workflow and not a re-practice session
+        if (creationWorkflow === 'topic' && !isFromSearchPractice) {
+            saveStatusContainer.innerHTML = `<p style="color: var(--accent-color);">Saving quiz to your backup... ⏳</p>`;
+            
+            const quizToSave = {
+                uniqueID: `quiz_${Date.now()}`, // Fallback ID
+                timestamp: new Date().toISOString(),
+                examName: quizMetaData.examName || "General",
+                topic: quizMetaData.topic || "General Topic",
+                questions: originalQuizData,
+            };
+
+            // Save in the background
+            saveQuizToSheet(quizToSave).then(response => { if (response.status === 'success' && response.uniqueID) { const backupId = response.uniqueID;
+                    try { localStorage.setItem('lastBackupId', backupId); } catch(e) { /* ignore */ }
+                    if (typeof dbHelper !== 'undefined' && dbHelper && dbHelper.set) { try { dbHelper.set('lastBackupId', backupId); } catch(e) { /* ignore */ } }
+                    showQuizSavedNotification();
+                    saveStatusContainer.innerHTML = `<p style=\"color: var(--correct-color); font-weight: bold;\">✅ Quiz saved successfully!</p>`; } else {
+                    saveStatusContainer.innerHTML = `<p style="color: var(--incorrect-color);">❌ Error: Could not save your quiz to the backup.</p>`;
+                }
+            });
+        } else if (isFromSearchPractice) {
+             saveStatusContainer.innerHTML = `<p style="color: var(--text-color);">This was a practice session. Results were not saved again.</p>`;
+        } else {
+            saveStatusContainer.innerHTML = `<p style="color: var(--text-color);">This quiz was not saved automatically. Only quizzes from the 'Generate from Topic' workflow are saved.</p>`;
+        }
+        // --- End of Save Logic ---
+
+        const totalQuestions = originalQuizData.length;
+        const correctCount = userAnswers.filter(ans => ans.isCorrect).length;
+        const incorrectCount = userAnswers.filter(ans => ans.status === 'answered' && !ans.isCorrect).length;
+        const skippedCount = totalQuestions - correctCount - incorrectCount;
+        const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
+        let remark=percentage>=90?"Excellent!":percentage>=75?"Great Job!":percentage>=50?"Good Effort!":"Needs Improvement";
+        const timeDiff=Math.round(((new Date())-quizStartTime)/1000);
+        const timeTaken=`${String(Math.floor(timeDiff/60)).padStart(2,'0')}:${String(timeDiff%60).padStart(2,'0')}`;
+        elements.scoreSummary.textContent=`You scored ${correctCount} out of ${totalQuestions}!`;
+        setTimeout(() => { elements.scoreSummary.classList.add('visible'); }, 100);
+        elements.scorePerformanceChartContainer.innerHTML = ''; // Chart logic can be re-added here if needed
+        elements.quizSummaryDetails.innerHTML=` <div class="summary-item"> <span class="summary-label">Status</span> <span class="summary-value remark">${remark}</span> </div> <div class="summary-item"> <span class="summary-label">Final Score</span> <span class="summary-value">${percentage.toFixed(1)}%</span> </div> <div class="summary-item"> <span class="summary-label">Correct Answers</span> <span class="summary-value" style="color: var(--correct-color);">${correctCount} / ${totalQuestions}</span> </div> <div class="summary-item"> <span class="summary-label">Incorrect Answers</span> <span class="summary-value" style="color: var(--incorrect-color);">${incorrectCount}</span> </div> <div class="summary-item"> <span class="summary-label">Skipped Questions</span> <span class="summary-value" style="color: var(--skipped-color);">${skippedCount}</span> </div> <div class="summary-item"> <span class="summary-label">Time Taken</span> <span class="summary-value">${timeTaken}</span> </div>`;
+        document.querySelectorAll('.count-up').forEach(el => animateCountUp(el, el.dataset.value));
+        elements.resultsReview.innerHTML=originalQuizData.map((q,i)=>{const answer=userAnswers[i];const optionsHtml=q.options.map((opt,oi)=>{let classes='result-option';if(answer.status==='answered'&&oi===answer.selected)classes+=' user-selected';if(oi===q.correctAnswerIndex)classes+=' correct-answer';return`<li class="${classes}">${opt}</li>`}).join('');return`<div class="result-item"><p class="result-question"><strong>Q${i + 1}:</strong> ${q.question.replace(/<[^>]*>/g, '')}<span class="bookmark-indicator ${bookmarkedQuestions.has(i)?'visible':''}">⭐</span></p><ul class="result-options-list">${optionsHtml}</ul><div class="result-explanation"><h5>Explanation</h5><p>${q.explanation}</p></div></div>`}).join('');
+        if (window.MathJax) MathJax.typesetPromise([elements.resultsScreen]);
+    }
+
+    // --- NEW: Search & Practice Logic ---
+    async function handlePerformSearch() {
+        const query = elements.searchInput.value.trim();
+        if (!query) {
+            alert("Please enter a topic or Backup ID to search.");
+            return;
+        }
+        showLoading("Searching...");
+        const results = await searchQuizzesInSheet(query);
+        hideLoading();
+        displaySearchResults(results);
+    }
+
+    function displaySearchResults(results) {
+        elements.searchResultsContainer.innerHTML = '';
+        if (!results || results.length === 0) {
+            elements.searchResultsContainer.innerHTML = `<p style="text-align: center; color: var(--text-color); opacity: 0.8;">No quizzes found for your search term.</p>`;
+            return;
+        }
+        results.forEach(result => {
+            const item = document.createElement('div');
+            item.className = 'search-result-item';
+            item.dataset.id = result.uniqueID;
+            item.innerHTML = `
+                <h4>${result.topic}</h4>
+                <p>${result.examName} - ${result.questionCount} Questions</p>
+                <p style="font-size: 0.8em; opacity: 0.6; margin-top: 4px;">ID: ${result.uniqueID}</p>
+            `;
+            elements.searchResultsContainer.appendChild(item);
+        });
+    }
+
+    async function handleStartQuizFromSearch(quizId) {
+        showLoading("Loading quiz from backup...");
+        const fetchedQuiz = await getQuizByIdFromSheet(quizId);
+        hideLoading();
+
+        if (fetchedQuiz && fetchedQuiz.questions) {
+            isFromSearchPractice = true;
+            quizData = fetchedQuiz.questions;
+            quizMetaData = { topic: fetchedQuiz.topic || "Practice", subject: fetchedQuiz.examName || "" };
+            startQuiz();
+        } else {
+            alert("Error: Could not load the selected quiz. It might have been deleted or there was a network issue.");
+        }
+    }
+
 
     // --- NEW: DYNAMIC PROMPT BUILDER LOGIC ---
     function setupDynamicPromptBuilder() {
@@ -3527,8 +4120,28 @@ Now, generate the questions based on all the instructions above.`;
         addRow();
     }
 });
+
+// ✅ Show notification instead of displaying Quiz ID
+function showQuizSavedNotification() {
+    const note = document.createElement('div');
+    note.textContent = "✅ Quiz successfully saved to Google Sheet!";
+    note.style.position = "fixed";
+    note.style.bottom = "20px";
+    note.style.left = "50%";
+    note.style.transform = "translateX(-50%)";
+    note.style.backgroundColor = "#28a745";
+    note.style.color = "#fff";
+    note.style.padding = "12px 20px";
+    note.style.borderRadius = "8px";
+    note.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+    note.style.fontWeight = "bold";
+    note.style.zIndex = "99999";
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+}
+
 </script>
-  <!-- Visitor Counter Start -->
+<!-- Visitor Counter Start -->
 <div id="visitor-count" 
      style="position:fixed; 
             bottom:0; 
@@ -3552,5 +4165,26 @@ Now, generate the questions based on all the instructions above.`;
   
 </div>
 <!-- Visitor Counter End -->
+<script type="module" src="/index.tsx">
+// ✅ Show notification instead of displaying Quiz ID
+function showQuizSavedNotification() {
+    const note = document.createElement('div');
+    note.textContent = "✅ Quiz successfully saved to Google Sheet!";
+    note.style.position = "fixed";
+    note.style.bottom = "20px";
+    note.style.left = "50%";
+    note.style.transform = "translateX(-50%)";
+    note.style.backgroundColor = "#28a745";
+    note.style.color = "#fff";
+    note.style.padding = "12px 20px";
+    note.style.borderRadius = "8px";
+    note.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+    note.style.fontWeight = "bold";
+    note.style.zIndex = "99999";
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+}
+
+</script>
 </body>
 </html>
