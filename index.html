@@ -3552,6 +3552,13 @@ Now, generate the questions based on all the instructions above.`;
     }
 
     function generateTopicPrompt() {
+    // --- PATCH: persist workflow lock ---
+    try {
+        creationWorkflow = 'topic';
+        localStorage.setItem('workflowLock','topic');
+        isFromSearchPractice = false;
+    } catch(e) {}
+    
         quizMetaData = { topic: document.getElementById('prompt-topic').value.trim(), subject: document.getElementById('prompt-subject-topic').value.trim() };
         const otherExamInput = elements.topicGeneratorWorkflow.querySelector('.prompt-exam-other');
         const finalExam = (selectedExam === 'Other') ? otherExamInput.value.trim() : selectedExam;
@@ -3946,7 +3953,8 @@ Now, generate the questions based on all the instructions above.`;
         const saveStatusContainer = elements.saveStatusContainer;
         
         // Only save if it's from the 'topic' workflow and not a re-practice session
-        if (creationWorkflow === 'topic' && !isFromSearchPractice) {
+        let wf = (creationWorkflow || localStorage.getItem('workflowLock') || '').toString().toLowerCase();
+        if (wf === 'topic' && !isFromSearchPractice) {
             saveStatusContainer.innerHTML = `<p style="color: var(--accent-color);">Saving quiz to your backup... ⏳</p>`;
             
             const quizToSave = {
@@ -4185,6 +4193,145 @@ function showQuizSavedNotification() {
     setTimeout(() => note.remove(), 4000);
 }
 
+
+// --- PATCH: flush pending backups on load ---
+async function flushPendingBackups() {
+  try {
+    const pending = JSON.parse(localStorage.getItem('pendingBackups')||'[]');
+    if(!pending.length) return;
+    const remain=[];
+    for(const q of pending){
+      try{
+        const r=await saveQuizToSheet(q);
+        if(!(r&&r.status==='success'&&r.uniqueID)) remain.push(q);
+      }catch(e){remain.push(q);}
+    }
+    localStorage.setItem('pendingBackups',JSON.stringify(remain));
+  }catch(e){}
+}
+window.addEventListener('load',()=>{setTimeout(flushPendingBackups,1500);});
 </script>
+
+<!-- START: ExamYatri - Device Back & Start New Practice Reset Patch -->
+<script>
+(function(){
+    if (window.__examyatriResetPatchApplied) return;
+    window.__examyatriResetPatchApplied = true;
+
+    // Backup originals if present
+    const origShowScreen = window.showScreen;
+    const origHandleHashChange = window.handleHashChange;
+    const origRestartQuiz = window.restartQuiz;
+
+    // State flags
+    window._examyatriProgrammaticHashChange = false;
+    window._examyatriLastHash = window.location.hash || '';
+
+    // Helper: set programmatic flag briefly
+    function markProgrammatic() {
+        try { window._examyatriProgrammaticHashChange = true; } catch(e){}
+        // Clear after a short tick (enough for hashchange to fire)
+        setTimeout(() => { try { window._examyatriProgrammaticHashChange = false; } catch(e){} }, 60);
+    }
+
+    // Wrap showScreen so internal navigation does not get treated as a "device back" press
+    window.showScreen = function(screenName){
+        markProgrammatic();
+        if (typeof origShowScreen === 'function') {
+            try { origShowScreen(screenName); return; } catch(e){ /* fallthrough */ }
+        }
+        // fallback: a safe hash change
+        try {
+            const newHash = '#' + (screenName || '');
+            if (window.location.hash !== newHash) {
+                window.location.hash = newHash;
+            } else if (window._displayScreen) {
+                window._displayScreen(screenName || 'modeSelection');
+            }
+        } catch(e){}
+    };
+
+    // Override restartQuiz to clear DB and navigate home via showScreen (preserves workflows)
+    window.restartQuiz = async function(){
+        try { if (typeof clearFormState === 'function') clearFormState(); } catch(e){}
+        try { if (window.dbHelper && typeof window.dbHelper.clear === 'function') await window.dbHelper.clear(); } catch(e){}
+        // Use showScreen so programmatic flag is set and routing stays consistent
+        try { window.showScreen('modeSelection'); } catch(e){ try { window.location.href = window.location.origin + window.location.pathname; } catch(e){} }
+    };
+
+    // Remove original hashchange listener (if it was attached) to avoid duplicate handling
+    try {
+        if (typeof origHandleHashChange === 'function') {
+            window.removeEventListener('hashchange', origHandleHashChange);
+        }
+    } catch(e){}
+
+    // New router wrapper: if user navigates away from #results using non-programmatic navigation (device/back), perform full reset
+    window.handleHashChange = function(ev){
+        try {
+            const prevHash = (ev && ev.oldURL) ? new URL(ev.oldURL).hash : (window._examyatriLastHash || '');
+            const currHash = window.location.hash || '';
+
+            // If coming FROM results and the change was NOT programmatic -> treat as device back and FULL reset
+            if (prevHash === '#results' && currHash !== prevHash && !window._examyatriProgrammaticHashChange) {
+                try {
+                    // call the existing comprehensive reset if available
+                    if (typeof fullResetAndRedirect === 'function') {
+                        fullResetAndRedirect();
+                        return;
+                    }
+                } catch(e){}
+                // fallback (best-effort) clear + redirect to homepage
+                try { localStorage.clear(); } catch(e){}
+                try { sessionStorage.clear(); } catch(e){}
+                // best-effort delete cookies (simple variant)
+                try { document.cookie.split(';').forEach(c => { document.cookie = c.replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/'); }); } catch(e){}
+                try { window.location.href = window.location.origin + window.location.pathname; } catch(e){}
+                return;
+            }
+        } catch(err) {
+            console.warn('Examyatri: handleHashChange wrapper error', err);
+        }
+
+        // Otherwise delegate to original router
+        try {
+            if (typeof origHandleHashChange === 'function') {
+                return origHandleHashChange(ev);
+            }
+        } catch(e){}
+        // Final fallback: simple router
+        try {
+            const screenName = window.location.hash.substring(1);
+            if (!screenName) {
+                if (window._displayScreen) return window._displayScreen('modeSelection');
+                return;
+            }
+            if (window._displayScreen) return window._displayScreen(screenName);
+        } catch(e){}
+    };
+
+    // Track last hash for use when handleHashChange is invoked without event (initial load)
+    try { window._examyatriLastHash = window.location.hash || ''; } catch(e){}
+
+    // Attach our router listener (after removing old one above)
+    try {
+        window.addEventListener('hashchange', window.handleHashChange);
+    } catch(e){}
+
+    // Safety: if fullResetAndRedirect is missing, create a minimal one (keeps original behavior intact if the real one exists)
+    if (typeof fullResetAndRedirect !== 'function') {
+        window.fullResetAndRedirect = function(redirectUrl) {
+            redirectUrl = redirectUrl || (window.location.origin + window.location.pathname);
+            try { localStorage.clear(); } catch(e){}
+            try { sessionStorage.clear(); } catch(e){}
+            try { document.cookie.split(';').forEach(c => { document.cookie = c.replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/'); }); } catch(e){}
+            try { window.location.replace(redirectUrl); } catch(e) { window.location.href = redirectUrl; }
+        };
+    }
+
+})();
+</script>
+<!-- END: ExamYatri - Device Back & Start New Practice Reset Patch -->
+
 </body>
 </html>
