@@ -3551,7 +3551,65 @@ Now, generate the questions based on all the instructions above.`;
         promptForGemini = null; // Clear the prompt after use
     }
 
-    function generateTopicPrompt() {
+    
+// --- Persistence helper: exam/topic priority handling ---
+// Priority when reading:
+// 1) localStorage (keys: savedExamName, savedTopicName)
+// 2) quizMetaData and page inputs
+// 3) fallback to 'general' / 'general topic'
+function _getExamAndTopicFromPriority() {
+    // 1) localStorage
+    try {
+        const lsExam = localStorage.getItem('savedExamName');
+        const lsTopic = localStorage.getItem('savedTopicName');
+        if (lsExam && lsExam.trim()) {
+            return { exam: lsExam.trim(), topic: (lsTopic && lsTopic.trim()) ? lsTopic.trim() : 'general topic' };
+        }
+    } catch(e) { /* ignore localStorage errors */ }
+
+    // 2) metadata / inputs
+    try {
+        if (typeof quizMetaData !== 'undefined' && quizMetaData) {
+            const qExam = quizMetaData.exam || quizMetaData.examName || '';
+            const qTopic = quizMetaData.topic || quizMetaData.subject || '';
+            if (qExam && String(qExam).trim()) {
+                return { exam: String(qExam).trim(), topic: (qTopic && String(qTopic).trim()) ? String(qTopic).trim() : 'general topic' };
+            }
+        }
+        // Try common input/select elements
+        const oth = document.querySelector('.prompt-exam-other');
+        if (oth && oth.value && oth.value.trim()) {
+            const tEl = document.getElementById('prompt-topic') || document.getElementById('prompt-topic-pdf') || document.querySelector('[data-type="topic"]');
+            const tVal = (tEl && tEl.value && tEl.value.trim()) ? tEl.value.trim() : 'general topic';
+            return { exam: oth.value.trim(), topic: tVal };
+        }
+        const selBtn = document.querySelector('.exam-btn.active');
+        if (selBtn) {
+            const dv = selBtn.dataset && selBtn.dataset.value ? selBtn.dataset.value : selBtn.innerText;
+            const tEl = document.getElementById('prompt-topic') || document.getElementById('prompt-topic-pdf') || document.querySelector('[data-type="topic"]');
+            const tVal = (tEl && tEl.value && tEl.value.trim()) ? tEl.value.trim() : 'general topic';
+            if (dv && dv.trim()) return { exam: dv.trim(), topic: tVal };
+        }
+        const selectEl = document.querySelector('select[id^="prompt-exam"]') || document.querySelector('select[name*="exam"]') || document.getElementById('prompt-exam-select');
+        if (selectEl && selectEl.value && selectEl.value.trim()) {
+            const tEl = document.getElementById('prompt-topic') || document.getElementById('prompt-topic-pdf') || document.querySelector('[data-type="topic"]');
+            const tVal = (tEl && tEl.value && tEl.value.trim()) ? tEl.value.trim() : 'general topic';
+            return { exam: selectEl.value.trim(), topic: tVal };
+        }
+    } catch(e) { console.warn('Error detecting exam/topic from inputs', e); }
+
+    // 3) Fallback
+    return { exam: 'general', topic: 'general topic' };
+}
+
+// Save exam/topic immediately (used during generation)
+function _saveExamAndTopicToLocalStorage(exam, topic) {
+    try {
+        if (exam && exam.trim()) localStorage.setItem('savedExamName', exam.trim());
+        if (topic && topic.trim()) localStorage.setItem('savedTopicName', topic.trim());
+    } catch(e) { /* ignore write errors */ }
+}
+function generateTopicPrompt() {
     // --- PATCH: persist workflow lock ---
     try {
         creationWorkflow = 'topic';
@@ -3562,6 +3620,13 @@ Now, generate the questions based on all the instructions above.`;
         quizMetaData = { topic: document.getElementById('prompt-topic').value.trim(), subject: document.getElementById('prompt-subject-topic').value.trim() };
         const otherExamInput = elements.topicGeneratorWorkflow.querySelector('.prompt-exam-other');
         const finalExam = (selectedExam === 'Other') ? otherExamInput.value.trim() : selectedExam;
+        // Persist exam/topic immediately so they survive refreshes/other-tabs
+        try {
+            const _examToSave = (typeof finalExam !== 'undefined' && finalExam) ? String(finalExam).trim() : ((quizMetaData && quizMetaData.exam) ? String(quizMetaData.exam).trim() : '');
+            const _topicToSave = (quizMetaData && quizMetaData.topic) ? String(quizMetaData.topic).trim() : (document.getElementById('prompt-topic') && document.getElementById('prompt-topic').value ? document.getElementById('prompt-topic').value.trim() : '');
+            _saveExamAndTopicToLocalStorage(_examToSave || 'general', _topicToSave || 'general topic');
+        } catch(e) { /* ignore */ }
+
         const source = { numQuestions: document.getElementById('prompt-num-questions-topic').value || 5, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-topic').value, language: document.getElementById('prompt-language-topic').value, formatKey: document.getElementById('question-format-select-topic').value, exam: finalExam };
         generatePrompt(source, 'topic');
     }
@@ -3603,6 +3668,13 @@ Now, generate the questions based on all the instructions above.`;
         quizMetaData = { topic: 'Custom Mock Test', subject: 'Mixed' };
         const otherExamInput = elements.textGeneratorWorkflow.querySelector('.prompt-exam-other');
         const finalExam = (selectedExam === 'Other') ? otherExamInput.value.trim() : selectedExam;
+        // Persist exam/topic immediately so they survive refreshes/other-tabs
+        try {
+            const _examToSave = (typeof finalExam !== 'undefined' && finalExam) ? String(finalExam).trim() : ((quizMetaData && quizMetaData.exam) ? String(quizMetaData.exam).trim() : '');
+            const _topicToSave = (quizMetaData && quizMetaData.topic) ? String(quizMetaData.topic).trim() : (document.getElementById('prompt-topic') && document.getElementById('prompt-topic').value ? document.getElementById('prompt-topic').value.trim() : '');
+            _saveExamAndTopicToLocalStorage(_examToSave || 'general', _topicToSave || 'general topic');
+        } catch(e) { /* ignore */ }
+
 
         const source = { 
             numQuestions: totalQuestions, 
@@ -3621,6 +3693,13 @@ Now, generate the questions based on all the instructions above.`;
         quizMetaData = { topic: document.getElementById('prompt-topic-image').value.trim(), subject: document.getElementById('prompt-subject-image').value.trim() };
         const otherExamInput = elements.imageGeneratorWorkflow.querySelector('.prompt-exam-other');
         const finalExam = (selectedExam === 'Other') ? otherExamInput.value.trim() : selectedExam;
+        // Persist exam/topic immediately so they survive refreshes/other-tabs
+        try {
+            const _examToSave = (typeof finalExam !== 'undefined' && finalExam) ? String(finalExam).trim() : ((quizMetaData && quizMetaData.exam) ? String(quizMetaData.exam).trim() : '');
+            const _topicToSave = (quizMetaData && quizMetaData.topic) ? String(quizMetaData.topic).trim() : (document.getElementById('prompt-topic') && document.getElementById('prompt-topic').value ? document.getElementById('prompt-topic').value.trim() : '');
+            _saveExamAndTopicToLocalStorage(_examToSave || 'general', _topicToSave || 'general topic');
+        } catch(e) { /* ignore */ }
+
         const source = { numQuestions: document.getElementById('prompt-num-questions-image').value, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-image').value, language: document.getElementById('prompt-language-image').value, formatKey: document.getElementById('question-format-select-image').value, exam: finalExam, sourceText: elements.sourceTextImage.value.trim() };
         generatePrompt(source, 'image');
     }
@@ -3629,6 +3708,13 @@ Now, generate the questions based on all the instructions above.`;
         quizMetaData = { topic: document.getElementById('prompt-topic-pdf').value.trim(), subject: document.getElementById('prompt-subject-pdf').value.trim() };
         const otherExamInput = elements.pdfGeneratorWorkflow.querySelector('.prompt-exam-other');
         const finalExam = (selectedExam === 'Other') ? otherExamInput.value.trim() : selectedExam;
+        // Persist exam/topic immediately so they survive refreshes/other-tabs
+        try {
+            const _examToSave = (typeof finalExam !== 'undefined' && finalExam) ? String(finalExam).trim() : ((quizMetaData && quizMetaData.exam) ? String(quizMetaData.exam).trim() : '');
+            const _topicToSave = (quizMetaData && quizMetaData.topic) ? String(quizMetaData.topic).trim() : (document.getElementById('prompt-topic') && document.getElementById('prompt-topic').value ? document.getElementById('prompt-topic').value.trim() : '');
+            _saveExamAndTopicToLocalStorage(_examToSave || 'general', _topicToSave || 'general topic');
+        } catch(e) { /* ignore */ }
+
         const source = { numQuestions: document.getElementById('prompt-num-questions-pdf').value, topic: quizMetaData.topic, subject: quizMetaData.subject, difficulty: document.getElementById('prompt-difficulty-pdf').value, language: document.getElementById('prompt-language-pdf').value, formatKey: document.getElementById('question-format-select-pdf').value, exam: finalExam, sourceText: elements.sourceTextPdf.value.trim() };
         generatePrompt(source, 'pdf');
     }
@@ -3957,11 +4043,12 @@ Now, generate the questions based on all the instructions above.`;
         if (wf === 'topic' && !isFromSearchPractice) {
             saveStatusContainer.innerHTML = `<p style="color: var(--accent-color);">Saving quiz to your backup... ⏳</p>`;
             
+            const _et = _getExamAndTopicFromPriority();
             const quizToSave = {
-                uniqueID: `quiz_${Date.now()}`, // Fallback ID
+                uniqueID: `quiz_${Date.now()}`,
                 timestamp: new Date().toISOString(),
-                examName: quizMetaData.examName || "General",
-                topic: quizMetaData.topic || "General Topic",
+                examName: (_et && _et.exam) ? _et.exam : 'general',
+                topic: (_et && _et.topic) ? _et.topic : 'general topic',
                 questions: originalQuizData,
             };
 
