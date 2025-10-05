@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examyatri - AI-Powered Typing Tutor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #f0f2f5;
+            --secondary-bg: #ffffff;
+            --primary-text: #333333;
+            --secondary-text: #666666;
+            --highlight-text: #000000;
+            --accent-color: #007bff;
+            --accent-hover: #0056b3;
+            --correct-char: #28a745;
+            --incorrect-char: #dc3545;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --font-ui: 'Poppins', sans-serif;
+            --font-english: 'Courier New', Courier, monospace;
+            --font-hindi: 'Tiro Devanagari Hindi', serif;
+        }
+
+        body.theme-dark {
+            --primary-bg: #000000;
+            --secondary-bg: #111111;
+            --primary-text: #ffffff;
+            --secondary-text: #bbbbbb;
+            --highlight-text: #ffffff;
+            --accent-color: #e53935;
+            --accent-hover: #c62828;
+            --correct-char: #00ff7f;
+            --incorrect-char: #dc3545;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 82, 82, 0.3);
+        }
+        
+        body.theme-sepia {
+            --primary-bg: #f4e8d1;
+            --secondary-bg: #fdf6e3;
+            --primary-text: #584b3e;
+            --secondary-text: #6e6053;
+            --highlight-text: #4a3f35;
+            --accent-color: #d33682;
+            --accent-hover: #b32d6f;
+            --correct-char: #859900;
+            --incorrect-char: #dc322f;
+            --glass-bg: rgba(253, 246, 227, 0.7);
+            --glass-border: rgba(88, 75, 62, 0.1);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: calc(16px * var(--font-scale, 1));
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--primary-text);
+            font-family: var(--font-ui);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 1rem;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 0;
+            transition: max-width 0.3s ease-in-out;
+        }
+
+        body.portrait-view .container {
+            max-width: 580px;
+        }
+        
+        header {
+            background: var(--secondary-bg);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: background-color 0.3s;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo { text-decoration: none; color: var(--highlight-text); }
+        .logo h1 { font-size: clamp(1.5rem, 4vw, 1.8rem); }
+        .logo p { font-size: 0.8rem; color: var(--secondary-text); margin-top: -5px; }
+        
+        .settings { display: flex; align-items: center; gap: 0.5rem; }
+        .settings button {
+            background: transparent;
+            color: var(--primary-text);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            padding: 0.3rem 0.8rem;
+            cursor: pointer;
+            font-family: var(--font-ui);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            height: 38px;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .settings button:hover { background-color: var(--glass-border); }
+
+        .settings .font-control { display: flex; gap: 0.25rem; }
+        .settings .font-control button { width: 42px; gap: 0;}
+        
+        #practice-game-btn {
+            animation: fire-glow 2s infinite ease-in-out;
+            border-color: var(--accent-hover);
+            font-weight: 600;
+        }
+
+        @keyframes fire-glow {
+            0%, 100% { box-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color); text-shadow: 0 0 2px var(--highlight-text); }
+            50% { box-shadow: 0 0 10px var(--accent-hover), 0 0 20px var(--accent-hover); text-shadow: 0 0 4px var(--highlight-text); }
+        }
+
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        .view { display: none; }
+        .view.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s, border 0.3s;
+        }
+        
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: var(--accent-color);
+        }
+
+        .setup-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .setup-grid h3 { color: var(--highlight-text); margin-bottom: 1rem; font-size: 1.1rem; }
+        
+        .custom-select {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-bg);
+            color: var(--primary-text);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            font-family: var(--font-ui);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .streak-card { border-left-color: var(--correct-char); margin-top: 1rem; }
+        .streak-card h4 { color: var(--correct-char); margin-bottom: 0.5rem; }
+        .streak-card p { font-size: 0.9rem; text-align: center; }
+        .streak-card .streak { font-weight: bold; font-size: 1.2rem; }
+
+        .cta-button {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            max-width: 600px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .cta-button:hover:not(:disabled) { background-color: var(--accent-hover); }
+        .cta-button:disabled { background-color: var(--secondary-text); cursor: not-allowed; }
+
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .stat-card { padding: 1rem; }
+        .stat-card .value { font-size: clamp(1.8rem, 6vw, 2.5rem); font-weight: 700; color: var(--highlight-text); }
+        .stat-card .label { font-size: 0.9rem; color: var(--secondary-text); }
+
+        .typing-area-wrapper { position: relative; }
+        .typing-area {
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
+            line-height: 1.8;
+            user-select: none;
+            color: var(--secondary-text);
+            height: calc(clamp(1.5rem, 4vw, 1.8rem) * 1.8 * 3); /* 3 lines visible */
+            overflow: hidden;
+            position: relative;
+        }
+        .typing-area.english { font-family: var(--font-english); }
+        .typing-area.hindi { font-family: var(--font-hindi); }
+
+        .typing-text { position: absolute; transition: top 0.2s linear; }
+        
+        .char { display: inline; }
+        .char.correct { color: var(--correct-char); }
+        .char.incorrect { background-color: var(--incorrect-char); color: #ffffff; border-radius: 3px; }
+        .char.current { background-color: var(--primary-text); color: var(--primary-bg); border-radius: 3px; }
+        
+        .caret {
+            position: absolute;
+            width: 2px;
+            background-color: var(--accent-color);
+            animation: blink 1s infinite;
+            transition: left 0.1s linear, top 0.1s linear;
+            border-radius: 2px;
+            height: calc(clamp(1.5rem, 4vw, 1.8rem) * 1.2);
+            margin-top: calc(clamp(1.5rem, 4vw, 1.8rem) * 0.2);
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        #hidden-input { position: absolute; left: -9999px; opacity: 0; }
+        
+        .typing-actions { text-align: center; margin-top: 1.5rem; }
+        .typing-actions .cta-button { width: auto; padding: 0.8rem 2rem; font-size: 1rem; }
+
+        .results-container { text-align: center; }
+        .results-container h2 { font-size: clamp(2rem, 5vw, 2.5rem); margin-bottom: 2rem; color: var(--highlight-text); }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+        .result-item h3 { font-size: 1.2rem; color: var(--accent-color); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;}
+        .result-item p { font-size: clamp(1.8rem, 5vw, 2.2rem); font-weight: 700; }
+        .results-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+        .results-actions .cta-button { width: auto; padding: 1rem 2rem; }
+
+        .history-section { margin-top: 3rem; text-align: left; }
+        .history-section h3 { text-align: center; margin-bottom: 1rem; }
+        #history-list { list-style: none; max-height: 300px; overflow-y: auto; padding-right: 1rem; }
+        .history-item { display: flex; justify-content: space-between; padding: 0.75rem; border-bottom: 1px solid var(--glass-border); flex-wrap: wrap; gap: 0.5rem;}
+        .history-item:nth-child(odd) { background: rgba(0,0,0,0.02); }
+        body.theme-dark .history-item:nth-child(odd) { background: rgba(255,255,255,0.02); }
+
+        /* Game Page Styles */
+        .game-menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .game-card { text-align: center; padding: 2rem 1.5rem; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .game-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        body.theme-dark .game-card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .game-card .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .game-card h3 { font-size: 1.5rem; color: var(--highlight-text); margin-bottom: 0.5rem; }
+        .game-card p { font-size: 0.9rem; color: var(--secondary-text); }
+        .game-container { text-align: center; }
+        .game-canvas { background: var(--secondary-bg); border-radius: 8px; border: 1px solid var(--glass-border); max-width: 100%; height: auto; transition: filter 0.2s; }
+        .game-canvas.shake { animation: screenShake 0.3s; }
+        @keyframes screenShake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
+        
+        .game-ui { display: flex; justify-content: space-around; margin: 1rem 0; font-size: 1.2rem; }
+        .game-ui span { font-weight: bold; }
+        .game-input { width: 100%; max-width: 400px; padding: 0.8rem; margin: 1rem auto; border: 1px solid var(--glass-border); background-color: var(--primary-bg); color: var(--primary-text); border-radius: 8px; font-size: 1.1rem; text-align: center; }
+        .game-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; border-radius: 8px; z-index: 10; }
+        .game-overlay h2 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .game-overlay p { font-size: 1.2rem; margin: 0.5rem 0 1.5rem 0; max-width: 80%; }
+        .game-overlay .cta-button { width: auto; padding: 0.8rem 2rem; }
+        
+        .difficulty-select { display: flex; gap: 1rem; margin-top: 1rem; }
+        .difficulty-btn { padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; border: 1px solid white; background: transparent; color: white; font-weight: 600; }
+        .difficulty-btn.easy { border-color: #4caf50; } .difficulty-btn.easy:hover { background: #4caf50; }
+        .difficulty-btn.medium { border-color: #ffc107; } .difficulty-btn.medium:hover { background: #ffc107; }
+        .difficulty-btn.hard { border-color: #f44336; } .difficulty-btn.hard:hover { background: #f44336; }
+        
+        .racetrack { height: 120px; background: var(--secondary-bg); border-radius: 8px; position: relative; overflow: hidden; border: 1px solid var(--glass-border); background-image: repeating-linear-gradient(to bottom, transparent, transparent 49.5%, var(--glass-border) 49.5%, var(--glass-border) 50.5%); background-size: 100% 60px; }
+        .car { position: absolute; top: 50%; transform: translateY(-50%); font-size: 40px; transition: left 0.2s linear, filter 0.2s; }
+        .car.nitro-boost { filter: drop-shadow(0 0 5px var(--correct-char)); }
+        #player-car { top: 25%; } #ai-car { top: 75%; }
+        .finish-line { position: absolute; right: 10%; top: 0; bottom: 0; width: 5px; background: repeating-linear-gradient(var(--primary-text), var(--primary-text) 10px, var(--secondary-bg) 10px, var(--secondary-bg) 20px); }
+
+        .word-builder-ui { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .scrambled-letters { font-size: 2rem; font-weight: bold; letter-spacing: 0.5rem; padding: 1rem; background: var(--secondary-bg); border-radius: 8px; }
+        .scrambled-letters .used { color: var(--accent-color); opacity: 0.5; }
+        .found-words-list { list-style: none; padding: 1rem; background: var(--secondary-bg); border-radius: 8px; min-height: 200px; max-height: 300px; overflow-y: auto; text-align: left;}
+        .found-words-list li { padding: 0.25rem 0; border-bottom: 1px solid var(--glass-border); animation: newWord 0.3s ease-out; }
+        @keyframes newWord { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+        .back-to-menu-btn { margin-top: 1rem; width: auto; padding: 0.8rem 2rem; font-size: 1rem; background-color: var(--secondary-text); }
+        
+        #rotate-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 9999;
+            font-size: 1.5rem;
+        }
+        #rotate-overlay p { max-width: 80%; }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            #rotate-overlay { display: flex; }
+        }
+
+        @media (max-width: 768px) {
+            .container { width: 95%; }
+            .header-content { flex-direction: column; gap: 1rem; }
+            .logo { text-align: center; }
+            .settings { flex-wrap: wrap; justify-content: center; }
+            .stats-dashboard { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+            .stat-card { padding: 0.75rem; }
+            .results-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+        }
+
+        @media (max-width: 480px) {
+             .results-actions { flex-direction: column; }
+             .history-item { flex-direction: column; align-items: flex-start; }
+             .game-card { padding: 1.5rem 1rem; }
+        }
+    </style>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="https://www.examyatri.live" target="_blank" rel="noopener noreferrer" class="logo">
+                <h1>Examyatri</h1>
+                <p>typing se hoga success Yatra</p>
+            </a>
+            <div class="settings">
+                <button id="theme-toggle-btn" aria-label="Toggle theme">🌙 Theme</button>
+                <div class="font-control">
+                    <button id="font-decrease-btn" aria-label="Decrease font size">A-</button>
+                    <button id="font-increase-btn" aria-label="Increase font size">A+</button>
+                </div>
+                <button id="layout-toggle-btn" aria-label="Toggle layout mode">🔄 Layout</button>
+                <button id="fullscreen-btn" aria-label="Toggle fullscreen">↗️ Fullscreen</button>
+                <button id="practice-game-btn">Practice with Game</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="practice-page" class="page active">
+            <div id="practice-setup-view" class="view active">
+                <div class="setup-grid">
+                    <div class="glass-card">
+                        <h3>1. Select Practice Method</h3>
+                        <select id="method-select" class="custom-select"></select>
+                    </div>
+                    <div class="glass-card">
+                        <h3>2. Select Duration</h3>
+                        <select id="duration-select" class="custom-select">
+                            <option value="1">1 Minute</option>
+                            <option value="3">3 Minutes</option>
+                            <option value="5">5 Minutes</option>
+                            <option value="10">10 Minutes</option>
+                            <option value="15">15 Minutes</option>
+                            <option value="30">30 Minutes</option>
+                        </select>
+                    </div>
+                    <div class="glass-card streak-card">
+                         <p>Practice Streak: <span id="streak-count" class="streak">0</span> days 🔥</p>
+                    </div>
+                </div>
+                <button id="start-practice-btn" class="cta-button">Start Practice</button>
+            </div>
+
+            <div id="practice-typing-view" class="view">
+                 <div class="stats-dashboard">
+                    <div class="stat-card glass-card"><div id="time-left" class="value">00:00</div><div class="label">Time Left</div></div>
+                    <div class="stat-card glass-card"><div id="wpm" class="value">0</div><div class="label">WPM</div></div>
+                    <div class="stat-card glass-card"><div id="accuracy" class="value">100</div><div class="label">Accuracy %</div></div>
+                     <div class="stat-card glass-card"><div id="errors" class="value">0</div><div class="label">Errors</div></div>
+                </div>
+                <div class="typing-area-wrapper glass-card">
+                    <div id="typing-area" class="typing-area english">
+                        <div id="typing-text" class="typing-text"></div>
+                    </div>
+                    <div id="caret" class="caret"></div>
+                </div>
+                <div class="typing-actions">
+                    <button id="submit-test-btn" class="cta-button">Submit Test</button>
+                </div>
+                <textarea id="hidden-input" autofocus autocapitalize="none" autocorrect="off"></textarea>
+            </div>
+
+            <div id="practice-results-view" class="view">
+                <div class="results-container">
+                    <h2>Test Complete!</h2>
+                    <div class="results-grid">
+                        <div class="result-item glass-card"><h3>Gross WPM</h3><p id="result-gross-wpm">0</p></div>
+                        <div class="result-item glass-card"><h3>Net WPM</h3><p id="result-net-wpm">0</p></div>
+                        <div class="result-item glass-card"><h3>Accuracy</h3><p id="result-accuracy">0%</p></div>
+                        <div class="result-item glass-card"><h3>Errors</h3><p id="result-errors">0</p></div>
+                        <div class="result-item glass-card"><h3>Time Taken</h3><p id="result-time-taken">00:00</p></div>
+                        <div class="result-item glass-card"><h3>Keystrokes</h3><p id="result-keystrokes">0</p></div>
+                    </div>
+                    <div class="results-actions">
+                        <button id="practice-again-btn" class="cta-button">Practice Again</button>
+                        <button id="new-test-btn" class="cta-button">New Test</button>
+                    </div>
+                    <div class="history-section">
+                        <h3>Practice History</h3>
+                        <ul id="history-list">
+                            <!-- History will be populated here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="game-page" class="page">
+            <div id="game-menu-view" class="view active">
+                <div class="game-menu-grid">
+                    <div class="game-card glass-card" data-game="wordStorm">
+                        <div class="icon">⛈️</div>
+                        <h3>Word Storm</h3>
+                        <p>Words fall faster over time; test your speed and focus.</p>
+                    </div>
+                    <div class="game-card glass-card" data-game="typingRacer">
+                        <div class="icon">🚗</div>
+                        <h3>Typing Racer</h3>
+                        <p>Type sentences to race against an AI opponent.</p>
+                    </div>
+                    <div class="game-card glass-card" data-game="keyDefender">
+                        <div class="icon">🛡️</div>
+                        <h3>Key Defender</h3>
+                        <p>Destroy enemy words before they reach your base.</p>
+                    </div>
+                    <div class="game-card glass-card" data-game="typingSprint">
+                        <div class="icon">🏁</div>
+                        <h3>Typing Sprint</h3>
+                        <p>Short timed challenges to improve your WPM.</p>
+                    </div>
+                    <div class="game-card glass-card" data-game="wordBuilder">
+                        <div class="icon">🧩</div>
+                        <h3>Word Builder</h3>
+                        <p>Form valid words from scrambled letters to score combos.</p>
+                    </div>
+                </div>
+                 <button id="back-to-practice-btn" class="cta-button back-to-menu-btn" style="margin-left: auto; margin-right: auto; display: block;">Back to Practice</button>
+            </div>
+            
+            <!-- Game Views -->
+            <div id="word-storm-game-view" class="view game-container"></div>
+            <div id="typing-racer-game-view" class="view game-container"></div>
+            <div id="key-defender-game-view" class="view game-container"></div>
+            <div id="word-builder-game-view" class="view game-container"></div>
+        </section>
+    </main>
+
+    <div id="rotate-overlay">
+        <p>🔄<br>Please rotate your device to portrait for the best experience.</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dom = {
+                html: document.documentElement,
+                body: document.body,
+                pages: {
+                    practice: document.getElementById('practice-page'),
+                    game: document.getElementById('game-page'),
+                },
+                views: {
+                    setup: document.getElementById('practice-setup-view'),
+                    typing: document.getElementById('practice-typing-view'),
+                    results: document.getElementById('practice-results-view'),
+                },
+                gameViews: {
+                    menu: document.getElementById('game-menu-view'),
+                    wordStorm: document.getElementById('word-storm-game-view'),
+                    typingRacer: document.getElementById('typing-racer-game-view'),
+                    keyDefender: document.getElementById('key-defender-game-view'),
+                    wordBuilder: document.getElementById('word-builder-game-view'),
+                },
+                setup: {
+                    methodSelect: document.getElementById('method-select'),
+                    durationSelect: document.getElementById('duration-select'),
+                    startBtn: document.getElementById('start-practice-btn'),
+                    streakCount: document.getElementById('streak-count'),
+                },
+                typing: {
+                    timeLeft: document.getElementById('time-left'),
+                    wpm: document.getElementById('wpm'),
+                    accuracy: document.getElementById('accuracy'),
+                    errors: document.getElementById('errors'),
+                    typingArea: document.getElementById('typing-area'),
+                    typingText: document.getElementById('typing-text'),
+                    caret: document.getElementById('caret'),
+                    hiddenInput: document.getElementById('hidden-input'),
+                    submitTestBtn: document.getElementById('submit-test-btn'),
+                },
+                results: {
+                    grossWpm: document.getElementById('result-gross-wpm'),
+                    netWpm: document.getElementById('result-net-wpm'),
+                    accuracy: document.getElementById('result-accuracy'),
+                    errors: document.getElementById('result-errors'),
+                    timeTaken: document.getElementById('result-time-taken'),
+                    keystrokes: document.getElementById('result-keystrokes'),
+                    practiceAgainBtn: document.getElementById('practice-again-btn'),
+                    newTestBtn: document.getElementById('new-test-btn'),
+                    historyList: document.getElementById('history-list'),
+                },
+                settings: {
+                    themeToggleBtn: document.getElementById('theme-toggle-btn'),
+                    fontIncreaseBtn: document.getElementById('font-increase-btn'),
+                    fontDecreaseBtn: document.getElementById('font-decrease-btn'),
+                    fullscreenBtn: document.getElementById('fullscreen-btn'),
+                    layoutToggleBtn: document.getElementById('layout-toggle-btn'),
+                    practiceGameBtn: document.getElementById('practice-game-btn'),
+                },
+                game: {
+                    backToPracticeBtn: document.getElementById('back-to-practice-btn'),
+                    gameCards: document.querySelectorAll('.game-card'),
+                }
+            };
+
+            let quoteCache = [];
+            let quoteCacheIndex = 0;
+            let wordCache = [];
+
+            const fetchQuotes = async () => {
+                if (quoteCache.length > 0) return;
+                try {
+                    const response = await fetch('https://type.fit/api/quotes');
+                    if (!response.ok) throw new Error('Network error');
+                    let quotes = await response.json();
+                    quoteCache = quotes.filter(q => q.text && q.author); 
+                    quoteCache.sort(() => Math.random() - 0.5);
+                } catch (error) {
+                    console.error("Failed to fetch quotes:", error);
+                    quoteCache = [ { text: "The quick brown fox jumps over the lazy dog." }, { text: "Technology has revolutionized the way we live and work." } ];
+                }
+            };
+            
+            const fetchWords = async (count = 100) => {
+                try {
+                    const response = await fetch(`https://random-word-api.herokuapp.com/word?number=${count}`);
+                    if (!response.ok) throw new Error('Network error');
+                    const words = await response.json();
+                    wordCache = [...new Set([...wordCache, ...words])]; // Avoid duplicates
+                    return words;
+                } catch (error) {
+                    console.error("Failed to fetch random words:", error);
+                    const fallback = ["apple", "banana", "cherry", "date", "elderberry", "fig", "grape", "honeydew", "kiwi", "lemon", "mango"];
+                    wordCache = [...new Set([...wordCache, ...fallback])];
+                    return fallback;
+                }
+            };
+            
+            const getSprintText = async (difficulty) => {
+                 switch(difficulty) {
+                    case 'easy':
+                        return (await fetchWords(30)).join(' ') + ' ';
+                    case 'hard':
+                         return practiceMethods.Intermediate["5. Shift & Symbols Practice"].fetch();
+                    case 'medium':
+                    default:
+                        return practiceMethods.Intermediate["7. Sentence Practice (Quotes)"].fetch();
+                }
+            };
+
+            const practiceMethods = {
+                "Beginner": { "1. Home Row Practice": { isDynamic: false, fetch: () => Promise.resolve("asdf jkl; a sad lad asks a fall; a lass a flask a jag a glad;") }, "2. Top Row Practice": { isDynamic: false, fetch: () => Promise.resolve("qwer uiop qwerty yuiop quit weep port terror to you were our trip.") }, "3. Bottom Row Practice": { isDynamic: false, fetch: () => Promise.resolve("zxcv m,./ buzz vex max copy zero comma buzz vex max copy zero.") }, "4. Number Row Practice": { isDynamic: false, fetch: () => Promise.resolve("12345 67890 19283 74650 10 29 38 47 56 123 456 7890.") }, },
+                "Intermediate": { "5. Shift & Symbols Practice": { isDynamic: false, fetch: () => Promise.resolve("The cost is $5.99 (a 15% discount!). She yelled, \"Stop!\" What's the plan?") }, "6. Word Practice (Random Words)": { isDynamic: true, fetch: async () => (await fetchWords(30)).join(' ') + ' ' }, "7. Sentence Practice (Quotes)": { isDynamic: true, fetch: async () => { if (quoteCache.length === 0) await fetchQuotes(); if (quoteCacheIndex >= quoteCache.length) quoteCacheIndex = 0; return quoteCache[quoteCacheIndex++].text + ' '; } }, "8. Paragraph Practice": { isDynamic: true, fetch: async () => { if (quoteCache.length === 0) await fetchQuotes(); if (quoteCacheIndex >= quoteCache.length) quoteCacheIndex = 0; let paragraph = ""; for(let i=0; i<2 && quoteCacheIndex < quoteCache.length; i++) { paragraph += quoteCache[quoteCacheIndex++].text + " "; } return paragraph; } }, },
+                "Advanced": { "9. Speed Test": { isDynamic: true, fetch: () => practiceMethods.Intermediate["8. Paragraph Practice"].fetch() }, "10. Accuracy Test (Penalty for Errors)": { isDynamic: true, fetch: () => practiceMethods.Intermediate["7. Sentence Practice (Quotes)"].fetch() }, }
+            };
+            
+            let appState = {
+                timerId: null, isFetchingMore: false, currentView: 'setup', activeGame: null,
+                testConfig: { method: '', duration: 1, text: '', isDynamic: false, sprintDifficulty: 'medium' },
+                testStats: { startTime: 0, charIndex: 0, typedChars: 0, correctChars: 0, errorCount: 0, keystrokes: 0, timeLeft: 0, chars: [], },
+                settings: { theme: 'dark', fontScale: 1.0, layout: 'auto' },
+                userData: { streak: 0, lastPracticeDate: null, history: [], },
+            };
+
+            const GRAPHEME_SPLITTER = new Intl.Segmenter();
+            const splitTextToChars = (text) => [...GRAPHEME_SPLITTER.segment(text)].map(s => s.segment);
+            
+            const showPage = (pageName) => {
+                Object.values(dom.pages).forEach(p => p.classList.remove('active'));
+                dom.pages[pageName].classList.add('active');
+                 if(appState.activeGame && typeof appState.activeGame.end === 'function') {
+                    appState.activeGame.end(); 
+                    appState.activeGame = null;
+                }
+                if (pageName === 'practice') {
+                    showView('setup', 'practice');
+                    dom.typing.hiddenInput.blur();
+                } else if (pageName === 'game') {
+                    showView('menu', 'game');
+                }
+            };
+
+            const showView = (view, page='practice') => {
+                appState.currentView = view;
+                if (page === 'practice') { Object.values(dom.views).forEach(v => v.classList.remove('active')); dom.views[view].classList.add('active'); } 
+                else if (page === 'game') { Object.values(dom.gameViews).forEach(v => v.classList.remove('active')); dom.gameViews[view].classList.add('active'); }
+            };
+            
+            const populateMethods = () => {
+                let html = '';
+                for (const category in practiceMethods) { html += `<optgroup label="${category}">`; for (const method in practiceMethods[category]) { html += `<option value="${category}:${method}">${method}</option>`; } html += `</optgroup>`; }
+                dom.setup.methodSelect.innerHTML = html;
+            };
+
+            const fetchAndAppendText = async () => {
+                if (appState.isFetchingMore) return;
+                appState.isFetchingMore = true;
+                try {
+                    const [category, methodName] = dom.setup.methodSelect.value.split(':');
+                    const newText = await practiceMethods[category][methodName].fetch();
+                    if (newText) {
+                        appState.testConfig.text += newText; const newChars = splitTextToChars(newText); appState.testStats.chars.push(...newChars);
+                        const fragment = document.createDocumentFragment(); newChars.forEach(char => { const span = document.createElement('span'); span.className = 'char'; span.textContent = char; fragment.appendChild(span); });
+                        dom.typing.typingText.appendChild(fragment);
+                    }
+                } catch (e) { console.error("Failed to fetch more text:", e); } 
+                finally { appState.isFetchingMore = false; }
+            };
+
+            const startPractice = async (isSprint = false) => {
+                dom.setup.startBtn.disabled = true; dom.setup.startBtn.textContent = 'Loading Text...';
+                let methodName, method;
+                if(isSprint) { methodName = `Typing Sprint (${appState.testConfig.sprintDifficulty})`; appState.testConfig.text = await getSprintText(appState.testConfig.sprintDifficulty); appState.testConfig.isDynamic = false; } 
+                else { const [category, mName] = dom.setup.methodSelect.value.split(':'); methodName = mName; method = practiceMethods[category][mName]; appState.testConfig.isDynamic = method.isDynamic; let initialText = await method.fetch(); if (appState.testConfig.isDynamic) { initialText += await method.fetch(); } appState.testConfig.text = initialText; }
+                dom.setup.startBtn.disabled = false; dom.setup.startBtn.textContent = 'Start Practice';
+                dom.typing.typingText.style.color = ''; appState.testConfig.duration = isSprint ? 1 : parseInt(dom.setup.durationSelect.value, 10); appState.testConfig.method = methodName;
+                if (appState.timerId) clearInterval(appState.timerId); appState.timerId = null;
+                appState.testStats = { startTime: 0, charIndex: 0, typedChars: 0, correctChars: 0, errorCount: 0, keystrokes: 0, timeLeft: appState.testConfig.duration * 60, chars: splitTextToChars(appState.testConfig.text), };
+                dom.typing.typingText.style.top = '0px'; dom.typing.typingText.innerHTML = appState.testStats.chars.map(char => `<span class="char">${char}</span>`).join('');
+                if (dom.typing.typingText.children.length > 0) { dom.typing.typingText.children[0].classList.add('current'); }
+                dom.typing.hiddenInput.value = ''; updateStatsDisplay(); updateCaretPosition(); showView('typing'); dom.typing.hiddenInput.focus();
+            };
+
+            const handleTyping = (e) => {
+                if (appState.testStats.timeLeft <= 0 || (!appState.timerId && appState.testStats.startTime > 0)) return;
+                const inputValue = dom.typing.hiddenInput.value; const charElements = dom.typing.typingText.children; const currentTypedCharsArray = splitTextToChars(inputValue); const newCharIndex = currentTypedCharsArray.length;
+                if (charElements[appState.testStats.charIndex]) { charElements[appState.testStats.charIndex].classList.remove('current'); }
+                let correctCount = 0; let errorCount = 0;
+                for (let i = 0; i < newCharIndex; i++) {
+                    const typedChar = currentTypedCharsArray[i]; const targetChar = appState.testStats.chars[i];
+                    if (charElements[i]) { charElements[i].className = 'char'; if (typedChar === targetChar) { charElements[i].classList.add('correct'); correctCount++; } else { charElements[i].classList.add('incorrect'); errorCount++; } }
+                }
+                if (charElements[newCharIndex]) { charElements[newCharIndex].classList.add('current'); }
+                appState.testStats = { ...appState.testStats, charIndex: newCharIndex, typedChars: newCharIndex, correctChars: correctCount, errorCount };
+                const remainingChars = appState.testStats.chars.length - appState.testStats.charIndex;
+                if (appState.testConfig.isDynamic && remainingChars < 100) { fetchAndAppendText(); }
+                updateCaretPosition(); updateStatsDisplay();
+                if(!appState.testConfig.isDynamic && appState.testStats.charIndex === appState.testStats.chars.length) endPractice();
+            };
+
+            const startTimer = () => { if (appState.timerId) return; appState.timerId = setInterval(() => { appState.testStats.timeLeft--; updateStatsDisplay(); if (appState.testStats.timeLeft <= 0) endPractice(); }, 1000); };
+
+            const endPractice = () => {
+                if (!appState.timerId && appState.testStats.startTime > 0) return; if (appState.timerId) clearInterval(appState.timerId); appState.timerId = null;
+                const timeTakenSeconds = appState.testConfig.duration * 60 - appState.testStats.timeLeft; const durationMinutes = timeTakenSeconds / 60 || 1;
+                const grossWpm = (appState.testStats.typedChars / 5) / durationMinutes; const netWpm = grossWpm - (appState.testStats.errorCount / durationMinutes); const accuracy = appState.testStats.typedChars > 0 ? (appState.testStats.correctChars / appState.testStats.typedChars) * 100 : 0;
+                dom.results.grossWpm.textContent = Math.round(grossWpm); dom.results.netWpm.textContent = Math.round(Math.max(0, netWpm)); dom.results.accuracy.textContent = `${accuracy.toFixed(1)}%`; dom.results.errors.textContent = appState.testStats.errorCount;
+                const minutes = Math.floor(timeTakenSeconds / 60); const seconds = timeTakenSeconds % 60; dom.results.timeTaken.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; dom.results.keystrokes.textContent = appState.testStats.keystrokes;
+                updateStreak();
+                const resultData = { date: new Date().toLocaleString(), method: appState.testConfig.method, netWpm: Math.round(Math.max(0, netWpm)), accuracy: accuracy.toFixed(1) };
+                appState.userData.history.unshift(resultData); if (appState.userData.history.length > 20) appState.userData.history.pop();
+                saveState(); updateHistoryList(); showView('results');
+            };
+
+            const updateStatsDisplay = () => {
+                const minutes = Math.floor(appState.testStats.timeLeft / 60); const seconds = appState.testStats.timeLeft % 60; dom.typing.timeLeft.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; dom.typing.errors.textContent = appState.testStats.errorCount;
+                if (appState.testStats.startTime > 0) {
+                    const elapsedTimeMinutes = (Date.now() - appState.testStats.startTime) / 60000; const wpm = elapsedTimeMinutes > 0 ? ((appState.testStats.correctChars / 5) / elapsedTimeMinutes) : 0;
+                    dom.typing.wpm.textContent = Math.round(Math.max(0, wpm)); const accuracy = appState.testStats.typedChars > 0 ? (appState.testStats.correctChars / appState.testStats.typedChars) * 100 : 100; dom.typing.accuracy.textContent = Math.round(accuracy);
+                } else { dom.typing.wpm.textContent = 0; dom.typing.accuracy.textContent = 100; }
+            };
+            
+            const updateCaretPosition = () => {
+                const charElements = dom.typing.typingText.children; const currentEl = charElements[appState.testStats.charIndex] || charElements[charElements.length - 1]; if (!currentEl) { dom.typing.caret.style.display = 'none'; return; }
+                dom.typing.caret.style.display = 'block'; const isAtEnd = appState.testStats.charIndex >= charElements.length; dom.typing.caret.style.left = `${currentEl.offsetLeft + (isAtEnd ? currentEl.offsetWidth : 0)}px`; dom.typing.caret.style.top = `${currentEl.offsetTop}px`;
+                const lineHeight = currentEl.offsetHeight; const currentLineTop = currentEl.offsetTop; const typingAreaHeight = dom.typing.typingArea.clientHeight;
+                const currentScrollTop = -parseInt(dom.typing.typingText.style.top || '0', 10);
+                if (currentLineTop >= currentScrollTop + typingAreaHeight - lineHeight) { dom.typing.typingText.style.top = `-${currentLineTop - (typingAreaHeight - lineHeight * 2)}px`; } 
+                else if (currentLineTop < currentScrollTop) { dom.typing.typingText.style.top = `-${currentLineTop}px`; }
+            };
+
+            const updateStreak = () => {
+                const today = new Date().toDateString(); const lastPractice = appState.userData.lastPracticeDate;
+                if (lastPractice !== today) { const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); if (lastPractice === yesterday.toDateString()) { appState.userData.streak++; } else { appState.userData.streak = 1; } appState.userData.lastPracticeDate = today; }
+                dom.setup.streakCount.textContent = appState.userData.streak;
+            };
+            
+            const updateHistoryList = () => { dom.results.historyList.innerHTML = appState.userData.history.map(item => `<li class="history-item"><span>${item.method} - ${item.date}</span><span><strong>${item.netWpm} WPM</strong> at ${item.accuracy}% Acc</span></li>`).join('') || '<li>No history yet. Complete a test!</li>'; };
+
+            const applySettings = () => {
+                const themeMap = { dark: '🌙 Theme', light: '☀️ Theme', sepia: '📖 Theme' };
+                dom.body.className = `theme-${appState.settings.theme}`;
+                dom.settings.themeToggleBtn.innerHTML = themeMap[appState.settings.theme];
+                dom.html.style.setProperty('--font-scale', appState.settings.fontScale);
+                if (appState.settings.layout === 'portrait') {
+                    dom.body.classList.add('portrait-view');
+                } else {
+                    dom.body.classList.remove('portrait-view');
+                }
+            };
+
+            const saveState = () => { localStorage.setItem('examyatriState', JSON.stringify({ settings: appState.settings, userData: appState.userData })); };
+            const loadState = () => { const savedState = localStorage.getItem('examyatriState'); if (savedState) { const parsed = JSON.parse(savedState); appState.settings = { ...appState.settings, ...parsed.settings }; appState.userData = { ...appState.userData, ...parsed.userData }; } };
+
+            const gameUtils = {
+                createGameUI(container, title, elements = {}) {
+                    container.innerHTML = `<h2 style="margin-bottom: 1rem;">${title}</h2><div class="glass-card" style="position: relative;">${elements.canvas || ''}${elements.ui || ''}<div class="game-overlay" style="display: flex;"><h2>${title}</h2><p>${elements.instructions || ''}</p><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Hard</button></div></div></div>${elements.input || ''}<button class="cta-button back-to-menu-btn">Back to Menu</button>`;
+                    return { overlay: container.querySelector('.game-overlay'), backBtn: container.querySelector('.back-to-menu-btn'), difficultyBtns: container.querySelectorAll('.difficulty-btn'), };
+                },
+                getRandomWord(minLength = 1, maxLength = 10) { const filteredWords = wordCache.filter(w => w.length >= minLength && w.length <= maxLength); return filteredWords.length > 0 ? filteredWords[Math.floor(Math.random() * filteredWords.length)] : 'default'; }
+            };
+            const games = { wordStorm: { state: {}, init() { const c = dom.gameViews.wordStorm; const ui = gameUtils.createGameUI(c, 'Word Storm', { canvas: `<canvas id="word-storm-canvas" class="game-canvas" width="800" height="500"></canvas>`, ui: `<div class="game-ui"><div>Score: <span id="ws-score">0</span></div><div>Lives: <span id="ws-lives">3</span></div></div>`, input: `<input type="text" id="ws-input" class="game-input" placeholder="Type words here..." autocomplete="off">`, instructions: 'Type the falling words before they hit the bottom. Press Enter to submit.' }); const canvas = c.querySelector('#word-storm-canvas'), ctx = canvas.getContext('2d'), input = c.querySelector('#ws-input'), scoreEl = c.querySelector('#ws-score'), livesEl = c.querySelector('#ws-lives'); const reset = (d) => { const s = { easy: { s: 0.8, r: 2500, min: 3, max: 5 }, medium: { s: 1, r: 2000, min: 4, max: 7 }, hard: { s: 1.5, r: 1500, min: 6, max: 10 } }; this.state = { w: [], p: [], sc: 0, l: 3, go: false, af: null, baseSpeed: s[d].s, spawnRate: s[d].r, wordMin: s[d].min, wordMax: s[d].max }; }; const particles = (x, y, t) => { for(let i=0;i<t.length*2;i++)this.state.p.push({x,y,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5,a:1,c:t[Math.floor(Math.random()*t.length)]}) }; const loop = () => { if(this.state.go)return; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--primary-text'); ctx.font='24px Courier New'; this.state.w.forEach((w,i)=>{ w.y+=w.speed;ctx.fillText(w.text,w.x,w.y);if(w.y>canvas.height){this.state.w.splice(i,1);this.state.l--;livesEl.textContent=this.state.l;if(this.state.l<=0)this.end('You ran out of lives!')}}); this.state.p.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;p.a-=.03;ctx.globalAlpha=p.a;ctx.fillText(p.c,p.x,p.y);if(p.a<=0)this.state.p.splice(i,1)});ctx.globalAlpha=1;canvas.style.filter=`brightness(${1-(this.state.baseSpeed-1)*.2})`;this.state.af=requestAnimationFrame(loop)}; const spawn = () => { if(this.state.go)return;this.state.w.push({text:gameUtils.getRandomWord(this.state.wordMin,this.state.wordMax),x:Math.random()*(canvas.width-100),y:0,speed:this.state.baseSpeed+Math.random()});this.state.spawnRate=Math.max(500,this.state.spawnRate*.995);this.state.baseSpeed+=.01;setTimeout(spawn,this.state.spawnRate)}; input.addEventListener('keyup',(e)=>{if(e.key!=='Enter'||this.state.go)return;const t=input.value.trim();const idx=this.state.w.findIndex(w=>w.text===t);if(idx!==-1){const w=this.state.w[idx];particles(w.x,w.y,w.text);this.state.w.splice(idx,1);this.state.sc+=t.length;scoreEl.textContent=this.state.sc;input.value=''}}); this.start=(d)=>{reset(d);ui.overlay.style.display='none';input.disabled=false;input.focus();scoreEl.textContent=this.state.sc;livesEl.textContent=this.state.l;setTimeout(spawn,1000);this.state.af=requestAnimationFrame(loop)}; this.end=(m='Game Over')=>{this.state.go=true;cancelAnimationFrame(this.state.af);ui.overlay.innerHTML=`<h2>${m}</h2><p>Final Score: ${this.state.sc}</p><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Play Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Play Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Play Hard</button></div>`;ui.overlay.style.display='flex';ui.overlay.querySelectorAll('.difficulty-btn').forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));input.disabled=true}; ui.difficultyBtns.forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty)); ui.backBtn.onclick=()=>{this.end();showView('menu','game')}}}, typingRacer: { state: {}, init() { const c=dom.gameViews.typingRacer; const ui=gameUtils.createGameUI(c,'Typing Racer',{ui:`<div class="racetrack"><div class="finish-line"></div><div id="player-car" class="car">🚗</div><div id="ai-car" class="car">💻</div></div>`,instructions:'Type the text below as fast as you can to win the race!'}); const pCar=c.querySelector('#player-car'),aiCar=c.querySelector('#ai-car');const wrap=document.createElement('div');wrap.className='typing-area-wrapper glass-card';wrap.style.marginTop='1rem';wrap.innerHTML=`<div id="tr-typing-area" class="typing-area english"><div id="tr-typing-text" class="typing-text"></div></div><div id="tr-caret" class="caret"></div>`;c.querySelector('.glass-card').appendChild(wrap);const typingText=c.querySelector('#tr-typing-text'),caret=c.querySelector('#tr-caret'),hInput=dom.typing.hiddenInput;const reset=async(d)=>{const s={easy:30,medium:45,hard:60};const tS=d==='hard'?getSprintText('hard'):practiceMethods.Intermediate["7. Sentence Practice (Quotes)"].fetch();this.state={text:await tS,chars:[],charIndex:0,totalChars:0,lastCorrectIndex:-1,go:false,aiWpm:s[d],aiInt:null};this.state.chars=splitTextToChars(this.state.text);this.state.totalChars=this.state.chars.length};const updateCars=()=>{const pP=(this.state.charIndex/this.state.totalChars)*90;pCar.style.left=`${pP}%`;if(pP>=90)this.end('You Win!')};const handleTyping=()=>{if(this.state.go)return;const tChars=splitTextToChars(hInput.value);this.state.charIndex=tChars.length;let correct=true;for(let i=0;i<this.state.charIndex;i++){const el=typingText.children[i];if(tChars[i]===this.state.chars[i]){el.className='char correct';if(correct)this.state.lastCorrectIndex=i}else{el.className='char incorrect';correct=false}}pCar.classList.toggle('nitro-boost',correct&&this.state.charIndex>this.state.lastCorrectIndex);for(let i=this.state.charIndex;i<this.state.totalChars;i++)typingText.children[i].className='char';if(typingText.children[this.state.charIndex])typingText.children[this.state.charIndex].classList.add('current');const currEl=typingText.children[this.state.charIndex]||typingText.children[this.state.totalChars-1];if(currEl){caret.style.left=`${currEl.offsetLeft}px`;caret.style.top=`${currEl.offsetTop}px`;if(currEl.offsetTop>100)typingText.style.top=`-${currEl.offsetTop-currEl.offsetHeight}px`}updateCars()};this.start=async(d)=>{await reset(d);ui.overlay.style.display='none';hInput.value='';hInput.oninput=handleTyping;hInput.focus();typingText.innerHTML=this.state.chars.map(c=>`<span class="char">${c}</span>`).join('');if(typingText.children.length>0)typingText.children[0].classList.add('current');updateCars();aiCar.style.left='0%';let aiP=0;const aiInc=(this.state.aiWpm*5)/60/4;this.state.aiInt=setInterval(()=>{if(this.state.go)return;aiP+=aiInc;const aiL=(aiP/this.state.totalChars)*90;aiCar.style.left=`${aiL}%`;if(aiL>=90)this.end('You Lose!')},250)};this.end=(m)=>{if(this.state.go)return;this.state.go=true;clearInterval(this.state.aiInt);hInput.oninput=handleTyping;ui.overlay.innerHTML=`<h2>${m}</h2><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Play Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Play Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Play Hard</button></div>`;ui.overlay.style.display='flex';ui.overlay.querySelectorAll('.difficulty-btn').forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty))};ui.difficultyBtns.forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));ui.backBtn.onclick=()=>{this.end();showView('menu','game')}}}, keyDefender: { state: {}, init() { const c=dom.gameViews.keyDefender; const ui=gameUtils.createGameUI(c,'Key Defender',{canvas:`<canvas id="kd-canvas" class="game-canvas" width="800" height="500"></canvas>`,ui:`<div class="game-ui"><div>Score: <span id="kd-score">0</span></div><div>Base HP: <span id="kd-hp">100</span></div></div>`,input:`<input type="text" id="kd-input" class="game-input" placeholder="Type enemy words..." autocomplete="off">`,instructions:'Destroy enemies by typing their words before they reach your base.'}); const canvas=c.querySelector('#kd-canvas'),ctx=canvas.getContext('2d'),input=c.querySelector('#kd-input'),scoreEl=c.querySelector('#kd-score'),hpEl=c.querySelector('#kd-hp'); const reset=(d)=>{const s={easy:{s:.5,r:3000,hp:150},medium:{s:.8,r:2500,hp:100},hard:{s:1.2,r:1800,hp:75}};this.state={e:[],p:[],sc:0,go:false,af:null,lvl:1,...s[d]}};const explosion=(x,y)=>{for(let i=0;i<20;i++)this.state.p.push({x,y,vx:(Math.random()-.5)*8,vy:(Math.random()-.5)*8,a:1,s:Math.random()*3+1})};const loop=()=>{if(this.state.go)return;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--correct-char');ctx.strokeStyle=ctx.fillStyle;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(20,0);ctx.bezierCurveTo(60,canvas.height/2,60,canvas.height/2,20,canvas.height);ctx.closePath();ctx.globalAlpha=.3;ctx.fill();ctx.globalAlpha=1;ctx.stroke();const textColor=getComputedStyle(document.body).getPropertyValue('--primary-text');ctx.fillStyle=textColor;ctx.font='24px Courier New';this.state.e.forEach((e,i)=>{e.x-=e.speed;const tW=ctx.measureText(e.text).width;ctx.strokeRect(e.x-5,e.y-25,tW+10,35);ctx.fillText(e.text,e.x,e.y);if(e.x<20){this.state.e.splice(i,1);this.state.hp-=10;hpEl.textContent=this.state.hp;canvas.classList.add('shake');setTimeout(()=>canvas.classList.remove('shake'),300);if(this.state.hp<=0)this.end('Your base was destroyed!')}});ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--accent-color');this.state.p.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;p.a-=.04;ctx.globalAlpha=p.a;ctx.fillRect(p.x,p.y,p.s,p.s);if(p.a<=0)this.state.p.splice(i,1)});ctx.globalAlpha=1;this.state.af=requestAnimationFrame(loop)}; const spawn=()=>{if(this.state.go)return;this.state.e.push({text:gameUtils.getRandomWord(4,8),x:canvas.width,y:30+Math.random()*(canvas.height-60),speed:this.state.baseSpeed+Math.random()*.5});if(this.state.sc>this.state.lvl*100){this.state.lvl++;this.state.baseSpeed+=.1;this.state.spawnRate=Math.max(500,this.state.spawnRate*.95)}setTimeout(spawn,this.state.spawnRate)};input.addEventListener('keyup',(e)=>{if(e.key!=='Enter'||this.state.go)return;const t=input.value.trim();const idx=this.state.e.findIndex(w=>w.text===t);if(idx!==-1){const en=this.state.e[idx];explosion(en.x,en.y);this.state.e.splice(idx,1);this.state.sc+=t.length;scoreEl.textContent=this.state.sc;input.value=''}});this.start=(d)=>{reset(d);ui.overlay.style.display='none';input.disabled=false;input.focus();scoreEl.textContent=this.state.sc;hpEl.textContent=this.state.hp;setTimeout(spawn,1000);this.state.af=requestAnimationFrame(loop)};this.end=(m='Game Over')=>{this.state.go=true;cancelAnimationFrame(this.state.af);ui.overlay.innerHTML=`<h2>${m}</h2><p>Final Score: ${this.state.sc}</p><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Play Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Play Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Play Hard</button></div>`;ui.overlay.style.display='flex';ui.overlay.querySelectorAll('.difficulty-btn').forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));input.disabled=true};ui.difficultyBtns.forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));ui.backBtn.onclick=()=>{this.end();showView('menu','game')}}}, typingSprint: { init() { const c=document.querySelector('.game-card[data-game="typingSprint"]'),p=c.querySelector('p'),s=document.createElement('div');s.className='difficulty-select';s.style.justifyContent='center';s.innerHTML=`<button class="difficulty-btn easy" data-difficulty="easy">Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Hard</button>`;s.style.display='none';c.appendChild(s);c.addEventListener('click',(e)=>{if(e.target.classList.contains('difficulty-btn')){appState.testConfig.sprintDifficulty=e.target.dataset.difficulty;showPage('practice');startPractice(true);p.style.display='block';s.style.display='none'}else if(!s.style.display||s.style.display==='none'){p.style.display='none';s.style.display='flex'}})}}, wordBuilder: { state: {}, init() { const c=dom.gameViews.wordBuilder; const ui=gameUtils.createGameUI(c,'Word Builder',{ui:`<div class="word-builder-ui"><div class="scrambled-letters" id="wb-letters"></div><div class="game-ui" style="flex-direction: column; text-align: right;"><div>Time: <span id="wb-time">60</span>s</div><div>Score: <span id="wb-score">0</span></div></div></div><ul id="wb-found-words" class="found-words-list"></ul>`,input:`<input type="text" id="wb-input" class="game-input" placeholder="Build words..." autocomplete="off">`,instructions:'Find as many English words as you can from the given letters.'}); const lEl=c.querySelector('#wb-letters'),tEl=c.querySelector('#wb-time'),sEl=c.querySelector('#wb-score'),fEl=c.querySelector('#wb-found-words'),input=c.querySelector('#wb-input');const reset=(d)=>{const s={easy:{t:90,min:5,max:6},medium:{t:60,min:6,max:7},hard:{t:45,min:7,max:8}};const w=wordCache.find(w=>w.length>=s[d].min&&w.length<=s[d].max)||'default';this.state={l:[...w].sort(()=>Math.random()-.5),f:new Set(),sc:0,go:false,tmr:null,bW:w,tL:s[d].t}};const canMake=(w,l)=>{let tL=[...l];for(const c of w){const i=tL.indexOf(c);if(i===-1)return false;tL.splice(i,1)}return true};input.addEventListener('keyup',(e)=>{if(e.key!=='Enter'||this.state.go)return;const t=input.value.trim().toLowerCase();if(t.length<3)return;if(!this.state.f.has(t)&&canMake(t,this.state.l)&&wordCache.includes(t)){this.state.f.add(t);this.state.sc+=t.length*10;sEl.textContent=this.state.sc;const li=document.createElement('li');li.textContent=t;fEl.prepend(li);input.value='';input.dispatchEvent(new Event('input'))}});input.addEventListener('input',()=>{const t=input.value.toLowerCase();let tL=[...this.state.l];lEl.innerHTML=this.state.l.map(l=>`<span>${l.toUpperCase()}</span>`).join('');for(const c of t){const i=tL.indexOf(c);if(i!==-1){const mS=Array.from(lEl.children).find(s=>s.textContent.toLowerCase()===c&&!s.classList.contains('used'));if(mS)mS.classList.add('used');tL[i]=null}}});this.start=(d)=>{reset(d);ui.overlay.style.display='none';input.disabled=false;input.focus();lEl.innerHTML=this.state.l.map(l=>`<span>${l.toUpperCase()}</span>`).join('');sEl.textContent='0';tEl.textContent=this.state.tL;fEl.innerHTML='';this.state.tmr=setInterval(()=>{this.state.tL--;tEl.textContent=this.state.tL;if(this.state.tL<=0)this.end('Time\'s up!')},1000)};this.end=(m='Game Over')=>{this.state.go=true;clearInterval(this.state.tmr);ui.overlay.innerHTML=`<h2>${m}</h2><p>Final Score: ${this.state.sc}</p><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Play Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Play Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Play Hard</button></div>`;ui.overlay.style.display='flex';ui.overlay.querySelectorAll('.difficulty-btn').forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));input.disabled=true};ui.difficultyBtns.forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));ui.backBtn.onclick=()=>{this.end();showView('menu','game')}}} };
+            
+            // Event Listeners
+            dom.settings.practiceGameBtn.addEventListener('click', () => showPage('game'));
+            dom.game.backToPracticeBtn.addEventListener('click', () => showPage('practice'));
+            dom.setup.startBtn.addEventListener('click', () => startPractice(false));
+            dom.typing.hiddenInput.addEventListener('input', handleTyping);
+            dom.typing.hiddenInput.addEventListener('keydown', (e) => { if (appState.testStats.timeLeft <= 0) return; if (appState.testStats.startTime === 0) { appState.testStats.startTime = Date.now(); startTimer(); } appState.testStats.keystrokes++; if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) e.preventDefault(); });
+            dom.typing.typingArea.addEventListener('click', () => dom.typing.hiddenInput.focus());
+            dom.typing.submitTestBtn.addEventListener('click', endPractice);
+            dom.results.practiceAgainBtn.addEventListener('click', () => startPractice(false));
+            dom.results.newTestBtn.addEventListener('click', () => showView('setup'));
+            
+            dom.settings.themeToggleBtn.addEventListener('click', () => {
+                const themes = ['dark', 'light', 'sepia'];
+                const currentIndex = themes.indexOf(appState.settings.theme);
+                appState.settings.theme = themes[(currentIndex + 1) % themes.length];
+                applySettings();
+                saveState();
+            });
+            dom.settings.fontIncreaseBtn.addEventListener('click', () => { if(appState.settings.fontScale < 1.5) appState.settings.fontScale = parseFloat((appState.settings.fontScale + 0.1).toFixed(2)); applySettings(); saveState(); });
+            dom.settings.fontDecreaseBtn.addEventListener('click', () => { if(appState.settings.fontScale > 0.7) appState.settings.fontScale = parseFloat((appState.settings.fontScale - 0.1).toFixed(2)); applySettings(); saveState(); });
+            dom.settings.fullscreenBtn.addEventListener('click', () => {
+                if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(err => console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`)); } 
+                else { document.exitFullscreen(); }
+            });
+            dom.settings.layoutToggleBtn.addEventListener('click', () => {
+                appState.settings.layout = appState.settings.layout === 'auto' ? 'portrait' : 'auto';
+                applySettings();
+                saveState();
+            });
+
+            dom.game.gameCards.forEach(card => {
+                const gameName = card.dataset.game;
+                if (gameName !== 'typingSprint') { card.addEventListener('click', () => { if (games[gameName]) { appState.activeGame = games[gameName]; showView(gameName, 'game'); } }); }
+            });
+
+            const init = async () => {
+                loadState(); populateMethods(); applySettings(); updateStreak(); updateHistoryList();
+                await fetchQuotes(); await fetchWords(500);
+                for (const game in games) { if (games[game].init) games[game].init(); }
+            };
+
+            init();
+        });
+    </script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
