@@ -81,39 +81,57 @@
             width: 90%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem 0;
             transition: max-width 0.3s ease-in-out;
         }
-
-        body.portrait-view .container {
-            max-width: 580px;
-        }
         
+        main.container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 0;
+        }
+
         header {
-            background: var(--secondary-bg);
-            border-bottom: 1px solid var(--glass-border);
+            background: #1976D2; /* Blue color */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             padding: 1rem 0;
             position: sticky;
             top: 0;
             z-index: 1000;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease-in-out;
+            flex-shrink: 0;
+        }
+        header .logo h1, header .logo p {
+            color: #FFFFFF;
+        }
+        header .settings button {
+            color: #FFFFFF;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        header .settings button:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+
+        body.practice-active header {
+            display: none;
         }
 
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
-        .logo { text-decoration: none; color: var(--highlight-text); }
+        .logo { text-decoration: none; }
         .logo h1 { font-size: clamp(1.5rem, 4vw, 1.8rem); }
-        .logo p { font-size: 0.8rem; color: var(--secondary-text); margin-top: -5px; }
+        .logo p { font-size: 0.8rem; margin-top: -5px; opacity: 0.9;}
         
         .settings { display: flex; align-items: center; gap: 0.5rem; }
         .settings button {
             background: transparent;
-            color: var(--primary-text);
-            border: 1px solid var(--glass-border);
             border-radius: 6px;
             padding: 0.3rem 0.8rem;
             cursor: pointer;
@@ -126,7 +144,6 @@
             transition: background-color 0.2s;
             white-space: nowrap;
         }
-        .settings button:hover { background-color: var(--glass-border); }
 
         .settings .font-control { display: flex; gap: 0.25rem; }
         .settings .font-control button { width: 42px; gap: 0;}
@@ -143,9 +160,22 @@
         }
 
         .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        .page.active { 
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            animation: fadeIn 0.5s ease-in-out; 
+        }
+
         .view { display: none; }
         .view.active { display: block; }
+        
+        #practice-typing-view.view.active {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-height: 0; /* Flexbox fix for overflow */
+        }
         
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -178,7 +208,7 @@
             grid-template-columns: 1fr;
             gap: 1.5rem;
             margin-bottom: 2rem;
-            max-width: 600px;
+            max-width: 800px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -196,6 +226,32 @@
             cursor: pointer;
         }
         
+        .language-select {
+            display: flex;
+            gap: 0.5rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.25rem;
+            background-color: var(--primary-bg);
+        }
+        .lang-btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: var(--font-ui);
+            font-size: 1rem;
+            color: var(--secondary-text);
+            transition: background-color 0.2s, color 0.2s;
+            font-weight: 600;
+        }
+        .lang-btn.active {
+            background-color: var(--accent-color);
+            color: #ffffff;
+        }
+
         .streak-card { border-left-color: var(--correct-char); margin-top: 1rem; }
         .streak-card h4 { color: var(--correct-char); margin-bottom: 0.5rem; }
         .streak-card p { font-size: 0.9rem; text-align: center; }
@@ -221,30 +277,78 @@
         .cta-button:disabled { background-color: var(--secondary-text); cursor: not-allowed; }
 
         .stats-dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
             text-align: center;
+            flex-wrap: wrap;
+            flex-shrink: 0;
         }
-        .stat-card { padding: 1rem; }
-        .stat-card .value { font-size: clamp(1.8rem, 6vw, 2.5rem); font-weight: 700; color: var(--highlight-text); }
-        .stat-card .label { font-size: 0.9rem; color: var(--secondary-text); }
+        .stat-card { 
+            padding: 0.5rem 1rem;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.5rem;
+            border-radius: 25px; /* Pill shape */
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .stat-card.good {
+            background-color: rgba(0, 255, 127, 0.15);
+            border-color: rgba(0, 255, 127, 0.5);
+        }
+        .stat-card.good .value {
+            color: var(--correct-char);
+        }
+        .stat-card.poor {
+            background-color: rgba(220, 53, 69, 0.15);
+            border-color: rgba(220, 53, 69, 0.5);
+        }
+        .stat-card.poor .value {
+            color: var(--incorrect-char);
+        }
 
-        .typing-area-wrapper { position: relative; }
+        .stat-card .value { 
+            font-size: clamp(1.2rem, 4vw, 1.5rem); 
+            font-weight: 600;
+            color: var(--highlight-text); 
+            line-height: 1;
+            transition: color 0.3s ease;
+        }
+        .stat-card .label { 
+            font-size: 0.8rem; 
+            color: var(--secondary-text); 
+            line-height: 1;
+            margin-top: 2px; /* Small alignment fix */
+        }
+
+        .typing-area-wrapper { 
+            position: relative;
+            flex-grow: 1; /* This makes it fill the space */
+            min-height: 100px; /* Minimum height */
+            display: flex;
+            padding: 1rem;
+        }
         .typing-area {
             font-size: clamp(1.5rem, 4vw, 1.8rem);
             line-height: 1.8;
             user-select: none;
             color: var(--secondary-text);
-            height: calc(clamp(1.5rem, 4vw, 1.8rem) * 1.8 * 3); /* 3 lines visible */
+            height: 100%;
+            width: 100%;
             overflow: hidden;
             position: relative;
+            cursor: text;
         }
         .typing-area.english { font-family: var(--font-english); }
         .typing-area.hindi { font-family: var(--font-hindi); }
 
-        .typing-text { position: absolute; transition: top 0.2s linear; }
+        .typing-text { 
+            position: relative;
+            width: 100%;
+            transition: transform 0.2s ease-out; 
+        }
         
         .char { display: inline; }
         .char.correct { color: var(--correct-char); }
@@ -264,9 +368,26 @@
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        #hidden-input { position: absolute; left: -9999px; opacity: 0; }
+        #hidden-input {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            margin: -1px;
+            padding: 0;
+            border: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+        }
         
-        .typing-actions { text-align: center; margin-top: 1.5rem; }
+        .typing-actions { 
+            text-align: center; 
+            margin-top: 1rem; 
+            flex-shrink: 0;
+        }
         .typing-actions .cta-button { width: auto; padding: 0.8rem 2rem; font-size: 1rem; }
 
         .results-container { text-align: center; }
@@ -345,18 +466,40 @@
             font-size: 1.5rem;
         }
         #rotate-overlay p { max-width: 80%; }
+        #rotate-overlay .cta-button {
+            margin-top: 1.5rem;
+            width: auto;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            background-color: var(--accent-color);
+        }
+        #rotate-overlay .cta-button:hover {
+            background-color: var(--accent-hover);
+        }
 
-        @media (max-height: 500px) and (orientation: landscape) {
+        @media (orientation: portrait) {
             #rotate-overlay { display: flex; }
+        }
+        
+        @media (min-width: 768px) {
+            .setup-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .setup-grid .language-card {
+                grid-column: 1 / -1;
+            }
         }
 
         @media (max-width: 768px) {
             .container { width: 95%; }
-            .header-content { flex-direction: column; gap: 1rem; }
+            main.container { padding: 1rem 0; }
+            .header-content { justify-content: center; }
             .logo { text-align: center; }
             .settings { flex-wrap: wrap; justify-content: center; }
-            .stats-dashboard { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-            .stat-card { padding: 0.75rem; }
+            .stats-dashboard { 
+                gap: 0.5rem; 
+            }
+            .stat-card { padding: 0.5rem 0.75rem; }
             .results-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
         }
 
@@ -368,7 +511,7 @@
     </style>
 <link rel="stylesheet" href="/index.css">
 </head>
-<body>
+<body class="theme-dark">
     <header>
         <div class="container header-content">
             <a href="https://www.examyatri.live" target="_blank" rel="noopener noreferrer" class="logo">
@@ -376,13 +519,10 @@
                 <p>typing se hoga success Yatra</p>
             </a>
             <div class="settings">
-                <button id="theme-toggle-btn" aria-label="Toggle theme">🌙 Theme</button>
                 <div class="font-control">
                     <button id="font-decrease-btn" aria-label="Decrease font size">A-</button>
                     <button id="font-increase-btn" aria-label="Increase font size">A+</button>
                 </div>
-                <button id="layout-toggle-btn" aria-label="Toggle layout mode">🔄 Layout</button>
-                <button id="fullscreen-btn" aria-label="Toggle fullscreen">↗️ Fullscreen</button>
                 <button id="practice-game-btn">Practice with Game</button>
             </div>
         </div>
@@ -407,6 +547,13 @@
                             <option value="30">30 Minutes</option>
                         </select>
                     </div>
+                     <div class="glass-card language-card">
+                        <h3>3. Select Language</h3>
+                        <div id="language-select" class="language-select">
+                            <button class="lang-btn active" data-lang="english">English</button>
+                            <button class="lang-btn" data-lang="hindi">Hindi</button>
+                        </div>
+                    </div>
                     <div class="glass-card streak-card">
                          <p>Practice Streak: <span id="streak-count" class="streak">0</span> days 🔥</p>
                     </div>
@@ -417,10 +564,10 @@
 
             <div id="practice-typing-view" class="view">
                  <div class="stats-dashboard">
-                    <div class="stat-card glass-card"><div id="time-left" class="value">00:00</div><div class="label">Time Left</div></div>
-                    <div class="stat-card glass-card"><div id="wpm" class="value">0</div><div class="label">WPM</div></div>
-                    <div class="stat-card glass-card"><div id="accuracy" class="value">100</div><div class="label">Accuracy %</div></div>
-                     <div class="stat-card glass-card"><div id="errors" class="value">0</div><div class="label">Errors</div></div>
+                    <div class="stat-card glass-card"><div class="label">Time</div><div id="time-left" class="value">00:00</div></div>
+                    <div class="stat-card glass-card"><div class="label">WPM</div><div id="wpm" class="value">0</div></div>
+                    <div class="stat-card glass-card"><div class="label">Acc %</div><div id="accuracy" class="value">100</div></div>
+                     <div class="stat-card glass-card"><div class="label">Errors</div><div id="errors" class="value">0</div></div>
                 </div>
                 <div class="typing-area-wrapper glass-card">
                     <div id="typing-area" class="typing-area english">
@@ -431,7 +578,7 @@
                 <div class="typing-actions">
                     <button id="submit-test-btn" class="cta-button">Submit Test</button>
                 </div>
-                <textarea id="hidden-input" autofocus autocapitalize="none" autocorrect="off"></textarea>
+                <textarea id="hidden-input" autofocus autocapitalize="none" autocorrect="off" inputmode="text"></textarea>
             </div>
 
             <div id="practice-results-view" class="view">
@@ -500,7 +647,8 @@
     </main>
 
     <div id="rotate-overlay">
-        <p>🔄<br>Please rotate your device to portrait for the best experience.</p>
+        <p>🔄<br>Please rotate your device to landscape for the best experience.</p>
+        <button id="force-rotate-btn" class="cta-button">Switch to Landscape</button>
     </div>
 
     <script>
@@ -508,6 +656,7 @@
             const dom = {
                 html: document.documentElement,
                 body: document.body,
+                header: document.querySelector('header'),
                 pages: {
                     practice: document.getElementById('practice-page'),
                     game: document.getElementById('game-page'),
@@ -530,6 +679,7 @@
                     startBtn: document.getElementById('start-practice-btn'),
                     streakCount: document.getElementById('streak-count'),
                     loadingStatus: document.getElementById('loading-status'),
+                    languageBtns: document.querySelectorAll('.lang-btn'),
                 },
                 typing: {
                     timeLeft: document.getElementById('time-left'),
@@ -554,25 +704,56 @@
                     historyList: document.getElementById('history-list'),
                 },
                 settings: {
-                    themeToggleBtn: document.getElementById('theme-toggle-btn'),
                     fontIncreaseBtn: document.getElementById('font-increase-btn'),
                     fontDecreaseBtn: document.getElementById('font-decrease-btn'),
-                    fullscreenBtn: document.getElementById('fullscreen-btn'),
-                    layoutToggleBtn: document.getElementById('layout-toggle-btn'),
                     practiceGameBtn: document.getElementById('practice-game-btn'),
                 },
                 game: {
                     backToPracticeBtn: document.getElementById('back-to-practice-btn'),
                     gameCards: document.querySelectorAll('.game-card'),
-                }
+                },
+                rotateOverlayBtn: document.getElementById('force-rotate-btn'),
             };
 
             let sentenceCache = [];
             let wordCache = [];
 
             const OFFLINE_FALLBACK_SENTENCES = [
-                "The sun always shines brightest after the rain.", "A journey of a thousand miles must begin with a single step.", "Believe you can and you're halfway there.", "The only way to do great work is to love what you do.", "Success is not final, failure is not fatal: it is the courage to continue that counts.", "You miss one hundred percent of the shots you don't take.", "The future belongs to those who believe in the beauty of their dreams.", "Strive not to be a success, but rather to be of value.", "In the middle of every difficulty lies opportunity.", "The best time to plant a tree was twenty years ago. The second best time is now.", "An unexamined life is not worth living.", "Everything you can imagine is real.", "It is never too late to be what you might have been.", "What we think, we become.", "The mind is everything.", "To live is the rarest thing in the world. Most people exist, that is all.", "Be yourself; everyone else is already taken.", "We are all in the gutter, but some of us are looking at the stars.", "Imperfection is beauty, madness is genius and it's better to be absolutely ridiculous than absolutely boring.", "There are only two ways to live your life. One is as though nothing is a miracle. The other is as though everything is a miracle.", "Life is what happens when you're busy making other plans.", "Get busy living or get busy dying.", "The purpose of our lives is to be happy.", "You only live once, but if you do it right, once is enough.", "Many of life's failures are people who did not realize how close they were to success when they gave up.", "If you want to live a happy life, tie it to a goal, not to people or things.", "Never let the fear of striking out keep you from playing the game.", "Money and success don’t change people; they merely amplify what is already there.", "Your time is limited, so don’t waste it living someone else’s life.", "The whole secret of a successful life is to find out what is one’s destiny to do, and then do it.", "The big lesson in life, baby, is never be scared of anyone or anything.", "Curvy roads are the most beautiful.", "Life is not a problem to be solved, but a reality to be experienced.", "The unexamined life is not worth living.", "Turn your wounds into wisdom.", "The way to get started is to quit talking and begin doing.", "Life is what we make it, always has been, always will be.", "The greatest glory in living lies not in never falling, but in rising every time we fall.", "Life is really simple, but we insist on making it complicated.", "May you live all the days of your life.", "Life itself is the most wonderful fairy tale.", "Do not let making a living prevent you from making a life.", "Go confidently in the direction of your dreams! Live the life you've imagined.", "Keep smiling, because life is a beautiful thing and there’s so much to smile about.", "Life is a long lesson in humility.", "In three words I can sum up everything I've learned about life: it goes on.", "Love the life you live. Live the life you love.", "Life is like riding a bicycle. To keep your balance, you must keep moving.", "You will face many defeats in life, but never let yourself be defeated.", "The only impossible journey is the one you never begin."
+                "The sun always shines brightest after the rain.", "A journey of a thousand miles must begin with a single step.", "Believe you can and you're halfway there.", "The only way to do great work is to love what you do.", "Success is not final, failure is not fatal: it is the courage to continue that counts.", "You miss one hundred percent of the shots you don't take.", "The future belongs to those who believe in the beauty of their dreams.", "Strive not to be a success, but rather to be of value.", "In the middle of every difficulty lies opportunity.", "The best time to plant a tree was twenty years ago. The second best time is now.", "An unexamined life is not worth living.", "Everything you can imagine is real.", "It is never too late to be what you might have been.", "What we think, we become.", "The mind is everything.", "To live is the rarest thing in the world. Most people exist, that is all.", "Be yourself; everyone else is already taken.", "We are all in the gutter, but some of us are looking at the stars.", "Imperfection is beauty, madness is genius and it's better to be absolutely ridiculous than absolutely boring.", "There are only two ways to live your life. One is as though nothing is a miracle. The other is as though everything is a miracle.", "Life is what happens when you're busy making other plans.", "Get busy living or get busy dying.", "The purpose of our lives is to be happy.", "You only live once, but if you do it right, once is enough.", "Many of life's failures are people who did not realize how close they were to success when they gave up.", "If you want to live a happy life, tie it to a goal, not to people or things.", "Never let the fear of striking out keep you from playing the game.", "Money and success don’t change people; they merely amplify what is already there.", "Your time is limited, so don’t waste it living someone else’s life.", "The whole secret of a successful life is to find out what is one’s destiny to do, and then do it.", "The big lesson in life, baby, is never be scared of anyone or anything.", "Curvy roads are the most beautiful.", "Life is not a problem to be solved, but a reality to be experienced.", "The unexamined life is not worth living.", "Turn your wounds into wisdom.", "The way to get started is to quit talking and begin doing.", "Life is what we make it, always has been, always will be.", "The greatest glory in living lies not in never falling, but in rising every time we fall.", "Life is really simple, but we insist on making it complicated.", "May you live all the days of your life.", "Life itself is the most wonderful fairy tale.", "Do not let making a living prevent you from making a life.", "Go confidently in the direction of your dreams! Live the life you've imagined.", "Keep smiling, because life is a beautiful thing and there’s so much to smile about.", "Life is a long lesson in humility.", "In three words I can sum up everything I've learned about life: it goes on.", "Love the life you live. Live the life you love.", "Life is like riding a bicycle. To keep your balance, you must keep moving.", "You will face many defeats in life, but never let yourself be defeated.", "The only impossible journey is the one you never begin.",
+                "The quick brown fox jumps over the lazy dog.", "Technology has changed the way we live and work.", "The internet connects people from all over the world.", "Reading books is a great way to expand your knowledge.", "Learning a new language opens up new opportunities.", "Music has the power to soothe the soul and lift the spirits.", "The early bird catches the worm.", "Actions speak louder than words.", "A picture is worth a thousand words.", "Honesty is the best policy.", "Where there is a will, there is a way.", "Practice makes perfect.", "Don't count your chickens before they hatch.", "Every cloud has a silver lining.", "The grass is always greener on the other side.", "Look before you leap.", "When in Rome, do as the Romans do.", "You can't judge a book by its cover.", "Two heads are better than one.", "The pen is mightier than the sword."
             ];
+
+            const HINDI_FALLBACK_SENTENCES = [
+                "सूरज की पहली किरण आशा लेकर आती है।", "सच्चा मित्र वही है जो कठिन समय में साथ दे।", "परिश्रम ही सफलता की कुंजी है।", "ज्ञान सबसे बड़ी शक्ति है।", "एक हजार मील की यात्रा एक कदम से शुरू होती है।", "समय किसी का इंतजार नहीं करता।", "स्वस्थ शरीर में ही स्वस्थ मन का वास होता है।", "किताबें हमारी सबसे अच्छी दोस्त होती हैं।", "जीवन एक अनमोल उपहार है, इसे व्यर्थ न करें।", "धैर्य और लगन से हर मुश्किल आसान हो जाती है।", "जोखिम उठाए बिना प्रगति संभव नहीं है।", "आपका भविष्य आपके आज के कर्मों पर निर्भर करता है।", "सकारात्मक सोच से जीवन में सकारात्मक बदलाव आते हैं।", "शिक्षा का उद्देश्य केवल नौकरी पाना नहीं, बल्कि एक अच्छा इंसान बनना है।", "प्रकृति की सुंदरता मन को शांति देती है।", "गलतियों से सीखना ही बुद्धिमानी है।", "एकता में ही बल है।", "वाणी में मधुरता और व्यवहार में विनम्रता होनी चाहिए।", "लक्ष्य के बिना जीवन दिशाहीन होता है।", "सफलता का कोई शॉर्टकट नहीं होता।",
+                "जीवन एक यात्रा है, इसका आनंद लें।", "क्रोध में बोला गया एक शब्द भी घातक हो सकता है।", "जो जैसा बोता है, वैसा ही काटता है।", "शिक्षा सबसे शक्तिशाली हथियार है जिसका उपयोग आप दुनिया को बदलने के लिए कर सकते हैं।", "असंभव शब्द केवल कायरों के शब्दकोश में पाया जाता है।", "स्वच्छता ही सेवा है।", "एक अच्छी शुरुआत आधे काम के बराबर होती है।", "सफलता का रहस्य निरंतरता है।", "समय और ज्वार किसी का इंतजार नहीं करते।", "सादा जीवन, उच्च विचार।", "अनुशासन ही देश को महान बनाता है।", "अपने सपनों को साकार करने का सबसे अच्छा तरीका है जाग जाना।", "एक स्वस्थ राष्ट्र के लिए स्वस्थ नागरिक आवश्यक हैं।", "बदलाव ही संसार का नियम है।", "ईमानदारी सबसे अच्छी नीति है।", "आत्मविश्वास और कड़ी मेहनत आपको हमेशा सफलता दिलाएगी।", "पेड़ लगाओ, जीवन बचाओ।", "संगीत आत्मा की भाषा है।", "कला जीवन का प्रतिबिंब है।", "ज्ञान बांटने से बढ़ता है।",
+                "हर मुश्किल में एक अवसर छिपा होता है।", "विनम्रता से बड़ा कोई गुण नहीं।", "क्षमा वीरों का आभूषण है।", "साहस का अर्थ भय की अनुपस्थिति नहीं, बल्कि भय पर विजय है।", "एक सच्चा नेता रास्ता जानता है, रास्ता दिखाता है और रास्ते पर चलता है।", "भविष्य उनका है जो अपने सपनों की सुंदरता में विश्वास करते हैं।", "कर्म करो, फल की चिंता मत करो।", "अंधकार को कोसने से बेहतर है एक दीया जलाना।", "छोटी-छोटी बातों में खुशी ढूंढना ही जीवन है।", "एक मुस्कान बिना किसी लागत के बहुत कुछ देती है।", "संतोष सबसे बड़ा धन है।", "आप तब तक नहीं हारते जब तक आप प्रयास करना नहीं छोड़ते।", "एक विचार आपके जीवन को बदल सकता है।", "योग मन और शरीर को जोड़ता है।", "पढ़ना मन के लिए व्यायाम है।", "सच्चाई की हमेशा जीत होती है।", "अच्छे काम का फल हमेशा अच्छा होता है।", "परिवार ही हमारी असली ताकत है।", "दोस्ती एक अनमोल रिश्ता है।", "मानवता सबसे बड़ा धर्म है।"
+            ];
+            
+            const fetchWikipediaText = async (lang = 'en') => {
+                const apiUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*`;
+                try {
+                    const randomPageRes = await fetch(apiUrl);
+                    if (!randomPageRes.ok) throw new Error('Failed to get random page');
+                    const randomPageData = await randomPageRes.json();
+                    const pageTitle = randomPageData.query.random[0].title;
+                    if (!pageTitle) throw new Error('No page title found');
+
+                    const contentUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&prop=extracts&exlimit=1&titles=${encodeURIComponent(pageTitle)}&explaintext=true&formatversion=2&format=json&origin=*`;
+                    const contentRes = await fetch(contentUrl);
+                    if (!contentRes.ok) throw new Error('Failed to get page content');
+                    const contentData = await contentRes.json();
+                    const pageContent = contentData.query.pages[0].extract;
+
+                    if (pageContent && pageContent.length > 50) {
+                        return pageContent.replace(/\[\d+\]/g, '').replace(/(\r\n|\n|\r)/gm, " ").replace(/\s+/g, ' ').trim();
+                    } else {
+                        throw new Error('Content too short or missing');
+                    }
+                } catch (error) {
+                    console.warn(`Failed to fetch from Wikipedia (${lang}):`, error);
+                    return null; // Signal failure
+                }
+            };
 
             const wordsToSentences = (words, minLength = 8, maxLength = 15) => {
                 const sentences = [];
@@ -631,15 +812,17 @@
                 startBtn.disabled = false;
             };
 
-            const getPracticeText = (type = 'paragraph') => {
-                if (sentenceCache.length === 0) return "Loading failed. Please try again later.";
+            const getPracticeText = (type = 'paragraph', lang = 'english') => {
+                const sourceCache = lang === 'hindi' ? HINDI_FALLBACK_SENTENCES : sentenceCache;
+                if (sourceCache.length === 0) return lang === 'hindi' ? "हिन्दी पाठ लोड करने में विफल। कृपया बाद में प्रयास करें।" : "Loading failed. Please try again later.";
+                
                 if (type === 'sentence') {
-                    const randomIndex = Math.floor(Math.random() * sentenceCache.length);
-                    return sentenceCache[randomIndex] + ' ';
+                    const randomIndex = Math.floor(Math.random() * sourceCache.length);
+                    return sourceCache[randomIndex] + ' ';
                 } else {
-                    const paragraphLength = Math.min(sentenceCache.length, Math.floor(Math.random() * 6) + 5); // 5-10 sentences
-                    const startIndex = Math.floor(Math.random() * (sentenceCache.length - paragraphLength + 1));
-                    return sentenceCache.slice(startIndex, startIndex + paragraphLength).join(' ') + ' ';
+                    const paragraphLength = Math.min(sourceCache.length, Math.floor(Math.random() * 6) + 5); // 5-10 sentences
+                    const startIndex = Math.floor(Math.random() * (sourceCache.length - paragraphLength + 1));
+                    return sourceCache.slice(startIndex, startIndex + paragraphLength).join(' ') + ' ';
                 }
             };
             
@@ -659,15 +842,29 @@
             };
             
             const getSprintText = async (difficulty) => {
-                 switch(difficulty) {
-                    case 'easy':
-                        return (await fetchWords(30)).join(' ') + ' ';
-                    case 'hard':
-                         return practiceMethods["Beginner Foundations"]["6. Punctuation Practice"].fetch();
-                    case 'medium':
-                    default:
-                        return practiceMethods["Skill Building"]["9. Sentence Practice"].fetch();
+                 const langCode = appState.testConfig.language === 'hindi' ? 'hi' : 'en';
+                 let text = await fetchWikipediaText(langCode);
+                 if (text) {
+                     const sentences = text.match(/[^.!?।]+[.!?।]+/g) || [text];
+                     return (sentences[0] || text) + ' ';
+                 }
+                 // Fallback if Wikipedia fails
+                 return getPracticeText('sentence', appState.testConfig.language);
+            };
+
+            const createDynamicFetch = (type) => async () => {
+                const lang = appState.testConfig.language === 'hindi' ? 'hi' : 'en';
+                let text = await fetchWikipediaText(lang);
+
+                if (text) {
+                    if (type === 'sentence') {
+                        const sentences = text.match(/[^.!?।]+[.!?।]+/g) || [text];
+                        text = sentences[0] || text;
+                    }
+                } else {
+                    text = getPracticeText(type, appState.testConfig.language);
                 }
+                return text + ' ';
             };
 
             const practiceMethods = {
@@ -681,39 +878,36 @@
                     "7. Number Pad Practice": { isDynamic: false, fetch: () => Promise.resolve("789 * 123 = 97047. 456 + 789 = 1245. 987 - 654 = 333. 10 / 2 = 5. The total is 4,567.89.") },
                 },
                 "Skill Building": {
-                    "8. Common Words Practice": { isDynamic: true, fetch: () => {
-                        const commonWords = ["the","be","to","of","and","a","in","that","have","it","for","not","on","with","he","as","you","do","at","this","but","his","by","from","they","we","say","her","she","or","an","will","my","one","all","would","there","their","what","so","up","out","if","about","who","get","which","go","me","when","make","can","like","time","no","just","him","know","take","people","into","year","your","good","some","could","them","see","other","than","then","now","look","only","come","its","over","think","also","back","after","use","two","how","our","work","first","well","way","even","new","want","because","any","these","give","day","most","us"];
-                        return Promise.resolve([...Array(50)].map(() => commonWords[Math.floor(Math.random() * commonWords.length)]).join(' ') + ' ');
-                    }},
-                    "9. Sentence Practice": { isDynamic: true, fetch: () => Promise.resolve(getPracticeText('sentence')) },
-                    "10. Paragraph Typing": { isDynamic: true, fetch: () => Promise.resolve(getPracticeText('paragraph')) },
+                    "8. Common Words Practice": { isDynamic: true, fetch: async () => (await fetchWords(50)).join(' ') + ' ' },
+                    "9. Sentence Practice": { isDynamic: true, fetch: createDynamicFetch('sentence') },
+                    "10. Paragraph Typing": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
                     "11. Random Words": { isDynamic: true, fetch: async () => (await fetchWords(50)).join(' ') + ' ' },
-                    "12. Accuracy Focus": { isDynamic: true, fetch: () => Promise.resolve(getPracticeText('paragraph')) },
-                    "13. Error Correction": { isDynamic: true, fetch: () => Promise.resolve(getPracticeText('paragraph')) },
-                    "14. Typing Sprint": { isDynamic: true, fetch: () => Promise.resolve(getPracticeText('sentence')) },
+                    "12. Accuracy Focus": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
+                    "13. Error Correction": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
+                    "14. Typing Sprint": { isDynamic: true, fetch: createDynamicFetch('sentence') },
                 },
                 "Advanced & Thematic Practice": {
-                    "15. Speed Test": { isDynamic: true, fetch: () => Promise.resolve(getPracticeText('paragraph')) },
-                    "16. Quotes Typing": { isDynamic: true, fetch: () => Promise.resolve(getPracticeText('sentence')) },
+                    "15. Speed Test": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
+                    "16. Quotes Typing": { isDynamic: true, fetch: createDynamicFetch('sentence') },
                     "17. Mixed Text Practice": { isDynamic: false, fetch: () => Promise.resolve("On 12/25/2023, Project-X reported a 15% increase in sales, reaching $1.2M. The report, titled \"Q4-Results\", is available online. Contact support@example.com for more info.") },
                     "18. Email / Letter Typing": { isDynamic: false, fetch: () => Promise.resolve("Dear Hiring Manager, I am writing to express my interest in the Software Engineer position. My resume is attached for your review. I look forward to hearing from you. Sincerely, Alex.") },
                     "19. News Article Typing": { isDynamic: false, fetch: () => Promise.resolve("Local authorities announced today that the city's annual festival will proceed as planned, with new safety measures in place. The event, which draws thousands of visitors, is a significant boost to the local economy.") },
                     "20. Programming Code (JS)": { isDynamic: false, fetch: () => Promise.resolve("function greet(name) { const message = `Hello, ${name}!`; console.log(message); } for (let i = 0; i < 5; i++) { if (i % 2 === 0) { greet('World'); } }") },
-                    "21. Transcription Practice": { isDynamic: true, fetch: () => Promise.resolve(getPracticeText('paragraph')) },
+                    "21. Transcription Practice": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
                 },
                 "Challenges & Special Modes": {
-                    "22. Copy Typing Challenge": { isDynamic: true, fetch: () => Promise.resolve(getPracticeText('paragraph')) },
-                    "23. Blind Typing (Focus on Screen)": { isDynamic: true, fetch: () => Promise.resolve(getPracticeText('paragraph')) },
-                    "24. AI Competition Mode (Text)": { isDynamic: true, fetch: () => Promise.resolve(getPracticeText('paragraph')) },
+                    "22. Copy Typing Challenge": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
+                    "23. Blind Typing (Focus on Screen)": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
+                    "24. AI Competition Mode (Text)": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
                     "25. Custom Text Practice": { isDynamic: false, fetch: () => Promise.resolve("This feature is coming soon! You will be able to paste your own text here to practice.") },
                 }
             };
             
             let appState = {
                 timerId: null, isFetchingMore: false, currentView: 'setup', activeGame: null,
-                testConfig: { method: '', duration: 1, text: '', isDynamic: false, sprintDifficulty: 'medium' },
+                testConfig: { method: '', duration: 1, text: '', isDynamic: false, sprintDifficulty: 'medium', language: 'english' },
                 testStats: { startTime: 0, charIndex: 0, typedChars: 0, correctChars: 0, errorCount: 0, keystrokes: 0, timeLeft: 0, chars: [], },
-                settings: { theme: 'dark', fontScale: 1.0, layout: 'auto' },
+                settings: { theme: 'dark', fontScale: 1.0 },
                 userData: { streak: 0, lastPracticeDate: null, history: [], },
             };
 
@@ -737,8 +931,19 @@
 
             const showView = (view, page='practice') => {
                 appState.currentView = view;
-                if (page === 'practice') { Object.values(dom.views).forEach(v => v.classList.remove('active')); dom.views[view].classList.add('active'); } 
-                else if (page === 'game') { Object.values(dom.gameViews).forEach(v => v.classList.remove('active')); dom.gameViews[view].classList.add('active'); }
+                if (page === 'practice') { 
+                    Object.values(dom.views).forEach(v => v.classList.remove('active')); 
+                    dom.views[view].classList.add('active'); 
+                } else if (page === 'game') { 
+                    Object.values(dom.gameViews).forEach(v => v.classList.remove('active'));
+                    dom.gameViews[view].classList.add('active'); 
+                }
+
+                if (page === 'practice' && view === 'typing') {
+                    dom.body.classList.add('practice-active');
+                } else {
+                    dom.body.classList.remove('practice-active');
+                }
             };
             
             const populateMethods = () => {
@@ -763,22 +968,54 @@
             };
 
             const startPractice = async (isSprint = false) => {
-                dom.setup.startBtn.disabled = true; dom.setup.startBtn.textContent = 'Loading Text...';
+                dom.setup.startBtn.disabled = true; 
+                dom.setup.startBtn.textContent = 'Fetching Text...';
+                
                 let methodName, method;
-                if(isSprint) { methodName = `Typing Sprint (${appState.testConfig.sprintDifficulty})`; appState.testConfig.text = await getSprintText(appState.testConfig.sprintDifficulty); appState.testConfig.isDynamic = false; } 
-                else { const [category, mName] = dom.setup.methodSelect.value.split(':'); methodName = mName; method = practiceMethods[category][mName]; appState.testConfig.isDynamic = method.isDynamic; let initialText = await method.fetch(); if (appState.testConfig.isDynamic) { initialText += await method.fetch(); } appState.testConfig.text = initialText; }
-                dom.setup.startBtn.disabled = false; dom.setup.startBtn.textContent = 'Start Practice';
-                dom.typing.typingText.style.color = ''; appState.testConfig.duration = isSprint ? 1 : parseInt(dom.setup.durationSelect.value, 10); appState.testConfig.method = methodName;
-                if (appState.timerId) clearInterval(appState.timerId); appState.timerId = null;
+                if(isSprint) { 
+                    methodName = `Typing Sprint (${appState.testConfig.sprintDifficulty})`; 
+                    appState.testConfig.text = await getSprintText(appState.testConfig.sprintDifficulty); 
+                    appState.testConfig.isDynamic = false; 
+                } else { 
+                    const [category, mName] = dom.setup.methodSelect.value.split(':'); 
+                    methodName = mName; 
+                    method = practiceMethods[category][mName]; 
+                    appState.testConfig.isDynamic = method.isDynamic; 
+                    let initialText = await method.fetch(); 
+                    if (appState.testConfig.isDynamic) { 
+                        initialText += await method.fetch(); // Fetch a second time for more length
+                    } 
+                    appState.testConfig.text = initialText; 
+                }
+
+                dom.setup.startBtn.disabled = false; 
+                dom.setup.startBtn.textContent = 'Start Practice';
+                dom.typing.typingArea.classList.remove('english', 'hindi');
+                dom.typing.typingArea.classList.add(appState.testConfig.language);
+                dom.typing.typingText.style.color = ''; 
+                appState.testConfig.duration = isSprint ? 1 : parseInt(dom.setup.durationSelect.value, 10); 
+                appState.testConfig.method = methodName;
+                if (appState.timerId) clearInterval(appState.timerId); 
+                appState.timerId = null;
                 appState.testStats = { startTime: 0, charIndex: 0, typedChars: 0, correctChars: 0, errorCount: 0, keystrokes: 0, timeLeft: appState.testConfig.duration * 60, chars: splitTextToChars(appState.testConfig.text), };
-                dom.typing.typingText.style.top = '0px'; dom.typing.typingText.innerHTML = appState.testStats.chars.map(char => `<span class="char">${char}</span>`).join('');
-                if (dom.typing.typingText.children.length > 0) { dom.typing.typingText.children[0].classList.add('current'); }
-                dom.typing.hiddenInput.value = ''; updateStatsDisplay(); updateCaretPosition(); showView('typing'); dom.typing.hiddenInput.focus();
+                dom.typing.typingText.style.transform = 'translateY(0px)'; 
+                dom.typing.typingText.innerHTML = appState.testStats.chars.map(char => `<span class="char">${char}</span>`).join('');
+                dom.typing.typingText.appendChild(dom.typing.caret);
+                const charElements = dom.typing.typingText.querySelectorAll('span.char');
+                if (charElements.length > 0) { charElements[0].classList.add('current'); }
+                dom.typing.hiddenInput.value = ''; 
+                updateStatsDisplay(); 
+                updateCaretPosition(); 
+                showView('typing'); 
+                dom.typing.hiddenInput.focus();
             };
 
             const handleTyping = (e) => {
                 if (appState.testStats.timeLeft <= 0 || (!appState.timerId && appState.testStats.startTime > 0)) return;
-                const inputValue = dom.typing.hiddenInput.value; const charElements = dom.typing.typingText.children; const currentTypedCharsArray = splitTextToChars(inputValue); const newCharIndex = currentTypedCharsArray.length;
+                const inputValue = dom.typing.hiddenInput.value; 
+                const charElements = dom.typing.typingText.querySelectorAll('span.char');
+                const currentTypedCharsArray = splitTextToChars(inputValue); 
+                const newCharIndex = currentTypedCharsArray.length;
                 if (charElements[appState.testStats.charIndex]) { charElements[appState.testStats.charIndex].classList.remove('current'); }
                 let correctCount = 0; let errorCount = 0;
                 for (let i = 0; i < newCharIndex; i++) {
@@ -808,20 +1045,68 @@
             };
 
             const updateStatsDisplay = () => {
-                const minutes = Math.floor(appState.testStats.timeLeft / 60); const seconds = appState.testStats.timeLeft % 60; dom.typing.timeLeft.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; dom.typing.errors.textContent = appState.testStats.errorCount;
+                const minutes = Math.floor(appState.testStats.timeLeft / 60); 
+                const seconds = appState.testStats.timeLeft % 60; 
+                dom.typing.timeLeft.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; 
+                dom.typing.errors.textContent = appState.testStats.errorCount;
+                
+                const wpmEl = dom.typing.wpm.parentElement;
+                const accuracyEl = dom.typing.accuracy.parentElement;
+
                 if (appState.testStats.startTime > 0) {
-                    const elapsedTimeMinutes = (Date.now() - appState.testStats.startTime) / 60000; const wpm = elapsedTimeMinutes > 0 ? ((appState.testStats.correctChars / 5) / elapsedTimeMinutes) : 0;
-                    dom.typing.wpm.textContent = Math.round(Math.max(0, wpm)); const accuracy = appState.testStats.typedChars > 0 ? (appState.testStats.correctChars / appState.testStats.typedChars) * 100 : 100; dom.typing.accuracy.textContent = Math.round(accuracy);
-                } else { dom.typing.wpm.textContent = 0; dom.typing.accuracy.textContent = 100; }
+                    const elapsedTimeMinutes = (Date.now() - appState.testStats.startTime) / 60000;
+                    const wpm = elapsedTimeMinutes > 0 ? ((appState.testStats.correctChars / 5) / elapsedTimeMinutes) : 0;
+                    const accuracy = appState.testStats.typedChars > 0 ? (appState.testStats.correctChars / appState.testStats.typedChars) * 100 : 100;
+                    
+                    dom.typing.wpm.textContent = Math.round(Math.max(0, wpm));
+                    dom.typing.accuracy.textContent = Math.round(accuracy);
+                    
+                    wpmEl.classList.remove('good', 'poor');
+                    if (wpm > 40) {
+                        wpmEl.classList.add('good');
+                    } else if (wpm < 20 && elapsedTimeMinutes > 0.08) { 
+                        wpmEl.classList.add('poor');
+                    }
+
+                    accuracyEl.classList.remove('good', 'poor');
+                    if (accuracy >= 98) {
+                        accuracyEl.classList.add('good');
+                    } else if (accuracy < 90) {
+                        accuracyEl.classList.add('poor');
+                    }
+
+                } else { 
+                    dom.typing.wpm.textContent = 0; 
+                    dom.typing.accuracy.textContent = 100;
+                    wpmEl.classList.remove('good', 'poor');
+                    accuracyEl.classList.remove('good', 'poor');
+                    dom.typing.errors.parentElement.classList.remove('good', 'poor');
+                }
             };
             
             const updateCaretPosition = () => {
-                const charElements = dom.typing.typingText.children; const currentEl = charElements[appState.testStats.charIndex] || charElements[charElements.length - 1]; if (!currentEl) { dom.typing.caret.style.display = 'none'; return; }
-                dom.typing.caret.style.display = 'block'; const isAtEnd = appState.testStats.charIndex >= charElements.length; dom.typing.caret.style.left = `${currentEl.offsetLeft + (isAtEnd ? currentEl.offsetWidth : 0)}px`; dom.typing.caret.style.top = `${currentEl.offsetTop}px`;
-                const lineHeight = currentEl.offsetHeight; const currentLineTop = currentEl.offsetTop; const typingAreaHeight = dom.typing.typingArea.clientHeight;
-                const currentScrollTop = -parseInt(dom.typing.typingText.style.top || '0', 10);
-                if (currentLineTop >= currentScrollTop + typingAreaHeight - lineHeight) { dom.typing.typingText.style.top = `-${currentLineTop - (typingAreaHeight - lineHeight * 2)}px`; } 
-                else if (currentLineTop < currentScrollTop) { dom.typing.typingText.style.top = `-${currentLineTop}px`; }
+                const charElements = dom.typing.typingText.querySelectorAll('span.char');
+                const currentEl = charElements[appState.testStats.charIndex] || charElements[charElements.length - 1];
+                if (!currentEl) {
+                    dom.typing.caret.style.display = 'none';
+                    return;
+                }
+
+                dom.typing.caret.style.display = 'block';
+                const isAtEnd = appState.testStats.charIndex >= charElements.length;
+                dom.typing.caret.style.left = `${currentEl.offsetLeft + (isAtEnd ? currentEl.offsetWidth : 0)}px`;
+                dom.typing.caret.style.top = `${currentEl.offsetTop}px`;
+
+                const typingArea = dom.typing.typingArea;
+                const typingText = dom.typing.typingText;
+                const caretTopRelativeToText = currentEl.offsetTop;
+
+                const desiredScrollTop = caretTopRelativeToText;
+
+                const maxScrollTop = typingText.scrollHeight - typingArea.clientHeight;
+                const scrollAmount = Math.max(0, Math.min(desiredScrollTop, maxScrollTop));
+
+                typingText.style.transform = `translateY(-${scrollAmount}px)`;
             };
 
             const updateStreak = () => {
@@ -833,19 +1118,20 @@
             const updateHistoryList = () => { dom.results.historyList.innerHTML = appState.userData.history.map(item => `<li class="history-item"><span>${item.method} - ${item.date}</span><span><strong>${item.netWpm} WPM</strong> at ${item.accuracy}% Acc</span></li>`).join('') || '<li>No history yet. Complete a test!</li>'; };
 
             const applySettings = () => {
-                const themeMap = { dark: '🌙 Theme', light: '☀️ Theme', sepia: '📖 Theme' };
                 dom.body.className = `theme-${appState.settings.theme}`;
-                dom.settings.themeToggleBtn.innerHTML = themeMap[appState.settings.theme];
                 dom.html.style.setProperty('--font-scale', appState.settings.fontScale);
-                if (appState.settings.layout === 'portrait') {
-                    dom.body.classList.add('portrait-view');
-                } else {
-                    dom.body.classList.remove('portrait-view');
-                }
             };
 
             const saveState = () => { localStorage.setItem('examyatriState', JSON.stringify({ settings: appState.settings, userData: appState.userData })); };
-            const loadState = () => { const savedState = localStorage.getItem('examyatriState'); if (savedState) { const parsed = JSON.parse(savedState); appState.settings = { ...appState.settings, ...parsed.settings }; appState.userData = { ...appState.userData, ...parsed.userData }; } };
+            const loadState = () => { 
+                const savedState = localStorage.getItem('examyatriState'); 
+                if (savedState) { 
+                    const parsed = JSON.parse(savedState); 
+                    appState.settings = { ...appState.settings, ...parsed.settings }; 
+                    appState.userData = { ...appState.userData, ...parsed.userData }; 
+                }
+                appState.settings.theme = 'dark'; // Force dark mode
+            };
 
             const gameUtils = {
                 createGameUI(container, title, elements = {}) {
@@ -856,6 +1142,23 @@
             };
             const games = { wordStorm: { state: {}, init() { const c = dom.gameViews.wordStorm; const ui = gameUtils.createGameUI(c, 'Word Storm', { canvas: `<canvas id="word-storm-canvas" class="game-canvas" width="800" height="500"></canvas>`, ui: `<div class="game-ui"><div>Score: <span id="ws-score">0</span></div><div>Lives: <span id="ws-lives">3</span></div></div>`, input: `<input type="text" id="ws-input" class="game-input" placeholder="Type words here..." autocomplete="off">`, instructions: 'Type the falling words before they hit the bottom. Press Enter to submit.' }); const canvas = c.querySelector('#word-storm-canvas'), ctx = canvas.getContext('2d'), input = c.querySelector('#ws-input'), scoreEl = c.querySelector('#ws-score'), livesEl = c.querySelector('#ws-lives'); const reset = (d) => { const s = { easy: { s: 0.8, r: 2500, min: 3, max: 5 }, medium: { s: 1, r: 2000, min: 4, max: 7 }, hard: { s: 1.5, r: 1500, min: 6, max: 10 } }; this.state = { w: [], p: [], sc: 0, l: 3, go: false, af: null, baseSpeed: s[d].s, spawnRate: s[d].r, wordMin: s[d].min, wordMax: s[d].max }; }; const particles = (x, y, t) => { for(let i=0;i<t.length*2;i++)this.state.p.push({x,y,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5,a:1,c:t[Math.floor(Math.random()*t.length)]}) }; const loop = () => { if(this.state.go)return; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--primary-text'); ctx.font='24px Courier New'; this.state.w.forEach((w,i)=>{ w.y+=w.speed;ctx.fillText(w.text,w.x,w.y);if(w.y>canvas.height){this.state.w.splice(i,1);this.state.l--;livesEl.textContent=this.state.l;if(this.state.l<=0)this.end('You ran out of lives!')}}); this.state.p.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;p.a-=.03;ctx.globalAlpha=p.a;ctx.fillText(p.c,p.x,p.y);if(p.a<=0)this.state.p.splice(i,1)});ctx.globalAlpha=1;canvas.style.filter=`brightness(${1-(this.state.baseSpeed-1)*.2})`;this.state.af=requestAnimationFrame(loop)}; const spawn = () => { if(this.state.go)return;this.state.w.push({text:gameUtils.getRandomWord(this.state.wordMin,this.state.wordMax),x:Math.random()*(canvas.width-100),y:0,speed:this.state.baseSpeed+Math.random()});this.state.spawnRate=Math.max(500,this.state.spawnRate*.995);this.state.baseSpeed+=.01;setTimeout(spawn,this.state.spawnRate)}; input.addEventListener('keyup',(e)=>{if(e.key!=='Enter'||this.state.go)return;const t=input.value.trim();const idx=this.state.w.findIndex(w=>w.text===t);if(idx!==-1){const w=this.state.w[idx];particles(w.x,w.y,w.text);this.state.w.splice(idx,1);this.state.sc+=t.length;scoreEl.textContent=this.state.sc;input.value=''}}); this.start=(d)=>{reset(d);ui.overlay.style.display='none';input.disabled=false;input.focus();scoreEl.textContent=this.state.sc;livesEl.textContent=this.state.l;setTimeout(spawn,1000);this.state.af=requestAnimationFrame(loop)}; this.end=(m='Game Over')=>{this.state.go=true;cancelAnimationFrame(this.state.af);ui.overlay.innerHTML=`<h2>${m}</h2><p>Final Score: ${this.state.sc}</p><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Play Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Play Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Play Hard</button></div>`;ui.overlay.style.display='flex';ui.overlay.querySelectorAll('.difficulty-btn').forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));input.disabled=true}; ui.difficultyBtns.forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty)); ui.backBtn.onclick=()=>{this.end();showView('menu','game')}}}, typingRacer: { state: {}, init() { const c=dom.gameViews.typingRacer; const ui=gameUtils.createGameUI(c,'Typing Racer',{ui:`<div class="racetrack"><div class="finish-line"></div><div id="player-car" class="car">🚗</div><div id="ai-car" class="car">💻</div></div>`,instructions:'Type the text below as fast as you can to win the race!'}); const pCar=c.querySelector('#player-car'),aiCar=c.querySelector('#ai-car');const wrap=document.createElement('div');wrap.className='typing-area-wrapper glass-card';wrap.style.marginTop='1rem';wrap.innerHTML=`<div id="tr-typing-area" class="typing-area english"><div id="tr-typing-text" class="typing-text"></div></div><div id="tr-caret" class="caret"></div>`;c.querySelector('.glass-card').appendChild(wrap);const typingText=c.querySelector('#tr-typing-text'),caret=c.querySelector('#tr-caret'),hInput=dom.typing.hiddenInput;const reset=async(d)=>{const s={easy:30,medium:45,hard:60};const tS=d==='hard'?getSprintText('hard'):practiceMethods["Skill Building"]["9. Sentence Practice"].fetch();this.state={text:await tS,chars:[],charIndex:0,totalChars:0,lastCorrectIndex:-1,go:false,aiWpm:s[d],aiInt:null};this.state.chars=splitTextToChars(this.state.text);this.state.totalChars=this.state.chars.length};const updateCars=()=>{const pP=(this.state.charIndex/this.state.totalChars)*90;pCar.style.left=`${pP}%`;if(pP>=90)this.end('You Win!')};const handleTyping=()=>{if(this.state.go)return;const tChars=splitTextToChars(hInput.value);this.state.charIndex=tChars.length;let correct=true;for(let i=0;i<this.state.charIndex;i++){const el=typingText.children[i];if(tChars[i]===this.state.chars[i]){el.className='char correct';if(correct)this.state.lastCorrectIndex=i}else{el.className='char incorrect';correct=false}}pCar.classList.toggle('nitro-boost',correct&&this.state.charIndex>this.state.lastCorrectIndex);for(let i=this.state.charIndex;i<this.state.totalChars;i++)typingText.children[i].className='char';if(typingText.children[this.state.charIndex])typingText.children[this.state.charIndex].classList.add('current');const currEl=typingText.children[this.state.charIndex]||typingText.children[this.state.totalChars-1];if(currEl){caret.style.left=`${currEl.offsetLeft}px`;caret.style.top=`${currEl.offsetTop}px`;if(currEl.offsetTop>100)typingText.style.top=`-${currEl.offsetTop-currEl.offsetHeight}px`}updateCars()};this.start=async(d)=>{await reset(d);ui.overlay.style.display='none';hInput.value='';hInput.oninput=handleTyping;hInput.focus();typingText.innerHTML=this.state.chars.map(c=>`<span class="char">${c}</span>`).join('');if(typingText.children.length>0)typingText.children[0].classList.add('current');updateCars();aiCar.style.left='0%';let aiP=0;const aiInc=(this.state.aiWpm*5)/60/4;this.state.aiInt=setInterval(()=>{if(this.state.go)return;aiP+=aiInc;const aiL=(aiP/this.state.totalChars)*90;aiCar.style.left=`${aiL}%`;if(aiL>=90)this.end('You Lose!')},250)};this.end=(m)=>{if(this.state.go)return;this.state.go=true;clearInterval(this.state.aiInt);hInput.oninput=handleTyping;ui.overlay.innerHTML=`<h2>${m}</h2><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Play Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Play Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Play Hard</button></div>`;ui.overlay.style.display='flex';ui.overlay.querySelectorAll('.difficulty-btn').forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty))};ui.difficultyBtns.forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));ui.backBtn.onclick=()=>{this.end();showView('menu','game')}}}, keyDefender: { state: {}, init() { const c=dom.gameViews.keyDefender; const ui=gameUtils.createGameUI(c,'Key Defender',{canvas:`<canvas id="kd-canvas" class="game-canvas" width="800" height="500"></canvas>`,ui:`<div class="game-ui"><div>Score: <span id="kd-score">0</span></div><div>Base HP: <span id="kd-hp">100</span></div></div>`,input:`<input type="text" id="kd-input" class="game-input" placeholder="Type enemy words..." autocomplete="off">`,instructions:'Destroy enemies by typing their words before they reach your base.'}); const canvas=c.querySelector('#kd-canvas'),ctx=canvas.getContext('2d'),input=c.querySelector('#kd-input'),scoreEl=c.querySelector('#kd-score'),hpEl=c.querySelector('#kd-hp'); const reset=(d)=>{const s={easy:{s:.5,r:3000,hp:150},medium:{s:.8,r:2500,hp:100},hard:{s:1.2,r:1800,hp:75}};this.state={e:[],p:[],sc:0,go:false,af:null,lvl:1,...s[d]}};const explosion=(x,y)=>{for(let i=0;i<20;i++)this.state.p.push({x,y,vx:(Math.random()-.5)*8,vy:(Math.random()-.5)*8,a:1,s:Math.random()*3+1})};const loop=()=>{if(this.state.go)return;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--correct-char');ctx.strokeStyle=ctx.fillStyle;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(20,0);ctx.bezierCurveTo(60,canvas.height/2,60,canvas.height/2,20,canvas.height);ctx.closePath();ctx.globalAlpha=.3;ctx.fill();ctx.globalAlpha=1;ctx.stroke();const textColor=getComputedStyle(document.body).getPropertyValue('--primary-text');ctx.fillStyle=textColor;ctx.font='24px Courier New';this.state.e.forEach((e,i)=>{e.x-=e.speed;const tW=ctx.measureText(e.text).width;ctx.strokeRect(e.x-5,e.y-25,tW+10,35);ctx.fillText(e.text,e.x,e.y);if(e.x<20){this.state.e.splice(i,1);this.state.hp-=10;hpEl.textContent=this.state.hp;canvas.classList.add('shake');setTimeout(()=>canvas.classList.remove('shake'),300);if(this.state.hp<=0)this.end('Your base was destroyed!')}});ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--accent-color');this.state.p.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;p.a-=.04;ctx.globalAlpha=p.a;ctx.fillRect(p.x,p.y,p.s,p.s);if(p.a<=0)this.state.p.splice(i,1)});ctx.globalAlpha=1;this.state.af=requestAnimationFrame(loop)}; const spawn=()=>{if(this.state.go)return;this.state.e.push({text:gameUtils.getRandomWord(4,8),x:canvas.width,y:30+Math.random()*(canvas.height-60),speed:this.state.baseSpeed+Math.random()*.5});if(this.state.sc>this.state.lvl*100){this.state.lvl++;this.state.baseSpeed+=.1;this.state.spawnRate=Math.max(500,this.state.spawnRate*.95)}setTimeout(spawn,this.state.spawnRate)};input.addEventListener('keyup',(e)=>{if(e.key!=='Enter'||this.state.go)return;const t=input.value.trim();const idx=this.state.e.findIndex(w=>w.text===t);if(idx!==-1){const en=this.state.e[idx];explosion(en.x,en.y);this.state.e.splice(idx,1);this.state.sc+=t.length;scoreEl.textContent=this.state.sc;input.value=''}});this.start=(d)=>{reset(d);ui.overlay.style.display='none';input.disabled=false;input.focus();scoreEl.textContent=this.state.sc;hpEl.textContent=this.state.hp;setTimeout(spawn,1000);this.state.af=requestAnimationFrame(loop)};this.end=(m='Game Over')=>{this.state.go=true;cancelAnimationFrame(this.state.af);ui.overlay.innerHTML=`<h2>${m}</h2><p>Final Score: ${this.state.sc}</p><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Play Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Play Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Play Hard</button></div>`;ui.overlay.style.display='flex';ui.overlay.querySelectorAll('.difficulty-btn').forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));input.disabled=true};ui.difficultyBtns.forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));ui.backBtn.onclick=()=>{this.end();showView('menu','game')}}}, typingSprint: { init() { const c=document.querySelector('.game-card[data-game="typingSprint"]'),p=c.querySelector('p'),s=document.createElement('div');s.className='difficulty-select';s.style.justifyContent='center';s.innerHTML=`<button class="difficulty-btn easy" data-difficulty="easy">Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Hard</button>`;s.style.display='none';c.appendChild(s);c.addEventListener('click',(e)=>{if(e.target.classList.contains('difficulty-btn')){appState.testConfig.sprintDifficulty=e.target.dataset.difficulty;showPage('practice');startPractice(true);p.style.display='block';s.style.display='none'}else if(!s.style.display||s.style.display==='none'){p.style.display='none';s.style.display='flex'}})}}, wordBuilder: { state: {}, init() { const c=dom.gameViews.wordBuilder; const ui=gameUtils.createGameUI(c,'Word Builder',{ui:`<div class="word-builder-ui"><div class="scrambled-letters" id="wb-letters"></div><div class="game-ui" style="flex-direction: column; text-align: right;"><div>Time: <span id="wb-time">60</span>s</div><div>Score: <span id="wb-score">0</span></div></div></div><ul id="wb-found-words" class="found-words-list"></ul>`,input:`<input type="text" id="wb-input" class="game-input" placeholder="Build words..." autocomplete="off">`,instructions:'Find as many English words as you can from the given letters.'}); const lEl=c.querySelector('#wb-letters'),tEl=c.querySelector('#wb-time'),sEl=c.querySelector('#wb-score'),fEl=c.querySelector('#wb-found-words'),input=c.querySelector('#wb-input');const reset=(d)=>{const s={easy:{t:90,min:5,max:6},medium:{t:60,min:6,max:7},hard:{t:45,min:7,max:8}};const w=wordCache.find(w=>w.length>=s[d].min&&w.length<=s[d].max)||'default';this.state={l:[...w].sort(()=>Math.random()-.5),f:new Set(),sc:0,go:false,tmr:null,bW:w,tL:s[d].t}};const canMake=(w,l)=>{let tL=[...l];for(const c of w){const i=tL.indexOf(c);if(i===-1)return false;tL.splice(i,1)}return true};input.addEventListener('keyup',(e)=>{if(e.key!=='Enter'||this.state.go)return;const t=input.value.trim().toLowerCase();if(t.length<3)return;if(!this.state.f.has(t)&&canMake(t,this.state.l)&&wordCache.includes(t)){this.state.f.add(t);this.state.sc+=t.length*10;sEl.textContent=this.state.sc;const li=document.createElement('li');li.textContent=t;fEl.prepend(li);input.value='';input.dispatchEvent(new Event('input'))}});input.addEventListener('input',()=>{const t=input.value.toLowerCase();let tL=[...this.state.l];lEl.innerHTML=this.state.l.map(l=>`<span>${l.toUpperCase()}</span>`).join('');for(const c of t){const i=tL.indexOf(c);if(i!==-1){const mS=Array.from(lEl.children).find(s=>s.textContent.toLowerCase()===c&&!s.classList.contains('used'));if(mS)mS.classList.add('used');tL[i]=null}}});this.start=(d)=>{reset(d);ui.overlay.style.display='none';input.disabled=false;input.focus();lEl.innerHTML=this.state.l.map(l=>`<span>${l.toUpperCase()}</span>`).join('');sEl.textContent='0';tEl.textContent=this.state.tL;fEl.innerHTML='';this.state.tmr=setInterval(()=>{this.state.tL--;tEl.textContent=this.state.tL;if(this.state.tL<=0)this.end('Time\'s up!')},1000)};this.end=(m='Game Over')=>{this.state.go=true;clearInterval(this.state.tmr);ui.overlay.innerHTML=`<h2>${m}</h2><p>Final Score: ${this.state.sc}</p><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Play Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Play Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Play Hard</button></div>`;ui.overlay.style.display='flex';ui.overlay.querySelectorAll('.difficulty-btn').forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));input.disabled=true};ui.difficultyBtns.forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));ui.backBtn.onclick=()=>{this.end();showView('menu','game')}}} };
             
+            const requestLandscape = () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().then(() => {
+                        if (screen.orientation && screen.orientation.lock) {
+                            screen.orientation.lock('landscape').catch(e => console.warn('Orientation lock failed:', e));
+                        }
+                    }).catch(err => {
+                         console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                         alert('Could not enter fullscreen. Please rotate your device manually.');
+                    });
+                } else {
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock('landscape').catch(e => console.warn('Orientation lock failed:', e));
+                    }
+                }
+            };
+
             // Event Listeners
             dom.settings.practiceGameBtn.addEventListener('click', () => showPage('game'));
             dom.game.backToPracticeBtn.addEventListener('click', () => showPage('practice'));
@@ -867,23 +1170,29 @@
             dom.results.practiceAgainBtn.addEventListener('click', () => startPractice(false));
             dom.results.newTestBtn.addEventListener('click', () => showView('setup'));
             
-            dom.settings.themeToggleBtn.addEventListener('click', () => {
-                const themes = ['dark', 'light', 'sepia'];
-                const currentIndex = themes.indexOf(appState.settings.theme);
-                appState.settings.theme = themes[(currentIndex + 1) % themes.length];
-                applySettings();
-                saveState();
-            });
             dom.settings.fontIncreaseBtn.addEventListener('click', () => { if(appState.settings.fontScale < 1.5) appState.settings.fontScale = parseFloat((appState.settings.fontScale + 0.1).toFixed(2)); applySettings(); saveState(); });
             dom.settings.fontDecreaseBtn.addEventListener('click', () => { if(appState.settings.fontScale > 0.7) appState.settings.fontScale = parseFloat((appState.settings.fontScale - 0.1).toFixed(2)); applySettings(); saveState(); });
-            dom.settings.fullscreenBtn.addEventListener('click', () => {
-                if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(err => console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`)); } 
-                else { document.exitFullscreen(); }
-            });
-            dom.settings.layoutToggleBtn.addEventListener('click', () => {
-                appState.settings.layout = appState.settings.layout === 'auto' ? 'portrait' : 'auto';
-                applySettings();
-                saveState();
+            dom.rotateOverlayBtn.addEventListener('click', requestLandscape);
+
+            dom.setup.languageBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelector('.lang-btn.active').classList.remove('active');
+                    btn.classList.add('active');
+                    appState.testConfig.language = btn.dataset.lang;
+                    
+                    const nonHindiMethods = ["1. Home Row Practice", "2. Top Row Practice", "3. Bottom Row Practice", "4. Number Row Practice", "5. Shift Key & Capitals", "6. Punctuation Practice", "7. Number Pad Practice", "8. Common Words Practice", "11. Random Words", "17. Mixed Text Practice", "18. Email / Letter Typing", "19. News Article Typing", "20. Programming Code (JS)"];
+                    const methodSelect = dom.setup.methodSelect;
+                    
+                    Array.from(methodSelect.options).forEach(opt => {
+                        const methodText = opt.text;
+                        const isNonHindi = nonHindiMethods.includes(methodText);
+                        opt.disabled = (appState.testConfig.language === 'hindi' && isNonHindi);
+                    });
+                    
+                    if (methodSelect.options[methodSelect.selectedIndex].disabled) {
+                        methodSelect.value = "Skill Building:9. Sentence Practice";
+                    }
+                });
             });
 
             dom.game.gameCards.forEach(card => {
