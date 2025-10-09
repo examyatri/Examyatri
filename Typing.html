@@ -3,54 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examyatri - AI-Powered Typing Tutor</title>
+    <title>ExamYatri Typing - Real Exam Simulator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-bg: #f0f2f5;
-            --secondary-bg: #ffffff;
-            --primary-text: #333333;
-            --secondary-text: #666666;
-            --highlight-text: #000000;
-            --accent-color: #007bff;
-            --accent-hover: #0056b3;
-            --correct-char: #28a745;
-            --incorrect-char: #dc3545;
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(0, 0, 0, 0.1);
-            --font-ui: 'Poppins', sans-serif;
-            --font-english: 'Courier New', Courier, monospace;
-            --font-hindi: 'Tiro Devanagari Hindi', serif;
-        }
-
-        body.theme-dark {
-            --primary-bg: #000000;
-            --secondary-bg: #111111;
-            --primary-text: #ffffff;
-            --secondary-text: #bbbbbb;
-            --highlight-text: #ffffff;
-            --accent-color: #e53935;
-            --accent-hover: #c62828;
-            --correct-char: #00ff7f;
-            --incorrect-char: #dc3545;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 82, 82, 0.3);
-        }
-        
-        body.theme-sepia {
-            --primary-bg: #f4e8d1;
-            --secondary-bg: #fdf6e3;
-            --primary-text: #584b3e;
-            --secondary-text: #6e6053;
-            --highlight-text: #4a3f35;
-            --accent-color: #d33682;
-            --accent-hover: #b32d6f;
-            --correct-char: #859900;
-            --incorrect-char: #dc322f;
-            --glass-bg: rgba(253, 246, 227, 0.7);
-            --glass-border: rgba(88, 75, 62, 0.1);
+            --bg-color: #000000;
+            --text-color: #FFFFFF;
+            --primary-color: #4CAF50; /* Green for accents */
+            --error-color: #F44336;
+            --caret-color: #2196F3;
+            --disabled-color: #555555;
+            --border-color: #333333;
+            --font-family: 'Roboto Mono', monospace;
         }
 
         *, *::before, *::after {
@@ -60,313 +26,241 @@
         }
 
         html {
-            scroll-behavior: smooth;
-            font-size: calc(16px * var(--font-scale, 1));
+            font-size: 16px;
         }
 
         body {
-            background-color: var(--primary-bg);
-            color: var(--primary-text);
-            font-family: var(--font-ui);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
             line-height: 1.6;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             overflow-x: hidden;
-            transition: background-color 0.3s, color 0.3s;
-            font-size: 1rem;
+            text-align: center;
         }
 
         .container {
             width: 90%;
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
-            transition: max-width 0.3s ease-in-out;
-        }
-        
-        main.container {
+            padding: 1rem 0;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            padding: 2rem 0;
         }
 
         header {
-            background: #1976D2; /* Blue color */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            transition: all 0.3s ease-in-out;
+            border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
         }
-        header .logo h1, header .logo p {
-            color: #FFFFFF;
-        }
-        header .settings button {
-            color: #FFFFFF;
-            border-color: rgba(255, 255, 255, 0.4);
-        }
-        header .settings button:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-        }
-
-
-        body.practice-active header {
-            display: none;
-        }
-
+        
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
         }
 
-        .logo { text-decoration: none; }
-        .logo h1 { font-size: clamp(1.5rem, 4vw, 1.8rem); }
-        .logo p { font-size: 0.8rem; margin-top: -5px; opacity: 0.9;}
-        
-        .settings { display: flex; align-items: center; gap: 0.5rem; }
-        .settings button {
-            background: transparent;
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .language-switch {
+            display: flex;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
-            padding: 0.3rem 0.8rem;
-            cursor: pointer;
-            font-family: var(--font-ui);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.4rem;
-            height: 38px;
-            transition: background-color 0.2s;
-            white-space: nowrap;
-        }
-
-        .settings .font-control { display: flex; gap: 0.25rem; }
-        .settings .font-control button { width: 42px; gap: 0;}
-        
-        #practice-game-btn {
-            animation: fire-glow 2s infinite ease-in-out;
-            border-color: var(--accent-hover);
-            font-weight: 600;
-        }
-
-        @keyframes fire-glow {
-            0%, 100% { box-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color); text-shadow: 0 0 2px var(--highlight-text); }
-            50% { box-shadow: 0 0 10px var(--accent-hover), 0 0 20px var(--accent-hover); text-shadow: 0 0 4px var(--highlight-text); }
-        }
-
-        .page { display: none; }
-        .page.active { 
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            animation: fadeIn 0.5s ease-in-out; 
-        }
-
-        .view { display: none; }
-        .view.active { display: block; }
-        
-        #practice-typing-view.view.active {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            min-height: 0; /* Flexbox fix for overflow */
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            position: relative;
             overflow: hidden;
-            transition: background-color 0.3s, border 0.3s;
         }
         
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background-color: var(--accent-color);
+        .lang-btn {
+            background: transparent;
+            color: var(--text-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-family: var(--font-family);
+            transition: background-color 0.2s;
+        }
+
+        .lang-btn.active {
+            background-color: var(--primary-color);
+        }
+
+        /* Views */
+        .view {
+            display: none;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .view.active {
+            display: flex;
+        }
+
+        /* Setup View */
+        #setup-view {
+            justify-content: center;
+            gap: 1.5rem;
         }
 
         .setup-grid {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
-        .setup-grid h3 { color: var(--highlight-text); margin-bottom: 1rem; font-size: 1.1rem; }
+
+        .setup-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .setup-card label {
+            text-align: left;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
         
         .custom-select {
             width: 100%;
             padding: 0.75rem;
-            background-color: var(--primary-bg);
-            color: var(--primary-text);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            font-family: var(--font-ui);
+            background-color: #111;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: var(--font-family);
             font-size: 1rem;
             cursor: pointer;
         }
-        
-        .language-select {
+
+        .minus-marking-controls {
             display: flex;
+            flex-direction: column;
             gap: 0.5rem;
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            padding: 0.25rem;
-            background-color: var(--primary-bg);
+            align-items: flex-start;
         }
-        .lang-btn {
-            flex: 1;
-            padding: 0.75rem;
-            background: transparent;
+        .minus-marking-controls > div {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .minus-marking-controls input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .minus-marking-controls input[type="number"] {
+            width: 60px;
+            padding: 0.5rem;
+            background-color: #111;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: var(--font-family);
+        }
+
+        #start-practice-btn {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: #000;
+            font-weight: 700;
             border: none;
             border-radius: 6px;
-            cursor: pointer;
-            font-family: var(--font-ui);
-            font-size: 1rem;
-            color: var(--secondary-text);
-            transition: background-color 0.2s, color 0.2s;
-            font-weight: 600;
-        }
-        .lang-btn.active {
-            background-color: var(--accent-color);
-            color: #ffffff;
-        }
-
-        .streak-card { border-left-color: var(--correct-char); margin-top: 1rem; }
-        .streak-card h4 { color: var(--correct-char); margin-bottom: 0.5rem; }
-        .streak-card p { font-size: 0.9rem; text-align: center; }
-        .streak-card .streak { font-weight: bold; font-size: 1.2rem; }
-
-        .cta-button {
-            width: 100%;
-            padding: 1rem;
-            background-color: var(--accent-color);
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            font-size: clamp(1rem, 3vw, 1.2rem);
-            font-weight: 700;
+            font-size: 1.2rem;
+            font-family: var(--font-family);
             cursor: pointer;
             transition: background-color 0.3s ease;
-            max-width: 600px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
         }
-        .cta-button:hover:not(:disabled) { background-color: var(--accent-hover); }
-        .cta-button:disabled { background-color: var(--secondary-text); cursor: not-allowed; }
+        
+        #start-practice-btn:disabled {
+            background-color: var(--disabled-color);
+            cursor: not-allowed;
+        }
+
+        #loading-status {
+            min-height: 1.2em;
+            margin-bottom: 1rem;
+        }
+        
+        /* Practice View */
+        #practice-view {
+            gap: 1rem;
+        }
 
         .stats-dashboard {
             display: flex;
-            justify-content: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-            text-align: center;
+            justify-content: space-around;
             flex-wrap: wrap;
-            flex-shrink: 0;
+            gap: 1rem;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
         }
-        .stat-card { 
-            padding: 0.5rem 1rem;
+
+        .stat-item {
             display: flex;
-            flex-direction: row;
-            align-items: center;
             gap: 0.5rem;
-            border-radius: 25px; /* Pill shape */
-            transition: background-color 0.3s ease, border-color 0.3s ease;
+            align-items: baseline;
         }
-        .stat-card.good {
-            background-color: rgba(0, 255, 127, 0.15);
-            border-color: rgba(0, 255, 127, 0.5);
+        .stat-item .label {
+            font-size: 0.8rem;
+            color: #aaa;
         }
-        .stat-card.good .value {
-            color: var(--correct-char);
-        }
-        .stat-card.poor {
-            background-color: rgba(220, 53, 69, 0.15);
-            border-color: rgba(220, 53, 69, 0.5);
-        }
-        .stat-card.poor .value {
-            color: var(--incorrect-char);
+        .stat-item .value {
+            font-size: 1.2rem;
+            font-weight: 700;
         }
 
-        .stat-card .value { 
-            font-size: clamp(1.2rem, 4vw, 1.5rem); 
-            font-weight: 600;
-            color: var(--highlight-text); 
-            line-height: 1;
-            transition: color 0.3s ease;
-        }
-        .stat-card .label { 
-            font-size: 0.8rem; 
-            color: var(--secondary-text); 
-            line-height: 1;
-            margin-top: 2px; /* Small alignment fix */
-        }
-
-        .typing-area-wrapper { 
-            position: relative;
-            flex-grow: 1; /* This makes it fill the space */
-            min-height: 100px; /* Minimum height */
-            display: flex;
+        #text-display-wrapper {
+            border: 1px solid var(--border-color);
             padding: 1rem;
-        }
-        .typing-area {
-            font-size: clamp(1.5rem, 4vw, 1.8rem);
+            border-radius: 6px;
+            font-size: 1.5rem;
             line-height: 1.8;
-            user-select: none;
-            color: var(--secondary-text);
-            height: 100%;
-            width: 100%;
+            text-align: left;
             overflow: hidden;
+            height: 250px;
             position: relative;
+            flex-shrink: 0;
+            user-select: none;
             cursor: text;
         }
-        .typing-area.english { font-family: var(--font-english); }
-        .typing-area.hindi { font-family: var(--font-hindi); }
-
-        .typing-text { 
-            position: relative;
-            width: 100%;
-            transition: transform 0.2s ease-out; 
-        }
         
-        .char { display: inline; }
-        .char.correct { color: var(--correct-char); }
-        .char.incorrect { background-color: var(--incorrect-char); color: #ffffff; border-radius: 3px; }
-        .char.current { background-color: var(--primary-text); color: var(--primary-bg); border-radius: 3px; }
+        #text-display {
+            color: #888;
+            position: relative;
+            transition: transform 0.2s ease-out;
+            overflow-wrap: break-word; /* Prevents text from overflowing horizontally */
+        }
+        #text-display.hindi {
+            font-family: 'Tiro Devanagari Hindi', serif;
+        }
+
+        .char {
+            display: inline;
+        }
+        .char.correct { color: var(--primary-color); }
+        .char.incorrect { color: var(--error-color); text-decoration: underline; }
         
         .caret {
             position: absolute;
             width: 2px;
-            background-color: var(--accent-color);
+            background-color: var(--caret-color);
             animation: blink 1s infinite;
             transition: left 0.1s linear, top 0.1s linear;
-            border-radius: 2px;
-            height: calc(clamp(1.5rem, 4vw, 1.8rem) * 1.2);
-            margin-top: calc(clamp(1.5rem, 4vw, 1.8rem) * 0.2);
+            border-radius: 1px;
+            height: calc(1.5rem * 1.2);
+            margin-top: calc(1.5rem * 0.2);
         }
-
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes blink { 50% { opacity: 0; } }
 
         #hidden-input {
             position: fixed;
@@ -382,839 +276,741 @@
             clip: rect(0, 0, 0, 0);
             white-space: nowrap;
         }
-        
-        .typing-actions { 
-            text-align: center; 
-            margin-top: 1rem; 
-            flex-shrink: 0;
+
+        #free-hand-area {
+            width: 100%;
+            height: 100%;
+            background: #111;
+            color: var(--text-color);
+            border: none;
+            font-size: 1.2rem;
+            font-family: inherit;
+            resize: none;
+            padding: 1rem;
         }
-        .typing-actions .cta-button { width: auto; padding: 0.8rem 2rem; font-size: 1rem; }
 
-        .results-container { text-align: center; }
-        .results-container h2 { font-size: clamp(2rem, 5vw, 2.5rem); margin-bottom: 2rem; color: var(--highlight-text); }
-        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
-        .result-item h3 { font-size: 1.2rem; color: var(--accent-color); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;}
-        .result-item p { font-size: clamp(1.8rem, 5vw, 2.2rem); font-weight: 700; }
-        .results-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-        .results-actions .cta-button { width: auto; padding: 1rem 2rem; }
+        #submit-test-btn {
+            padding: 0.75rem 2rem;
+            background-color: var(--error-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0 auto;
+        }
+        
+        /* Results Modal */
+        #results-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none; /* Toggled by JS */
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
 
-        .history-section { margin-top: 3rem; text-align: left; }
-        .history-section h3 { text-align: center; margin-bottom: 1rem; }
-        #history-list { list-style: none; max-height: 300px; overflow-y: auto; padding-right: 1rem; }
-        .history-item { display: flex; justify-content: space-between; padding: 0.75rem; border-bottom: 1px solid var(--glass-border); flex-wrap: wrap; gap: 0.5rem;}
-        .history-item:nth-child(odd) { background: rgba(0,0,0,0.02); }
-        body.theme-dark .history-item:nth-child(odd) { background: rgba(255,255,255,0.02); }
+        #results-modal.active {
+            display: flex;
+        }
 
-        /* Game Page Styles */
-        .game-menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        .results-content {
+            background-color: #1a1a1a;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
             gap: 1.5rem;
         }
-        .game-card { text-align: center; padding: 2rem 1.5rem; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .game-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        body.theme-dark .game-card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .game-card .icon { font-size: 3rem; margin-bottom: 1rem; }
-        .game-card h3 { font-size: 1.5rem; color: var(--highlight-text); margin-bottom: 0.5rem; }
-        .game-card p { font-size: 0.9rem; color: var(--secondary-text); }
-        .game-container { text-align: center; }
-        .game-canvas { background: var(--secondary-bg); border-radius: 8px; border: 1px solid var(--glass-border); max-width: 100%; height: auto; transition: filter 0.2s; }
-        .game-canvas.shake { animation: screenShake 0.3s; }
-        @keyframes screenShake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
-        
-        .game-ui { display: flex; justify-content: space-around; margin: 1rem 0; font-size: 1.2rem; }
-        .game-ui span { font-weight: bold; }
-        .game-input { width: 100%; max-width: 400px; padding: 0.8rem; margin: 1rem auto; border: 1px solid var(--glass-border); background-color: var(--primary-bg); color: var(--primary-text); border-radius: 8px; font-size: 1.1rem; text-align: center; }
-        .game-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; border-radius: 8px; z-index: 10; }
-        .game-overlay h2 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-        .game-overlay p { font-size: 1.2rem; margin: 0.5rem 0 1.5rem 0; max-width: 80%; }
-        .game-overlay .cta-button { width: auto; padding: 0.8rem 2rem; }
-        
-        .difficulty-select { display: flex; gap: 1rem; margin-top: 1rem; }
-        .difficulty-btn { padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; border: 1px solid white; background: transparent; color: white; font-weight: 600; }
-        .difficulty-btn.easy { border-color: #4caf50; } .difficulty-btn.easy:hover { background: #4caf50; }
-        .difficulty-btn.medium { border-color: #ffc107; } .difficulty-btn.medium:hover { background: #ffc107; }
-        .difficulty-btn.hard { border-color: #f44336; } .difficulty-btn.hard:hover { background: #f44336; }
-        
-        .racetrack { height: 120px; background: var(--secondary-bg); border-radius: 8px; position: relative; overflow: hidden; border: 1px solid var(--glass-border); background-image: repeating-linear-gradient(to bottom, transparent, transparent 49.5%, var(--glass-border) 49.5%, var(--glass-border) 50.5%); background-size: 100% 60px; }
-        .car { position: absolute; top: 50%; transform: translateY(-50%); font-size: 40px; transition: left 0.2s linear, filter 0.2s; }
-        .car.nitro-boost { filter: drop-shadow(0 0 5px var(--correct-char)); }
-        #player-car { top: 25%; } #ai-car { top: 75%; }
-        .finish-line { position: absolute; right: 10%; top: 0; bottom: 0; width: 5px; background: repeating-linear-gradient(var(--primary-text), var(--primary-text) 10px, var(--secondary-bg) 10px, var(--secondary-bg) 20px); }
 
-        .word-builder-ui { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .scrambled-letters { font-size: 2rem; font-weight: bold; letter-spacing: 0.5rem; padding: 1rem; background: var(--secondary-bg); border-radius: 8px; }
-        .scrambled-letters .used { color: var(--accent-color); opacity: 0.5; }
-        .found-words-list { list-style: none; padding: 1rem; background: var(--secondary-bg); border-radius: 8px; min-height: 200px; max-height: 300px; overflow-y: auto; text-align: left;}
-        .found-words-list li { padding: 0.25rem 0; border-bottom: 1px solid var(--glass-border); animation: newWord 0.3s ease-out; }
-        @keyframes newWord { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-
-        .back-to-menu-btn { margin-top: 1rem; width: auto; padding: 0.8rem 2rem; font-size: 1rem; background-color: var(--secondary-text); }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
         
-        #rotate-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background-color: rgba(0, 0, 0, 0.9);
-            color: white;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+        .result-item h3 {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 0.25rem;
+            font-weight: 400;
+            text-transform: uppercase;
+        }
+        .result-item p {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .result-item.final-wpm p {
+            color: var(--primary-color);
+            font-size: 2.2rem;
+        }
+        .result-item.final-wpm {
+            grid-column: 1 / -1;
             text-align: center;
-            z-index: 9999;
-            font-size: 1.5rem;
-        }
-        #rotate-overlay p { max-width: 80%; }
-        #rotate-overlay .cta-button {
-            margin-top: 1.5rem;
-            width: auto;
-            padding: 0.8rem 2rem;
-            font-size: 1rem;
-            background-color: var(--accent-color);
-        }
-        #rotate-overlay .cta-button:hover {
-            background-color: var(--accent-hover);
+            background: #222;
+            padding: 1rem;
+            border-radius: 6px;
         }
 
-        @media (orientation: portrait) {
-            #rotate-overlay { display: flex; }
+        #result-summary {
+            font-size: 1rem;
+            color: #ddd;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .results-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .results-actions button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: #222;
+            color: var(--text-color);
+            font-family: var(--font-family);
+            cursor: pointer;
         }
         
-        @media (min-width: 768px) {
-            .setup-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .setup-grid .language-card {
-                grid-column: 1 / -1;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container { width: 95%; }
-            main.container { padding: 1rem 0; }
-            .header-content { justify-content: center; }
-            .logo { text-align: center; }
-            .settings { flex-wrap: wrap; justify-content: center; }
-            .stats-dashboard { 
-                gap: 0.5rem; 
-            }
-            .stat-card { padding: 0.5rem 0.75rem; }
-            .results-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
-        }
-
-        @media (max-width: 480px) {
-             .results-actions { flex-direction: column; }
-             .history-item { flex-direction: column; align-items: flex-start; }
-             .game-card { padding: 1.5rem 1rem; }
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.2rem; }
+            .setup-grid { grid-template-columns: 1fr; }
+            #text-display-wrapper { font-size: 1.2rem; height: 200px; }
+            .stat-item .value { font-size: 1rem; }
+            .results-content { padding: 1.5rem; }
+            .result-item p { font-size: 1.5rem; }
+            .result-item.final-wpm p { font-size: 1.8rem; }
         }
     </style>
-<link rel="stylesheet" href="/index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/index.css">
 </head>
-<body class="theme-dark">
+<body>
     <header>
         <div class="container header-content">
-            <a href="https://www.examyatri.live" target="_blank" rel="noopener noreferrer" class="logo">
-                <h1>Examyatri</h1>
-                <p>typing se hoga success Yatra</p>
-            </a>
-            <div class="settings">
-                <div class="font-control">
-                    <button id="font-decrease-btn" aria-label="Decrease font size">A-</button>
-                    <button id="font-increase-btn" aria-label="Increase font size">A+</button>
-                </div>
-                <button id="practice-game-btn">Practice with Game</button>
+            <h1>ExamYatri Typing</h1>
+            <div class="language-switch">
+                <button id="lang-english-btn" class="lang-btn active" data-lang="en">English</button>
+                <button id="lang-hindi-btn" class="lang-btn" data-lang="hi">हिंदी</button>
             </div>
         </div>
     </header>
 
     <main class="container">
-        <section id="practice-page" class="page active">
-            <div id="practice-setup-view" class="view active">
-                <div class="setup-grid">
-                    <div class="glass-card">
-                        <h3>1. Select Practice Method</h3>
-                        <select id="method-select" class="custom-select"></select>
-                    </div>
-                    <div class="glass-card">
-                        <h3>2. Select Duration</h3>
-                        <select id="duration-select" class="custom-select">
-                            <option value="1">1 Minute</option>
-                            <option value="3">3 Minutes</option>
-                            <option value="5">5 Minutes</option>
-                            <option value="10">10 Minutes</option>
-                            <option value="15">15 Minutes</option>
-                            <option value="30">30 Minutes</option>
-                        </select>
-                    </div>
-                     <div class="glass-card language-card">
-                        <h3>3. Select Language</h3>
-                        <div id="language-select" class="language-select">
-                            <button class="lang-btn active" data-lang="english">English</button>
-                            <button class="lang-btn" data-lang="hindi">Hindi</button>
-                        </div>
-                    </div>
-                    <div class="glass-card streak-card">
-                         <p>Practice Streak: <span id="streak-count" class="streak">0</span> days 🔥</p>
-                    </div>
+        <!-- Setup View -->
+        <section id="setup-view" class="view active">
+            <div class="setup-grid">
+                <div class="setup-card">
+                    <label for="level-select">1. Difficulty Level</label>
+                    <select id="level-select" class="custom-select"></select>
                 </div>
-                <p id="loading-status" style="text-align: center; margin-bottom: 1rem; color: var(--secondary-text); min-height: 1.6em;"></p>
-                <button id="start-practice-btn" class="cta-button" disabled>Loading...</button>
-            </div>
-
-            <div id="practice-typing-view" class="view">
-                 <div class="stats-dashboard">
-                    <div class="stat-card glass-card"><div class="label">Time</div><div id="time-left" class="value">00:00</div></div>
-                    <div class="stat-card glass-card"><div class="label">WPM</div><div id="wpm" class="value">0</div></div>
-                    <div class="stat-card glass-card"><div class="label">Acc %</div><div id="accuracy" class="value">100</div></div>
-                     <div class="stat-card glass-card"><div class="label">Errors</div><div id="errors" class="value">0</div></div>
+                <div class="setup-card">
+                    <label for="method-select">2. Practice Method</label>
+                    <select id="method-select" class="custom-select"></select>
                 </div>
-                <div class="typing-area-wrapper glass-card">
-                    <div id="typing-area" class="typing-area english">
-                        <div id="typing-text" class="typing-text"></div>
-                    </div>
-                    <div id="caret" class="caret"></div>
+                <div class="setup-card">
+                    <label for="duration-select">3. Duration</label>
+                    <select id="duration-select" class="custom-select">
+                        <option value="1">1 Minute</option>
+                        <option value="2">2 Minutes</option>
+                        <option value="5">5 Minutes</option>
+                        <option value="10">10 Minutes</option>
+                        <option value="15">15 Minutes</option>
+                        <option value="30">30 Minutes</option>
+                    </select>
                 </div>
-                <div class="typing-actions">
-                    <button id="submit-test-btn" class="cta-button">Submit Test</button>
-                </div>
-                <textarea id="hidden-input" autofocus autocapitalize="none" autocorrect="off" inputmode="text"></textarea>
-            </div>
-
-            <div id="practice-results-view" class="view">
-                <div class="results-container">
-                    <h2>Test Complete!</h2>
-                    <div class="results-grid">
-                        <div class="result-item glass-card"><h3>Gross WPM</h3><p id="result-gross-wpm">0</p></div>
-                        <div class="result-item glass-card"><h3>Net WPM</h3><p id="result-net-wpm">0</p></div>
-                        <div class="result-item glass-card"><h3>Accuracy</h3><p id="result-accuracy">0%</p></div>
-                        <div class="result-item glass-card"><h3>Errors</h3><p id="result-errors">0</p></div>
-                        <div class="result-item glass-card"><h3>Time Taken</h3><p id="result-time-taken">00:00</p></div>
-                        <div class="result-item glass-card"><h3>Keystrokes</h3><p id="result-keystrokes">0</p></div>
+                <div class="setup-card minus-marking-controls">
+                    <label>4. Minus Marking</label>
+                    <div>
+                        <input type="checkbox" id="minus-marking-enabled">
+                        <label for="minus-marking-enabled">Enable</label>
                     </div>
-                    <div class="results-actions">
-                        <button id="practice-again-btn" class="cta-button">Practice Again</button>
-                        <button id="new-test-btn" class="cta-button">New Test</button>
-                    </div>
-                    <div class="history-section">
-                        <h3>Practice History</h3>
-                        <ul id="history-list">
-                            <!-- History will be populated here -->
-                        </ul>
+                    <div>
+                        <input type="number" id="minus-marking-value" min="0" max="5" value="1" disabled>
+                        <label for="minus-marking-value">WPM per error</label>
                     </div>
                 </div>
             </div>
+            <p id="loading-status"></p>
+            <button id="start-practice-btn">Start Practice</button>
         </section>
 
-        <section id="game-page" class="page">
-            <div id="game-menu-view" class="view active">
-                <div class="game-menu-grid">
-                    <div class="game-card glass-card" data-game="wordStorm">
-                        <div class="icon">⛈️</div>
-                        <h3>Word Storm</h3>
-                        <p>Words fall faster over time; test your speed and focus.</p>
-                    </div>
-                    <div class="game-card glass-card" data-game="typingRacer">
-                        <div class="icon">🚗</div>
-                        <h3>Typing Racer</h3>
-                        <p>Type sentences to race against an AI opponent.</p>
-                    </div>
-                    <div class="game-card glass-card" data-game="keyDefender">
-                        <div class="icon">🛡️</div>
-                        <h3>Key Defender</h3>
-                        <p>Destroy enemy words before they reach your base.</p>
-                    </div>
-                    <div class="game-card glass-card" data-game="typingSprint">
-                        <div class="icon">🏁</div>
-                        <h3>Typing Sprint</h3>
-                        <p>Short timed challenges to improve your WPM.</p>
-                    </div>
-                    <div class="game-card glass-card" data-game="wordBuilder">
-                        <div class="icon">🧩</div>
-                        <h3>Word Builder</h3>
-                        <p>Form valid words from scrambled letters to score combos.</p>
-                    </div>
-                </div>
-                 <button id="back-to-practice-btn" class="cta-button back-to-menu-btn" style="margin-left: auto; margin-right: auto; display: block;">Back to Practice</button>
+        <!-- Practice View -->
+        <section id="practice-view" class="view">
+            <div class="stats-dashboard">
+                <div class="stat-item"><span class="label">Time:</span><span id="stat-time" class="value">00:00</span></div>
+                <div class="stat-item"><span class="label">Gross WPM:</span><span id="stat-gross-wpm" class="value">0</span></div>
+                <div class="stat-item"><span class="label">Net WPM:</span><span id="stat-net-wpm" class="value">0</span></div>
+                <div class="stat-item"><span class="label">Errors:</span><span id="stat-errors" class="value">0</span></div>
+                <div class="stat-item"><span class="label">Accuracy:</span><span id="stat-accuracy" class="value">100%</span></div>
             </div>
-            
-            <!-- Game Views -->
-            <div id="word-storm-game-view" class="view game-container"></div>
-            <div id="typing-racer-game-view" class="view game-container"></div>
-            <div id="key-defender-game-view" class="view game-container"></div>
-            <div id="word-builder-game-view" class="view game-container"></div>
+            <div id="text-display-wrapper">
+                <div id="text-display"></div>
+                <div id="caret" class="caret" style="display: none;"></div>
+                <textarea id="free-hand-area" style="display: none;" placeholder="Start typing..."></textarea>
+            </div>
+            <button id="submit-test-btn">Submit Now</button>
         </section>
     </main>
 
-    <div id="rotate-overlay">
-        <p>🔄<br>Please rotate your device to landscape for the best experience.</p>
-        <button id="force-rotate-btn" class="cta-button">Switch to Landscape</button>
+    <!-- Results Modal -->
+    <div id="results-modal">
+        <div class="results-content">
+            <h2>Result Summary</h2>
+            <div class="results-grid">
+                <div class="result-item"><h3>Gross Speed</h3><p><span id="result-gross-wpm">0</span> WPM</p></div>
+                <div class="result-item"><h3>Net Speed</h3><p><span id="result-net-wpm">0</span> WPM</p></div>
+                <div class="result-item"><h3>Accuracy</h3><p><span id="result-accuracy">0</span>%</p></div>
+                <div class="result-item"><h3>Errors</h3><p><span id="result-errors">0</span></p></div>
+                <div class="result-item"><h3>Total Words</h3><p><span id="result-total-words">0</span></p></div>
+                <div class="result-item"><h3>Correct Words</h3><p><span id="result-correct-words">0</span></p></div>
+                <div class="result-item"><h3>Time Taken</h3><p id="result-time-taken">00:00</p></div>
+                <div class="result-item"><h3>Keystrokes</h3><p id="result-keystrokes">0</p></div>
+                <div class="result-item final-wpm"><h3>Final WPM</h3><p><span id="result-final-wpm">0</span> WPM</p></div>
+            </div>
+            <p id="minus-marking-summary" style="font-size: 0.9rem; text-align: left;"></p>
+            <p id="result-summary" style="text-align: left;"></p>
+            <div class="results-actions">
+                <button id="retry-test-btn">Retry Same Test</button>
+                <button id="new-test-btn">Next Practice Text</button>
+                <button id="back-to-home-btn">Back to Home</button>
+            </div>
+        </div>
     </div>
+
+    <textarea id="hidden-input" autofocus autocapitalize="none" autocorrect="off"></textarea>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const dom = {
-                html: document.documentElement,
-                body: document.body,
-                header: document.querySelector('header'),
-                pages: {
-                    practice: document.getElementById('practice-page'),
-                    game: document.getElementById('game-page'),
+                setupView: document.getElementById('setup-view'),
+                practiceView: document.getElementById('practice-view'),
+                levelSelect: document.getElementById('level-select'),
+                methodSelect: document.getElementById('method-select'),
+                durationSelect: document.getElementById('duration-select'),
+                minusMarkingEnabled: document.getElementById('minus-marking-enabled'),
+                minusMarkingValue: document.getElementById('minus-marking-value'),
+                loadingStatus: document.getElementById('loading-status'),
+                startBtn: document.getElementById('start-practice-btn'),
+                
+                stats: {
+                    time: document.getElementById('stat-time'),
+                    grossWpm: document.getElementById('stat-gross-wpm'),
+                    netWpm: document.getElementById('stat-net-wpm'),
+                    errors: document.getElementById('stat-errors'),
+                    accuracy: document.getElementById('stat-accuracy'),
                 },
-                views: {
-                    setup: document.getElementById('practice-setup-view'),
-                    typing: document.getElementById('practice-typing-view'),
-                    results: document.getElementById('practice-results-view'),
-                },
-                gameViews: {
-                    menu: document.getElementById('game-menu-view'),
-                    wordStorm: document.getElementById('word-storm-game-view'),
-                    typingRacer: document.getElementById('typing-racer-game-view'),
-                    keyDefender: document.getElementById('key-defender-game-view'),
-                    wordBuilder: document.getElementById('word-builder-game-view'),
-                },
-                setup: {
-                    methodSelect: document.getElementById('method-select'),
-                    durationSelect: document.getElementById('duration-select'),
-                    startBtn: document.getElementById('start-practice-btn'),
-                    streakCount: document.getElementById('streak-count'),
-                    loadingStatus: document.getElementById('loading-status'),
-                    languageBtns: document.querySelectorAll('.lang-btn'),
-                },
-                typing: {
-                    timeLeft: document.getElementById('time-left'),
-                    wpm: document.getElementById('wpm'),
-                    accuracy: document.getElementById('accuracy'),
-                    errors: document.getElementById('errors'),
-                    typingArea: document.getElementById('typing-area'),
-                    typingText: document.getElementById('typing-text'),
-                    caret: document.getElementById('caret'),
-                    hiddenInput: document.getElementById('hidden-input'),
-                    submitTestBtn: document.getElementById('submit-test-btn'),
-                },
+                textDisplayWrapper: document.getElementById('text-display-wrapper'),
+                textDisplay: document.getElementById('text-display'),
+                caret: document.getElementById('caret'),
+                hiddenInput: document.getElementById('hidden-input'),
+                freeHandArea: document.getElementById('free-hand-area'),
+                submitBtn: document.getElementById('submit-test-btn'),
+
+                resultsModal: document.getElementById('results-modal'),
                 results: {
                     grossWpm: document.getElementById('result-gross-wpm'),
                     netWpm: document.getElementById('result-net-wpm'),
                     accuracy: document.getElementById('result-accuracy'),
                     errors: document.getElementById('result-errors'),
+                    totalWords: document.getElementById('result-total-words'),
+                    correctWords: document.getElementById('result-correct-words'),
                     timeTaken: document.getElementById('result-time-taken'),
                     keystrokes: document.getElementById('result-keystrokes'),
-                    practiceAgainBtn: document.getElementById('practice-again-btn'),
-                    newTestBtn: document.getElementById('new-test-btn'),
-                    historyList: document.getElementById('history-list'),
+                    finalWpm: document.getElementById('result-final-wpm'),
+                    minusMarkingSummary: document.getElementById('minus-marking-summary'),
+                    summary: document.getElementById('result-summary'),
                 },
-                settings: {
-                    fontIncreaseBtn: document.getElementById('font-increase-btn'),
-                    fontDecreaseBtn: document.getElementById('font-decrease-btn'),
-                    practiceGameBtn: document.getElementById('practice-game-btn'),
+                resultActions: {
+                    retry: document.getElementById('retry-test-btn'),
+                    newTest: document.getElementById('new-test-btn'),
+                    backToHome: document.getElementById('back-to-home-btn'),
                 },
-                game: {
-                    backToPracticeBtn: document.getElementById('back-to-practice-btn'),
-                    gameCards: document.querySelectorAll('.game-card'),
-                },
-                rotateOverlayBtn: document.getElementById('force-rotate-btn'),
-            };
-
-            let sentenceCache = [];
-            let wordCache = [];
-
-            const OFFLINE_FALLBACK_SENTENCES = [
-                "The sun always shines brightest after the rain.", "A journey of a thousand miles must begin with a single step.", "Believe you can and you're halfway there.", "The only way to do great work is to love what you do.", "Success is not final, failure is not fatal: it is the courage to continue that counts.", "You miss one hundred percent of the shots you don't take.", "The future belongs to those who believe in the beauty of their dreams.", "Strive not to be a success, but rather to be of value.", "In the middle of every difficulty lies opportunity.", "The best time to plant a tree was twenty years ago. The second best time is now.", "An unexamined life is not worth living.", "Everything you can imagine is real.", "It is never too late to be what you might have been.", "What we think, we become.", "The mind is everything.", "To live is the rarest thing in the world. Most people exist, that is all.", "Be yourself; everyone else is already taken.", "We are all in the gutter, but some of us are looking at the stars.", "Imperfection is beauty, madness is genius and it's better to be absolutely ridiculous than absolutely boring.", "There are only two ways to live your life. One is as though nothing is a miracle. The other is as though everything is a miracle.", "Life is what happens when you're busy making other plans.", "Get busy living or get busy dying.", "The purpose of our lives is to be happy.", "You only live once, but if you do it right, once is enough.", "Many of life's failures are people who did not realize how close they were to success when they gave up.", "If you want to live a happy life, tie it to a goal, not to people or things.", "Never let the fear of striking out keep you from playing the game.", "Money and success don’t change people; they merely amplify what is already there.", "Your time is limited, so don’t waste it living someone else’s life.", "The whole secret of a successful life is to find out what is one’s destiny to do, and then do it.", "The big lesson in life, baby, is never be scared of anyone or anything.", "Curvy roads are the most beautiful.", "Life is not a problem to be solved, but a reality to be experienced.", "The unexamined life is not worth living.", "Turn your wounds into wisdom.", "The way to get started is to quit talking and begin doing.", "Life is what we make it, always has been, always will be.", "The greatest glory in living lies not in never falling, but in rising every time we fall.", "Life is really simple, but we insist on making it complicated.", "May you live all the days of your life.", "Life itself is the most wonderful fairy tale.", "Do not let making a living prevent you from making a life.", "Go confidently in the direction of your dreams! Live the life you've imagined.", "Keep smiling, because life is a beautiful thing and there’s so much to smile about.", "Life is a long lesson in humility.", "In three words I can sum up everything I've learned about life: it goes on.", "Love the life you live. Live the life you love.", "Life is like riding a bicycle. To keep your balance, you must keep moving.", "You will face many defeats in life, but never let yourself be defeated.", "The only impossible journey is the one you never begin.",
-                "The quick brown fox jumps over the lazy dog.", "Technology has changed the way we live and work.", "The internet connects people from all over the world.", "Reading books is a great way to expand your knowledge.", "Learning a new language opens up new opportunities.", "Music has the power to soothe the soul and lift the spirits.", "The early bird catches the worm.", "Actions speak louder than words.", "A picture is worth a thousand words.", "Honesty is the best policy.", "Where there is a will, there is a way.", "Practice makes perfect.", "Don't count your chickens before they hatch.", "Every cloud has a silver lining.", "The grass is always greener on the other side.", "Look before you leap.", "When in Rome, do as the Romans do.", "You can't judge a book by its cover.", "Two heads are better than one.", "The pen is mightier than the sword."
-            ];
-
-            const HINDI_FALLBACK_SENTENCES = [
-                "सूरज की पहली किरण आशा लेकर आती है।", "सच्चा मित्र वही है जो कठिन समय में साथ दे।", "परिश्रम ही सफलता की कुंजी है।", "ज्ञान सबसे बड़ी शक्ति है।", "एक हजार मील की यात्रा एक कदम से शुरू होती है।", "समय किसी का इंतजार नहीं करता।", "स्वस्थ शरीर में ही स्वस्थ मन का वास होता है।", "किताबें हमारी सबसे अच्छी दोस्त होती हैं।", "जीवन एक अनमोल उपहार है, इसे व्यर्थ न करें।", "धैर्य और लगन से हर मुश्किल आसान हो जाती है।", "जोखिम उठाए बिना प्रगति संभव नहीं है।", "आपका भविष्य आपके आज के कर्मों पर निर्भर करता है।", "सकारात्मक सोच से जीवन में सकारात्मक बदलाव आते हैं।", "शिक्षा का उद्देश्य केवल नौकरी पाना नहीं, बल्कि एक अच्छा इंसान बनना है।", "प्रकृति की सुंदरता मन को शांति देती है।", "गलतियों से सीखना ही बुद्धिमानी है।", "एकता में ही बल है।", "वाणी में मधुरता और व्यवहार में विनम्रता होनी चाहिए।", "लक्ष्य के बिना जीवन दिशाहीन होता है।", "सफलता का कोई शॉर्टकट नहीं होता।",
-                "जीवन एक यात्रा है, इसका आनंद लें।", "क्रोध में बोला गया एक शब्द भी घातक हो सकता है।", "जो जैसा बोता है, वैसा ही काटता है।", "शिक्षा सबसे शक्तिशाली हथियार है जिसका उपयोग आप दुनिया को बदलने के लिए कर सकते हैं।", "असंभव शब्द केवल कायरों के शब्दकोश में पाया जाता है।", "स्वच्छता ही सेवा है।", "एक अच्छी शुरुआत आधे काम के बराबर होती है।", "सफलता का रहस्य निरंतरता है।", "समय और ज्वार किसी का इंतजार नहीं करते।", "सादा जीवन, उच्च विचार।", "अनुशासन ही देश को महान बनाता है।", "अपने सपनों को साकार करने का सबसे अच्छा तरीका है जाग जाना।", "एक स्वस्थ राष्ट्र के लिए स्वस्थ नागरिक आवश्यक हैं।", "बदलाव ही संसार का नियम है।", "ईमानदारी सबसे अच्छी नीति है।", "आत्मविश्वास और कड़ी मेहनत आपको हमेशा सफलता दिलाएगी।", "पेड़ लगाओ, जीवन बचाओ।", "संगीत आत्मा की भाषा है।", "कला जीवन का प्रतिबिंब है।", "ज्ञान बांटने से बढ़ता है।",
-                "हर मुश्किल में एक अवसर छिपा होता है।", "विनम्रता से बड़ा कोई गुण नहीं।", "क्षमा वीरों का आभूषण है।", "साहस का अर्थ भय की अनुपस्थिति नहीं, बल्कि भय पर विजय है।", "एक सच्चा नेता रास्ता जानता है, रास्ता दिखाता है और रास्ते पर चलता है।", "भविष्य उनका है जो अपने सपनों की सुंदरता में विश्वास करते हैं।", "कर्म करो, फल की चिंता मत करो।", "अंधकार को कोसने से बेहतर है एक दीया जलाना।", "छोटी-छोटी बातों में खुशी ढूंढना ही जीवन है।", "एक मुस्कान बिना किसी लागत के बहुत कुछ देती है।", "संतोष सबसे बड़ा धन है।", "आप तब तक नहीं हारते जब तक आप प्रयास करना नहीं छोड़ते।", "एक विचार आपके जीवन को बदल सकता है।", "योग मन और शरीर को जोड़ता है।", "पढ़ना मन के लिए व्यायाम है।", "सच्चाई की हमेशा जीत होती है।", "अच्छे काम का फल हमेशा अच्छा होता है।", "परिवार ही हमारी असली ताकत है।", "दोस्ती एक अनमोल रिश्ता है।", "मानवता सबसे बड़ा धर्म है।"
-            ];
-            
-            const fetchWikipediaText = async (lang = 'en') => {
-                const apiUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*`;
-                try {
-                    const randomPageRes = await fetch(apiUrl);
-                    if (!randomPageRes.ok) throw new Error('Failed to get random page');
-                    const randomPageData = await randomPageRes.json();
-                    const pageTitle = randomPageData.query.random[0].title;
-                    if (!pageTitle) throw new Error('No page title found');
-
-                    const contentUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&prop=extracts&exlimit=1&titles=${encodeURIComponent(pageTitle)}&explaintext=true&formatversion=2&format=json&origin=*`;
-                    const contentRes = await fetch(contentUrl);
-                    if (!contentRes.ok) throw new Error('Failed to get page content');
-                    const contentData = await contentRes.json();
-                    const pageContent = contentData.query.pages[0].extract;
-
-                    if (pageContent && pageContent.length > 50) {
-                        return pageContent.replace(/\[\d+\]/g, '').replace(/(\r\n|\n|\r)/gm, " ").replace(/\s+/g, ' ').trim();
-                    } else {
-                        throw new Error('Content too short or missing');
-                    }
-                } catch (error) {
-                    console.warn(`Failed to fetch from Wikipedia (${lang}):`, error);
-                    return null; // Signal failure
-                }
-            };
-
-            const wordsToSentences = (words, minLength = 8, maxLength = 15) => {
-                const sentences = [];
-                let currentSentence = [];
-                for (const word of words) {
-                    if (!word || word.length < 2) continue;
-                    currentSentence.push(word.toLowerCase());
-                    if (currentSentence.length >= minLength && (Math.random() > 0.7 || currentSentence.length >= maxLength)) {
-                        let sentence = currentSentence.join(' ');
-                        sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1) + '.';
-                        sentences.push(sentence);
-                        currentSentence = [];
-                    }
-                }
-                if (currentSentence.length >= minLength) {
-                    let sentence = currentSentence.join(' ');
-                    sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1) + '.';
-                    sentences.push(sentence);
-                }
-                return sentences;
-            };
-
-            const loadPracticeSentences = async () => {
-                const statusEl = dom.setup.loadingStatus;
-                const startBtn = dom.setup.startBtn;
-
-                const sources = [
-                    { name: 'Type.fit Quotes', url: 'https://type.fit/api/quotes', parser: async (res) => (await res.json()).map(q => q.text.trim()).filter(Boolean) },
-                    { name: 'Zen Quotes', url: 'https://zenquotes.io/api/quotes', parser: async (res) => (await res.json()).map(q => q.q.trim()).filter(Boolean) },
-                    { name: 'Random Words API', url: 'https://random-word-api.herokuapp.com/word?number=200', parser: async (res) => wordsToSentences(await res.json()) },
-                    { name: 'English Words List', url: 'https://raw.githubusercontent.com/dwyl/english-words/master/words.txt', parser: async (res) => wordsToSentences((await res.text()).split('\n')) }
-                ];
-
-                for (const source of sources) {
-                    try {
-                        statusEl.textContent = `Loading sentences from ${source.name}...`;
-                        const response = await fetch(source.url);
-                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                        const data = await source.parser(response);
-                        if (data && data.length > 0) {
-                            sentenceCache = data.filter(s => s.length > 10);
-                            statusEl.textContent = `Loaded ${sentenceCache.length} sentences successfully!`;
-                            setTimeout(() => statusEl.textContent = '', 3000);
-                            startBtn.textContent = 'Start Practice';
-                            startBtn.disabled = false;
-                            return;
-                        }
-                    } catch (error) {
-                        console.warn(`Failed to load from ${source.name}:`, error);
-                        statusEl.textContent = `Failed to load from ${source.name}. Trying next source...`;
-                    }
-                }
-                sentenceCache = OFFLINE_FALLBACK_SENTENCES;
-                statusEl.innerHTML = '<strong>Offline mode activated</strong> – using local sentences.';
-                startBtn.textContent = 'Start Practice';
-                startBtn.disabled = false;
-            };
-
-            const getPracticeText = (type = 'paragraph', lang = 'english') => {
-                const sourceCache = lang === 'hindi' ? HINDI_FALLBACK_SENTENCES : sentenceCache;
-                if (sourceCache.length === 0) return lang === 'hindi' ? "हिन्दी पाठ लोड करने में विफल। कृपया बाद में प्रयास करें।" : "Loading failed. Please try again later.";
-                
-                if (type === 'sentence') {
-                    const randomIndex = Math.floor(Math.random() * sourceCache.length);
-                    return sourceCache[randomIndex] + ' ';
-                } else {
-                    const paragraphLength = Math.min(sourceCache.length, Math.floor(Math.random() * 6) + 5); // 5-10 sentences
-                    const startIndex = Math.floor(Math.random() * (sourceCache.length - paragraphLength + 1));
-                    return sourceCache.slice(startIndex, startIndex + paragraphLength).join(' ') + ' ';
-                }
-            };
-            
-            const fetchWords = async (count = 100) => {
-                try {
-                    const response = await fetch(`https://random-word-api.herokuapp.com/word?number=${count}`);
-                    if (!response.ok) throw new Error('Network error');
-                    const words = await response.json();
-                    wordCache = [...new Set([...wordCache, ...words])]; // Avoid duplicates
-                    return words;
-                } catch (error) {
-                    console.error("Failed to fetch random words:", error);
-                    const fallback = ["apple", "banana", "cherry", "date", "elderberry", "fig", "grape", "honeydew", "kiwi", "lemon", "mango"];
-                    wordCache = [...new Set([...wordCache, ...fallback])];
-                    return fallback;
-                }
-            };
-            
-            const getSprintText = async (difficulty) => {
-                 const langCode = appState.testConfig.language === 'hindi' ? 'hi' : 'en';
-                 let text = await fetchWikipediaText(langCode);
-                 if (text) {
-                     const sentences = text.match(/[^.!?।]+[.!?।]+/g) || [text];
-                     return (sentences[0] || text) + ' ';
-                 }
-                 // Fallback if Wikipedia fails
-                 return getPracticeText('sentence', appState.testConfig.language);
-            };
-
-            const createDynamicFetch = (type) => async () => {
-                const lang = appState.testConfig.language === 'hindi' ? 'hi' : 'en';
-                let text = await fetchWikipediaText(lang);
-
-                if (text) {
-                    if (type === 'sentence') {
-                        const sentences = text.match(/[^.!?।]+[.!?।]+/g) || [text];
-                        text = sentences[0] || text;
-                    }
-                } else {
-                    text = getPracticeText(type, appState.testConfig.language);
-                }
-                return text + ' ';
-            };
-
-            const practiceMethods = {
-                "Beginner Foundations": {
-                    "1. Home Row Practice": { isDynamic: false, fetch: () => Promise.resolve("asdf jkl; asdf jkl; a sad lad asks a fall; a lass a flask a jag a glad;") },
-                    "2. Top Row Practice": { isDynamic: false, fetch: () => Promise.resolve("qwer uiop qwer uiop quit weep port terror to you were our trip.") },
-                    "3. Bottom Row Practice": { isDynamic: false, fetch: () => Promise.resolve("zxcv m,./ zxcv m,./ buzz vex max copy zero comma buzz vex max copy.") },
-                    "4. Number Row Practice": { isDynamic: false, fetch: () => Promise.resolve("12345 67890 19283 74650 10 29 38 47 56 123 456 7890.") },
-                    "5. Shift Key & Capitals": { isDynamic: false, fetch: () => Promise.resolve("The quick brown fox Jumps over the Lazy Dog. My name is Alex, and I live in New York. The event is on Monday, July 4th.") },
-                    "6. Punctuation Practice": { isDynamic: false, fetch: () => Promise.resolve("Wait, what? He asked, \"Are you sure?\" I'm not sure... let's check the guide (page 5). The options are: red, green, or blue.") },
-                    "7. Number Pad Practice": { isDynamic: false, fetch: () => Promise.resolve("789 * 123 = 97047. 456 + 789 = 1245. 987 - 654 = 333. 10 / 2 = 5. The total is 4,567.89.") },
-                },
-                "Skill Building": {
-                    "8. Common Words Practice": { isDynamic: true, fetch: async () => (await fetchWords(50)).join(' ') + ' ' },
-                    "9. Sentence Practice": { isDynamic: true, fetch: createDynamicFetch('sentence') },
-                    "10. Paragraph Typing": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
-                    "11. Random Words": { isDynamic: true, fetch: async () => (await fetchWords(50)).join(' ') + ' ' },
-                    "12. Accuracy Focus": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
-                    "13. Error Correction": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
-                    "14. Typing Sprint": { isDynamic: true, fetch: createDynamicFetch('sentence') },
-                },
-                "Advanced & Thematic Practice": {
-                    "15. Speed Test": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
-                    "16. Quotes Typing": { isDynamic: true, fetch: createDynamicFetch('sentence') },
-                    "17. Mixed Text Practice": { isDynamic: false, fetch: () => Promise.resolve("On 12/25/2023, Project-X reported a 15% increase in sales, reaching $1.2M. The report, titled \"Q4-Results\", is available online. Contact support@example.com for more info.") },
-                    "18. Email / Letter Typing": { isDynamic: false, fetch: () => Promise.resolve("Dear Hiring Manager, I am writing to express my interest in the Software Engineer position. My resume is attached for your review. I look forward to hearing from you. Sincerely, Alex.") },
-                    "19. News Article Typing": { isDynamic: false, fetch: () => Promise.resolve("Local authorities announced today that the city's annual festival will proceed as planned, with new safety measures in place. The event, which draws thousands of visitors, is a significant boost to the local economy.") },
-                    "20. Programming Code (JS)": { isDynamic: false, fetch: () => Promise.resolve("function greet(name) { const message = `Hello, ${name}!`; console.log(message); } for (let i = 0; i < 5; i++) { if (i % 2 === 0) { greet('World'); } }") },
-                    "21. Transcription Practice": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
-                },
-                "Challenges & Special Modes": {
-                    "22. Copy Typing Challenge": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
-                    "23. Blind Typing (Focus on Screen)": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
-                    "24. AI Competition Mode (Text)": { isDynamic: true, fetch: createDynamicFetch('paragraph') },
-                    "25. Custom Text Practice": { isDynamic: false, fetch: () => Promise.resolve("This feature is coming soon! You will be able to paste your own text here to practice.") },
-                }
-            };
-            
-            let appState = {
-                timerId: null, isFetchingMore: false, currentView: 'setup', activeGame: null,
-                testConfig: { method: '', duration: 1, text: '', isDynamic: false, sprintDifficulty: 'medium', language: 'english' },
-                testStats: { startTime: 0, charIndex: 0, typedChars: 0, correctChars: 0, errorCount: 0, keystrokes: 0, timeLeft: 0, chars: [], },
-                settings: { theme: 'dark', fontScale: 1.0 },
-                userData: { streak: 0, lastPracticeDate: null, history: [], },
+                langEnglishBtn: document.getElementById('lang-english-btn'),
+                langHindiBtn: document.getElementById('lang-hindi-btn'),
             };
 
             const GRAPHEME_SPLITTER = new Intl.Segmenter();
             const splitTextToChars = (text) => [...GRAPHEME_SPLITTER.segment(text)].map(s => s.segment);
             
-            const showPage = (pageName) => {
-                Object.values(dom.pages).forEach(p => p.classList.remove('active'));
-                dom.pages[pageName].classList.add('active');
-                 if(appState.activeGame && typeof appState.activeGame.end === 'function') {
-                    appState.activeGame.end(); 
-                    appState.activeGame = null;
+            const KEYS = {
+                en: {
+                    home: "asdfjkl;",
+                    top: "qwertyuiop",
+                    bottom: "zxcvbnm,.",
+                    numbers: "1234567890",
+                    symbols: "!@#$%^&*()_+-=[]{}|;':\",./<>?"
+                },
+                hi: {
+                    home: "ोेि्कसहमतरल",
+                    top: "ौैाीपृछठटझफ",
+                    bottom: "़ऋदजगबअड़ध",
+                    numbers: "१२३४५६७८९०",
+                    symbols: "।(),'\"-:",
                 }
-                if (pageName === 'practice') {
-                    showView('setup', 'practice');
-                    dom.typing.hiddenInput.blur();
-                } else if (pageName === 'game') {
-                    showView('menu', 'game');
+            };
+             const OFFLINE_FALLBACK = {
+                en: [
+                    "The quick brown fox jumps over the lazy dog.",
+                    "Technology has changed the way we live and work.",
+                    "The internet connects people from all over the world.",
+                    "Reading books is a great way to expand your knowledge.",
+                    "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+                    "The only way to do great work is to love what you do.",
+                    "Believe you can and you're halfway there.",
+                    "The future belongs to those who believe in the beauty of their dreams.",
+                    "Strive not to be a success, but rather to be of value.",
+                    "In the middle of every difficulty lies opportunity.",
+                ],
+                hi: [
+                    "सूरज की पहली किरण आशा लेकर आती है।",
+                    "सच्चा मित्र वही है जो कठिन समय में साथ दे।",
+                    "परिश्रम ही सफलता की कुंजी है।",
+                    "ज्ञान सबसे बड़ी शक्ति है।",
+                    "एक हजार मील की यात्रा एक कदम से शुरू होती है।",
+                    "समय किसी का इंतजार नहीं करता।",
+                    "स्वस्थ शरीर में ही स्वस्थ मन का वास होता है।",
+                    "किताबें हमारी सबसे अच्छी दोस्त होती हैं।",
+                    "जीवन एक अनमोल उपहार है, इसे व्यर्थ न करें।",
+                    "धैर्य और लगन से हर मुश्किल आसान हो जाती है।",
+                ]
+            };
+             const STATIC_TEXTS = {
+                en: {
+                    application: "To,\nThe Hiring Manager,\n[Company Name],\n[Company Address]\n\nSubject: Application for the post of [Job Title]\n\nDear Sir/Madam,\nI am writing to express my keen interest in the [Job Title] position advertised on [Platform]. With my skills and experience, I am confident that I would be a valuable asset to your team. My resume is attached for your review. I look forward to hearing from you soon.\n\nSincerely,\n[Your Name]",
+                    legal: "Notwithstanding any other provision of this agreement, the parties agree that neither party shall be liable to the other for any indirect, special, or consequential damages. The validity, interpretation, and performance of this agreement shall be governed by and construed in accordance with the laws of the specified jurisdiction, without regard to its conflict of law principles.",
+                    letter: "Dear [Recipient Name],\nI hope this letter finds you well. I am writing to you today to discuss the upcoming project deadline. We need to ensure all deliverables are submitted by the end of the week. Please coordinate with your respective teams to finalize the reports. Your prompt attention to this matter is highly appreciated.\n\nBest regards,\n[Your Name]",
+                    punctuation: "Wait, what? He asked, \"Are you sure?\" I'm not sure... let's check the guide (page 5). The options are: red, green, or blue; however, I prefer the first one. It's a 'win-win' situation, isn't it?",
+                    capitalization: "The United Nations (UN) headquarters is in New York City. Dr. Smith and his colleague, Professor Jones, attended a conference in Paris, France, last Monday. They discussed the impact of climate change on the Arctic Circle.",
+                    symbols: "The formula E=mc^2 is famous. Contact me at user@example.com or call +1 (555) 123-4567. The stock price rose by 15% to $1,234.56. We need to check the file at C:\\Users\\Default\\.",
+                },
+                hi: {
+                    application: "सेवा में,\nश्रीमान प्रबंधक,\n[कंपनी का नाम],\n[कंपनी का पता]\n\nविषय: [पद का नाम] पद हेतु आवेदन पत्र\n\nमहोदय,\nसविनय निवेदन है कि मुझे [प्लेटफॉर्म] पर विज्ञापित [पद का नाम] पद के लिए आपकी कंपनी में रुचि है। मेरे कौशल और अनुभव के साथ, मुझे विश्वास है कि मैं आपकी टीम के लिए एक मूल्यवान संपत्ति होऊंगा। मेरा बायोडाटा आपके अवलोकन के लिए संलग्न है। मुझे आपसे शीघ्र उत्तर की आशा है।\n\nभवदीय,\n[आपका नाम]",
+                    legal: "इस समझौते के किसी अन्य प्रावधान के होते हुए भी, पक्ष इस बात से सहमत हैं कि कोई भी पक्ष दूसरे पक्ष के प्रति किसी भी अप्रत्यक्ष, विशेष, या परिणामी क्षति के लिए उत्तरदायी नहीं होगा। इस समझौते की वैधता, व्याख्या, और प्रदर्शन निर्दिष्ट अधिकार क्षेत्र के कानूनों के अनुसार शासित और समझे जाएंगे, इसके कानून सिद्धांतों के टकराव की परवाह किए बिना।",
+                    letter: "प्रिय [प्राप्तकर्ता का नाम],\nआशा है कि आप स्वस्थ होंगे। मैं आज आपसे आगामी परियोजना की समय सीमा पर चर्चा करने के लिए लिख रहा हूं। हमें यह सुनिश्चित करने की आवश्यकता है कि सभी डिलिवरेबल्स सप्ताह के अंत तक जमा कर दिए जाएं। कृपया रिपोर्ट को अंतिम रूप देने के लिए अपनी संबंधित टीमों के साथ समन्वय करें। इस मामले पर आपके त्वरित ध्यान की अत्यधिक सराहना की जाती है।\n\nसाभार,\n[आपका नाम]",
+                    punctuation: "रुको, क्या? उसने पूछा, \"क्या तुम निश्चित हो?\" मुझे यकीन नहीं है... चलो गाइड (पेज 5) देखते हैं। विकल्प हैं: लाल, हरा, या नीला; हालाँकि, मुझे पहला वाला पसंद है। यह एक 'जीत-जीत' की स्थिति है, है ना?",
+                    capitalization: "संयुक्त राष्ट्र (UN) का मुख्यालय न्यूयॉर्क शहर में है। डॉ. शर्मा और उनके सहयोगी, प्रोफेसर वर्मा, पिछले सोमवार को पेरिस, फ्रांस में एक सम्मेलन में शामिल हुए। उन्होंने आर्कटिक सर्कल पर जलवायु परिवर्तन के प्रभाव पर चर्चा की।",
                 }
             };
 
-            const showView = (view, page='practice') => {
-                appState.currentView = view;
-                if (page === 'practice') { 
-                    Object.values(dom.views).forEach(v => v.classList.remove('active')); 
-                    dom.views[view].classList.add('active'); 
-                } else if (page === 'game') { 
-                    Object.values(dom.gameViews).forEach(v => v.classList.remove('active'));
-                    dom.gameViews[view].classList.add('active'); 
+            const getRandomFallback = (lang) => OFFLINE_FALLBACK[lang][Math.floor(Math.random() * OFFLINE_FALLBACK[lang].length)];
+            
+            const generateRandomText = (chars, wordLength, numWords) => {
+                let text = '';
+                for (let i = 0; i < numWords; i++) {
+                    let word = '';
+                    const currentWordLength = Math.floor(Math.random() * (wordLength - 2)) + 2;
+                    for (let j = 0; j < currentWordLength; j++) {
+                        word += chars[Math.floor(Math.random() * chars.length)];
+                    }
+                    text += word + ' ';
                 }
+                return text.trim();
+            };
 
-                if (page === 'practice' && view === 'typing') {
-                    dom.body.classList.add('practice-active');
-                } else {
-                    dom.body.classList.remove('practice-active');
+            const getTypingText = async (language = 'en') => {
+                 const sources = [
+                    async () => { 
+                        const url = language === 'hi'
+                            ? 'https://api.rss2json.com/v1/api.json?rss_url=https://www.jagran.com/education/rssfeed.xml'
+                            : 'https://api.rss2json.com/v1/api.json?rss_url=https://www.thehindu.com/education/feeder/default.rss';
+                        const res = await fetch(url, { cache: "no-cache" });
+                        if (!res.ok) throw new Error("RSS Network error");
+                        const data = await res.json();
+                        if (data.status !== 'ok' || !data.items || data.items.length === 0) throw new Error("News source failed");
+                        return data.items[Math.floor(Math.random() * data.items.length)].description.replace(/<[^>]+>/g, '').trim();
+                    },
+                    async () => {
+                        const url = language === 'hi'
+                            ? 'https://hi.wikipedia.org/api/rest_v1/page/random/summary'
+                            : 'https://en.wikipedia.org/api/rest_v1/page/random/summary';
+                        const res = await fetch(url);
+                        if (!res.ok) throw new Error("Wikipedia Network error");
+                        const data = await res.json();
+                        if (!data.extract) throw new Error("Wikipedia extract failed");
+                        return data.extract;
+                    }
+                ];
+
+                for (const source of sources) {
+                    try {
+                        const text = await Promise.race([
+                            source(),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 4000))
+                        ]);
+                        if (text && text.length > 50) return text;
+                    } catch (err) {
+                        console.warn("A text source failed or timed out, trying next...");
+                    }
+                }
+                
+                console.warn("All online sources failed. Using offline fallback.");
+                return getRandomFallback(language);
+            };
+            
+             const practiceLevels = {
+                "Beginner": {
+                    "1. Home Row": () => generateRandomText(KEYS[appState.lang].home, 5, 20),
+                    "2. Top Row": () => generateRandomText(KEYS[appState.lang].top, 5, 20),
+                    "3. Bottom Row": () => generateRandomText(KEYS[appState.lang].bottom, 5, 20),
+                    "4. Home + Top": () => generateRandomText(KEYS[appState.lang].home + KEYS[appState.lang].top, 6, 25),
+                    "5. Home + Bottom": () => generateRandomText(KEYS[appState.lang].home + KEYS[appState.lang].bottom, 6, 25),
+                    "6. Top + Bottom": () => generateRandomText(KEYS[appState.lang].top + KEYS[appState.lang].bottom, 6, 25),
+                    "7. Word Formation": () => generateRandomText(KEYS[appState.lang].home + KEYS[appState.lang].top, 4, 30),
+                    "8. Small Sentences": () => Promise.resolve(getRandomFallback(appState.lang)),
+                    "9. Random Row Mix": () => generateRandomText(KEYS[appState.lang].home + KEYS[appState.lang].top + KEYS[appState.lang].bottom, 6, 25),
+                    "10. Numeric Practice": () => generateRandomText(KEYS.en.numbers + ' ', 5, 20),
+                },
+                "Skill Building": {
+                    "1. Random Words": () => getTypingText(appState.lang),
+                    "2. Sentence Practice": () => getTypingText(appState.lang),
+                    "3. Paragraph Practice": () => getTypingText(appState.lang),
+                    "4. Punctuation Practice": () => Promise.resolve(STATIC_TEXTS[appState.lang].punctuation),
+                    "5. Capitalization": () => Promise.resolve(STATIC_TEXTS[appState.lang].capitalization),
+                    "6. Numeric Row Practice": () => generateRandomText(KEYS.en.numbers + ' 123 456 7890 ', 7, 20),
+                    "7. Symbol Typing": () => Promise.resolve(STATIC_TEXTS.en.symbols),
+                    "8. Dictation Mode": () => getTypingText(appState.lang),
+                    "9. Mixed Practice": () => getTypingText(appState.lang),
+                    "10. Repetition Drill": async () => { const s = await getTypingText(appState.lang); return (s + " ").repeat(2).trim(); },
+                },
+                "Advanced": {
+                    "1. Editorial Articles": () => getTypingText(appState.lang),
+                    "2. Technical Text": () => getTypingText(appState.lang),
+                    "3. Application Format": () => Promise.resolve(STATIC_TEXTS[appState.lang].application),
+                    "4. Government Notice": () => getTypingText(appState.lang),
+                    "5. Table Data Typing": () => Promise.resolve("Name|Age|City|Country\nJohn|30|New York|USA\nAnna|25|Paris|France\nMike|42|Tokyo|Japan"),
+                    "6. Speech Text": () => getTypingText(appState.lang),
+                    "7. Legal Paragraphs": () => Promise.resolve(STATIC_TEXTS[appState.lang].legal),
+                    "8. Complex Sentences": () => getTypingText(appState.lang),
+                    "9. News Report Practice": () => getTypingText(appState.lang),
+                    "10. Error Correction": () => getTypingText(appState.lang),
+                },
+                "Expert": {
+                    "1. Long Paragraph": () => getTypingText(appState.lang),
+                    "2. Letter Writing": () => Promise.resolve(STATIC_TEXTS[appState.lang].letter),
+                    "3. Report Typing": () => getTypingText(appState.lang),
+                    "4. Press Release": () => getTypingText(appState.lang),
+                    "5. Data Table Typing": () => Promise.resolve("ID,Product,Price,Stock\n101,Laptop,1200,50\n102,Mouse,25,200\n103,Keyboard,75,150\n104,Monitor,300,80"),
+                    "6. Essay Typing": () => getTypingText(appState.lang),
+                    "7. Mixed Format": () => Promise.resolve(`${STATIC_TEXTS[appState.lang].letter} \n\n ${STATIC_TEXTS[appState.lang].legal}`),
+                    "8. Official Document": () => getTypingText(appState.lang),
+                    "9. English-Hindi Mix": () => Promise.resolve("This is an English sentence. यह एक हिंदी वाक्य है। We need to type both. हमें दोनों टाइप करने होंगे।"),
+                    "10. Multiple Passages": () => getTypingText(appState.lang),
+                },
+                "Exam Type": {
+                    "1. SSC Exam Mode": () => getTypingText(appState.lang),
+                    "2. CPCT Mode": () => getTypingText(appState.lang),
+                    "3. RSMSSB Mode": () => getTypingText(appState.lang),
+                    "4. UP Police Clerk": () => getTypingText(appState.lang),
+                    "5. Bank Clerk Mode": () => getTypingText(appState.lang),
+                    "6. Railway Typing": () => getTypingText(appState.lang),
+                    "7. High Court Clerk": () => getTypingText(appState.lang),
+                    "8. Insurance Typing": () => getTypingText(appState.lang),
+                    "9. MP DEO Typing": () => getTypingText(appState.lang),
+                    "10. Custom Exam Sim": () => getTypingText(appState.lang),
+                },
+                "Free Hand": { "Free Practice": () => Promise.resolve(""), }
+            };
+            
+            let appState = {};
+
+            const resetState = () => {
+                appState = {
+                    lang: 'en', timerId: null, isPracticeActive: false,
+                    config: { level: '', method: '', duration: 0, minusMarking: { enabled: false, value: 1 }, sourceText: '', sourceWords: [], sourceChars: [], },
+                    session: { startTime: 0, timeLeft: 0, typedText: '', charIndex: 0, correctChars: 0, errorCount: 0, keystrokes: 0, },
+                };
+            };
+            
+            const populateLevels = () => { dom.levelSelect.innerHTML = Object.keys(practiceLevels).map(level => `<option value="${level}">${level}</option>`).join(''); };
+            const populateMethods = () => {
+                const selectedLevel = dom.levelSelect.value;
+                const methods = Object.keys(practiceLevels[selectedLevel]);
+                dom.methodSelect.innerHTML = methods.map(method => `<option value="${method}">${method}</option>`).join('');
+                handleMethodChange();
+            };
+            const handleMethodChange = () => {
+                 const isFreeHand = dom.levelSelect.value === 'Free Hand';
+                 dom.durationSelect.disabled = isFreeHand;
+                 dom.minusMarkingEnabled.disabled = isFreeHand;
+                 if (isFreeHand && dom.minusMarkingEnabled.checked) { dom.minusMarkingEnabled.click(); }
+            };
+
+            const switchView = (view) => {
+                dom.setupView.classList.toggle('active', view === 'setup');
+                dom.practiceView.classList.toggle('active', view === 'practice');
+            };
+
+            const startPractice = async () => {
+                dom.startBtn.disabled = true;
+                dom.loadingStatus.textContent = 'Fetching text...';
+                try {
+                    appState.config = {
+                        level: dom.levelSelect.value,
+                        method: dom.methodSelect.value,
+                        duration: parseInt(dom.durationSelect.value, 10) * 60,
+                        minusMarking: { enabled: dom.minusMarkingEnabled.checked, value: parseInt(dom.minusMarkingValue.value, 10) },
+                        sourceText: await practiceLevels[dom.levelSelect.value][dom.methodSelect.value](),
+                    };
+                    if (!appState.config.sourceText && appState.config.level !== 'Free Hand') {
+                        appState.config.sourceText = getRandomFallback(appState.lang);
+                    }
+                    if (appState.config.level === 'Free Hand') {
+                        dom.textDisplay.style.display = 'none';
+                        dom.caret.style.display = 'none';
+                        dom.freeHandArea.style.display = 'block';
+                        dom.freeHandArea.value = '';
+                    } else {
+                        dom.textDisplay.style.display = 'block';
+                        dom.freeHandArea.style.display = 'none';
+                        appState.config.sourceWords = appState.config.sourceText.split(/\s+/).filter(Boolean);
+                        appState.config.sourceChars = splitTextToChars(appState.config.sourceText);
+                        dom.textDisplay.innerHTML = appState.config.sourceChars.map(char => `<span class="char">${char}</span>`).join('');
+                        dom.textDisplay.className = appState.lang === 'hi' ? 'hindi' : '';
+                    }
+                    resetSession();
+                    switchView('practice');
+                    appState.config.level === 'Free Hand' ? dom.freeHandArea.focus() : dom.hiddenInput.focus();
+                } catch (error) {
+                    console.error("Failed to start practice:", error);
+                    dom.loadingStatus.textContent = 'Error fetching text. Please try again.';
+                } finally {
+                    dom.loadingStatus.textContent = '';
+                    dom.startBtn.disabled = false;
                 }
             };
             
-            const populateMethods = () => {
-                let html = '';
-                for (const category in practiceMethods) { html += `<optgroup label="${category}">`; for (const method in practiceMethods[category]) { html += `<option value="${category}:${method}">${method}</option>`; } html += `</optgroup>`; }
-                dom.setup.methodSelect.innerHTML = html;
-            };
-
-            const fetchAndAppendText = async () => {
-                if (appState.isFetchingMore) return;
-                appState.isFetchingMore = true;
-                try {
-                    const [category, methodName] = dom.setup.methodSelect.value.split(':');
-                    const newText = await practiceMethods[category][methodName].fetch();
-                    if (newText) {
-                        appState.testConfig.text += newText; const newChars = splitTextToChars(newText); appState.testStats.chars.push(...newChars);
-                        const fragment = document.createDocumentFragment(); newChars.forEach(char => { const span = document.createElement('span'); span.className = 'char'; span.textContent = char; fragment.appendChild(span); });
-                        dom.typing.typingText.appendChild(fragment);
-                    }
-                } catch (e) { console.error("Failed to fetch more text:", e); } 
-                finally { appState.isFetchingMore = false; }
-            };
-
-            const startPractice = async (isSprint = false) => {
-                dom.setup.startBtn.disabled = true; 
-                dom.setup.startBtn.textContent = 'Fetching Text...';
-                
-                let methodName, method;
-                if(isSprint) { 
-                    methodName = `Typing Sprint (${appState.testConfig.sprintDifficulty})`; 
-                    appState.testConfig.text = await getSprintText(appState.testConfig.sprintDifficulty); 
-                    appState.testConfig.isDynamic = false; 
-                } else { 
-                    const [category, mName] = dom.setup.methodSelect.value.split(':'); 
-                    methodName = mName; 
-                    method = practiceMethods[category][mName]; 
-                    appState.testConfig.isDynamic = method.isDynamic; 
-                    let initialText = await method.fetch(); 
-                    if (appState.testConfig.isDynamic) { 
-                        initialText += await method.fetch(); // Fetch a second time for more length
-                    } 
-                    appState.testConfig.text = initialText; 
-                }
-
-                dom.setup.startBtn.disabled = false; 
-                dom.setup.startBtn.textContent = 'Start Practice';
-                dom.typing.typingArea.classList.remove('english', 'hindi');
-                dom.typing.typingArea.classList.add(appState.testConfig.language);
-                dom.typing.typingText.style.color = ''; 
-                appState.testConfig.duration = isSprint ? 1 : parseInt(dom.setup.durationSelect.value, 10); 
-                appState.testConfig.method = methodName;
-                if (appState.timerId) clearInterval(appState.timerId); 
+            const resetSession = () => {
+                if (appState.timerId) clearInterval(appState.timerId);
+                appState.isPracticeActive = false;
                 appState.timerId = null;
-                appState.testStats = { startTime: 0, charIndex: 0, typedChars: 0, correctChars: 0, errorCount: 0, keystrokes: 0, timeLeft: appState.testConfig.duration * 60, chars: splitTextToChars(appState.testConfig.text), };
-                dom.typing.typingText.style.transform = 'translateY(0px)'; 
-                dom.typing.typingText.innerHTML = appState.testStats.chars.map(char => `<span class="char">${char}</span>`).join('');
-                dom.typing.typingText.appendChild(dom.typing.caret);
-                const charElements = dom.typing.typingText.querySelectorAll('span.char');
-                if (charElements.length > 0) { charElements[0].classList.add('current'); }
-                dom.typing.hiddenInput.value = ''; 
-                updateStatsDisplay(); 
-                updateCaretPosition(); 
-                showView('typing'); 
-                dom.typing.hiddenInput.focus();
+                appState.session = { startTime: 0, timeLeft: appState.config.duration, typedText: '', charIndex: 0, correctChars: 0, errorCount: 0, keystrokes: 0, };
+                dom.hiddenInput.value = '';
+                dom.textDisplay.style.transform = 'translateY(0px)';
+                updateStatsDisplay();
+                updateTextDisplay();
             };
 
-            const handleTyping = (e) => {
-                if (appState.testStats.timeLeft <= 0 || (!appState.timerId && appState.testStats.startTime > 0)) return;
-                const inputValue = dom.typing.hiddenInput.value; 
-                const charElements = dom.typing.typingText.querySelectorAll('span.char');
-                const currentTypedCharsArray = splitTextToChars(inputValue); 
-                const newCharIndex = currentTypedCharsArray.length;
-                if (charElements[appState.testStats.charIndex]) { charElements[appState.testStats.charIndex].classList.remove('current'); }
-                let correctCount = 0; let errorCount = 0;
-                for (let i = 0; i < newCharIndex; i++) {
-                    const typedChar = currentTypedCharsArray[i]; const targetChar = appState.testStats.chars[i];
-                    if (charElements[i]) { charElements[i].className = 'char'; if (typedChar === targetChar) { charElements[i].classList.add('correct'); correctCount++; } else { charElements[i].classList.add('incorrect'); errorCount++; } }
+            const handleTyping = () => {
+                if (appState.session.timeLeft <= 0 && appState.config.level !== 'Free Hand') return;
+                if (!appState.isPracticeActive && appState.config.duration > 0) {
+                    appState.isPracticeActive = true;
+                    appState.session.startTime = Date.now();
+                    startTimer();
                 }
-                if (charElements[newCharIndex]) { charElements[newCharIndex].classList.add('current'); }
-                appState.testStats = { ...appState.testStats, charIndex: newCharIndex, typedChars: newCharIndex, correctChars: correctCount, errorCount };
-                const remainingChars = appState.testStats.chars.length - appState.testStats.charIndex;
-                if (appState.testConfig.isDynamic && remainingChars < 100) { fetchAndAppendText(); }
-                updateCaretPosition(); updateStatsDisplay();
-                if(!appState.testConfig.isDynamic && appState.testStats.charIndex === appState.testStats.chars.length) endPractice();
+                appState.session.typedText = appState.config.level === 'Free Hand' ? dom.freeHandArea.value : dom.hiddenInput.value;
+                updateTextDisplay();
+                if (appState.config.level !== 'Free Hand' && appState.session.charIndex === appState.config.sourceChars.length) { endPractice(); }
+            };
+            
+            const startTimer = () => {
+                if (appState.timerId || appState.config.duration <= 0) return;
+                appState.timerId = setInterval(() => {
+                    if (appState.isPracticeActive) {
+                        const elapsed = Math.floor((Date.now() - appState.session.startTime) / 1000);
+                        appState.session.timeLeft = appState.config.duration - elapsed;
+                        updateStatsDisplay();
+                    }
+                    if (appState.session.timeLeft <= 0) { endPractice(); }
+                }, 250);
             };
 
-            const startTimer = () => { if (appState.timerId) return; appState.timerId = setInterval(() => { appState.testStats.timeLeft--; updateStatsDisplay(); if (appState.testStats.timeLeft <= 0) endPractice(); }, 1000); };
-
-            const endPractice = () => {
-                if (!appState.timerId && appState.testStats.startTime > 0) return; if (appState.timerId) clearInterval(appState.timerId); appState.timerId = null;
-                const timeTakenSeconds = appState.testConfig.duration * 60 - appState.testStats.timeLeft; const durationMinutes = timeTakenSeconds / 60 || 1;
-                const grossWpm = (appState.testStats.typedChars / 5) / durationMinutes; const netWpm = grossWpm - (appState.testStats.errorCount / durationMinutes); const accuracy = appState.testStats.typedChars > 0 ? (appState.testStats.correctChars / appState.testStats.typedChars) * 100 : 0;
-                dom.results.grossWpm.textContent = Math.round(grossWpm); dom.results.netWpm.textContent = Math.round(Math.max(0, netWpm)); dom.results.accuracy.textContent = `${accuracy.toFixed(1)}%`; dom.results.errors.textContent = appState.testStats.errorCount;
-                const minutes = Math.floor(timeTakenSeconds / 60); const seconds = timeTakenSeconds % 60; dom.results.timeTaken.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; dom.results.keystrokes.textContent = appState.testStats.keystrokes;
-                updateStreak();
-                const resultData = { date: new Date().toLocaleString(), method: appState.testConfig.method, netWpm: Math.round(Math.max(0, netWpm)), accuracy: accuracy.toFixed(1) };
-                appState.userData.history.unshift(resultData); if (appState.userData.history.length > 20) appState.userData.history.pop();
-                saveState(); updateHistoryList(); showView('results');
-            };
-
-            const updateStatsDisplay = () => {
-                const minutes = Math.floor(appState.testStats.timeLeft / 60); 
-                const seconds = appState.testStats.timeLeft % 60; 
-                dom.typing.timeLeft.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; 
-                dom.typing.errors.textContent = appState.testStats.errorCount;
-                
-                const wpmEl = dom.typing.wpm.parentElement;
-                const accuracyEl = dom.typing.accuracy.parentElement;
-
-                if (appState.testStats.startTime > 0) {
-                    const elapsedTimeMinutes = (Date.now() - appState.testStats.startTime) / 60000;
-                    const wpm = elapsedTimeMinutes > 0 ? ((appState.testStats.correctChars / 5) / elapsedTimeMinutes) : 0;
-                    const accuracy = appState.testStats.typedChars > 0 ? (appState.testStats.correctChars / appState.testStats.typedChars) * 100 : 100;
-                    
-                    dom.typing.wpm.textContent = Math.round(Math.max(0, wpm));
-                    dom.typing.accuracy.textContent = Math.round(accuracy);
-                    
-                    wpmEl.classList.remove('good', 'poor');
-                    if (wpm > 40) {
-                        wpmEl.classList.add('good');
-                    } else if (wpm < 20 && elapsedTimeMinutes > 0.08) { 
-                        wpmEl.classList.add('poor');
+            const updateTextDisplay = () => {
+                if (appState.config.level === 'Free Hand') return;
+                const typedChars = splitTextToChars(appState.session.typedText);
+                const charElements = dom.textDisplay.querySelectorAll('.char');
+                appState.session.charIndex = typedChars.length;
+                let correctCount = 0;
+                let errorCount = 0;
+                charElements.forEach((charEl, index) => {
+                    if (index < appState.session.charIndex) {
+                        if (typedChars[index] === appState.config.sourceChars[index]) {
+                            charEl.className = 'char correct';
+                            correctCount++;
+                        } else {
+                            charEl.className = 'char incorrect';
+                            errorCount++;
+                        }
+                    } else {
+                        charEl.className = 'char';
                     }
-
-                    accuracyEl.classList.remove('good', 'poor');
-                    if (accuracy >= 98) {
-                        accuracyEl.classList.add('good');
-                    } else if (accuracy < 90) {
-                        accuracyEl.classList.add('poor');
-                    }
-
-                } else { 
-                    dom.typing.wpm.textContent = 0; 
-                    dom.typing.accuracy.textContent = 100;
-                    wpmEl.classList.remove('good', 'poor');
-                    accuracyEl.classList.remove('good', 'poor');
-                    dom.typing.errors.parentElement.classList.remove('good', 'poor');
-                }
+                });
+                appState.session.correctChars = correctCount;
+                appState.session.errorCount = errorCount;
+                updateCaretPosition();
             };
             
             const updateCaretPosition = () => {
-                const charElements = dom.typing.typingText.querySelectorAll('span.char');
-                const currentEl = charElements[appState.testStats.charIndex] || charElements[charElements.length - 1];
+                const charElements = dom.textDisplay.querySelectorAll('.char');
+                const isAtEnd = appState.session.charIndex >= charElements.length;
+                const currentEl = isAtEnd ? charElements[charElements.length - 1] : charElements[appState.session.charIndex];
+
                 if (!currentEl) {
-                    dom.typing.caret.style.display = 'none';
+                    dom.caret.style.display = 'none';
                     return;
                 }
 
-                dom.typing.caret.style.display = 'block';
-                const isAtEnd = appState.testStats.charIndex >= charElements.length;
-                dom.typing.caret.style.left = `${currentEl.offsetLeft + (isAtEnd ? currentEl.offsetWidth : 0)}px`;
-                dom.typing.caret.style.top = `${currentEl.offsetTop}px`;
+                dom.caret.style.display = 'block';
+                dom.caret.style.left = `${currentEl.offsetLeft + (isAtEnd ? currentEl.offsetWidth : 0)}px`;
+                dom.caret.style.top = `${currentEl.offsetTop}px`;
 
-                const typingArea = dom.typing.typingArea;
-                const typingText = dom.typing.typingText;
-                const caretTopRelativeToText = currentEl.offsetTop;
-
-                const desiredScrollTop = caretTopRelativeToText;
-
-                const maxScrollTop = typingText.scrollHeight - typingArea.clientHeight;
-                const scrollAmount = Math.max(0, Math.min(desiredScrollTop, maxScrollTop));
-
-                typingText.style.transform = `translateY(-${scrollAmount}px)`;
-            };
-
-            const updateStreak = () => {
-                const today = new Date().toDateString(); const lastPractice = appState.userData.lastPracticeDate;
-                if (lastPractice !== today) { const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); if (lastPractice === yesterday.toDateString()) { appState.userData.streak++; } else { appState.userData.streak = 1; } appState.userData.lastPracticeDate = today; }
-                dom.setup.streakCount.textContent = appState.userData.streak;
-            };
-            
-            const updateHistoryList = () => { dom.results.historyList.innerHTML = appState.userData.history.map(item => `<li class="history-item"><span>${item.method} - ${item.date}</span><span><strong>${item.netWpm} WPM</strong> at ${item.accuracy}% Acc</span></li>`).join('') || '<li>No history yet. Complete a test!</li>'; };
-
-            const applySettings = () => {
-                dom.body.className = `theme-${appState.settings.theme}`;
-                dom.html.style.setProperty('--font-scale', appState.settings.fontScale);
-            };
-
-            const saveState = () => { localStorage.setItem('examyatriState', JSON.stringify({ settings: appState.settings, userData: appState.userData })); };
-            const loadState = () => { 
-                const savedState = localStorage.getItem('examyatriState'); 
-                if (savedState) { 
-                    const parsed = JSON.parse(savedState); 
-                    appState.settings = { ...appState.settings, ...parsed.settings }; 
-                    appState.userData = { ...appState.userData, ...parsed.userData }; 
-                }
-                appState.settings.theme = 'dark'; // Force dark mode
-            };
-
-            const gameUtils = {
-                createGameUI(container, title, elements = {}) {
-                    container.innerHTML = `<h2 style="margin-bottom: 1rem;">${title}</h2><div class="glass-card" style="position: relative;">${elements.canvas || ''}${elements.ui || ''}<div class="game-overlay" style="display: flex;"><h2>${title}</h2><p>${elements.instructions || ''}</p><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Hard</button></div></div></div>${elements.input || ''}<button class="cta-button back-to-menu-btn">Back to Menu</button>`;
-                    return { overlay: container.querySelector('.game-overlay'), backBtn: container.querySelector('.back-to-menu-btn'), difficultyBtns: container.querySelectorAll('.difficulty-btn'), };
-                },
-                getRandomWord(minLength = 1, maxLength = 10) { const filteredWords = wordCache.filter(w => w.length >= minLength && w.length <= maxLength); return filteredWords.length > 0 ? filteredWords[Math.floor(Math.random() * filteredWords.length)] : 'default'; }
-            };
-            const games = { wordStorm: { state: {}, init() { const c = dom.gameViews.wordStorm; const ui = gameUtils.createGameUI(c, 'Word Storm', { canvas: `<canvas id="word-storm-canvas" class="game-canvas" width="800" height="500"></canvas>`, ui: `<div class="game-ui"><div>Score: <span id="ws-score">0</span></div><div>Lives: <span id="ws-lives">3</span></div></div>`, input: `<input type="text" id="ws-input" class="game-input" placeholder="Type words here..." autocomplete="off">`, instructions: 'Type the falling words before they hit the bottom. Press Enter to submit.' }); const canvas = c.querySelector('#word-storm-canvas'), ctx = canvas.getContext('2d'), input = c.querySelector('#ws-input'), scoreEl = c.querySelector('#ws-score'), livesEl = c.querySelector('#ws-lives'); const reset = (d) => { const s = { easy: { s: 0.8, r: 2500, min: 3, max: 5 }, medium: { s: 1, r: 2000, min: 4, max: 7 }, hard: { s: 1.5, r: 1500, min: 6, max: 10 } }; this.state = { w: [], p: [], sc: 0, l: 3, go: false, af: null, baseSpeed: s[d].s, spawnRate: s[d].r, wordMin: s[d].min, wordMax: s[d].max }; }; const particles = (x, y, t) => { for(let i=0;i<t.length*2;i++)this.state.p.push({x,y,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5,a:1,c:t[Math.floor(Math.random()*t.length)]}) }; const loop = () => { if(this.state.go)return; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--primary-text'); ctx.font='24px Courier New'; this.state.w.forEach((w,i)=>{ w.y+=w.speed;ctx.fillText(w.text,w.x,w.y);if(w.y>canvas.height){this.state.w.splice(i,1);this.state.l--;livesEl.textContent=this.state.l;if(this.state.l<=0)this.end('You ran out of lives!')}}); this.state.p.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;p.a-=.03;ctx.globalAlpha=p.a;ctx.fillText(p.c,p.x,p.y);if(p.a<=0)this.state.p.splice(i,1)});ctx.globalAlpha=1;canvas.style.filter=`brightness(${1-(this.state.baseSpeed-1)*.2})`;this.state.af=requestAnimationFrame(loop)}; const spawn = () => { if(this.state.go)return;this.state.w.push({text:gameUtils.getRandomWord(this.state.wordMin,this.state.wordMax),x:Math.random()*(canvas.width-100),y:0,speed:this.state.baseSpeed+Math.random()});this.state.spawnRate=Math.max(500,this.state.spawnRate*.995);this.state.baseSpeed+=.01;setTimeout(spawn,this.state.spawnRate)}; input.addEventListener('keyup',(e)=>{if(e.key!=='Enter'||this.state.go)return;const t=input.value.trim();const idx=this.state.w.findIndex(w=>w.text===t);if(idx!==-1){const w=this.state.w[idx];particles(w.x,w.y,w.text);this.state.w.splice(idx,1);this.state.sc+=t.length;scoreEl.textContent=this.state.sc;input.value=''}}); this.start=(d)=>{reset(d);ui.overlay.style.display='none';input.disabled=false;input.focus();scoreEl.textContent=this.state.sc;livesEl.textContent=this.state.l;setTimeout(spawn,1000);this.state.af=requestAnimationFrame(loop)}; this.end=(m='Game Over')=>{this.state.go=true;cancelAnimationFrame(this.state.af);ui.overlay.innerHTML=`<h2>${m}</h2><p>Final Score: ${this.state.sc}</p><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Play Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Play Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Play Hard</button></div>`;ui.overlay.style.display='flex';ui.overlay.querySelectorAll('.difficulty-btn').forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));input.disabled=true}; ui.difficultyBtns.forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty)); ui.backBtn.onclick=()=>{this.end();showView('menu','game')}}}, typingRacer: { state: {}, init() { const c=dom.gameViews.typingRacer; const ui=gameUtils.createGameUI(c,'Typing Racer',{ui:`<div class="racetrack"><div class="finish-line"></div><div id="player-car" class="car">🚗</div><div id="ai-car" class="car">💻</div></div>`,instructions:'Type the text below as fast as you can to win the race!'}); const pCar=c.querySelector('#player-car'),aiCar=c.querySelector('#ai-car');const wrap=document.createElement('div');wrap.className='typing-area-wrapper glass-card';wrap.style.marginTop='1rem';wrap.innerHTML=`<div id="tr-typing-area" class="typing-area english"><div id="tr-typing-text" class="typing-text"></div></div><div id="tr-caret" class="caret"></div>`;c.querySelector('.glass-card').appendChild(wrap);const typingText=c.querySelector('#tr-typing-text'),caret=c.querySelector('#tr-caret'),hInput=dom.typing.hiddenInput;const reset=async(d)=>{const s={easy:30,medium:45,hard:60};const tS=d==='hard'?getSprintText('hard'):practiceMethods["Skill Building"]["9. Sentence Practice"].fetch();this.state={text:await tS,chars:[],charIndex:0,totalChars:0,lastCorrectIndex:-1,go:false,aiWpm:s[d],aiInt:null};this.state.chars=splitTextToChars(this.state.text);this.state.totalChars=this.state.chars.length};const updateCars=()=>{const pP=(this.state.charIndex/this.state.totalChars)*90;pCar.style.left=`${pP}%`;if(pP>=90)this.end('You Win!')};const handleTyping=()=>{if(this.state.go)return;const tChars=splitTextToChars(hInput.value);this.state.charIndex=tChars.length;let correct=true;for(let i=0;i<this.state.charIndex;i++){const el=typingText.children[i];if(tChars[i]===this.state.chars[i]){el.className='char correct';if(correct)this.state.lastCorrectIndex=i}else{el.className='char incorrect';correct=false}}pCar.classList.toggle('nitro-boost',correct&&this.state.charIndex>this.state.lastCorrectIndex);for(let i=this.state.charIndex;i<this.state.totalChars;i++)typingText.children[i].className='char';if(typingText.children[this.state.charIndex])typingText.children[this.state.charIndex].classList.add('current');const currEl=typingText.children[this.state.charIndex]||typingText.children[this.state.totalChars-1];if(currEl){caret.style.left=`${currEl.offsetLeft}px`;caret.style.top=`${currEl.offsetTop}px`;if(currEl.offsetTop>100)typingText.style.top=`-${currEl.offsetTop-currEl.offsetHeight}px`}updateCars()};this.start=async(d)=>{await reset(d);ui.overlay.style.display='none';hInput.value='';hInput.oninput=handleTyping;hInput.focus();typingText.innerHTML=this.state.chars.map(c=>`<span class="char">${c}</span>`).join('');if(typingText.children.length>0)typingText.children[0].classList.add('current');updateCars();aiCar.style.left='0%';let aiP=0;const aiInc=(this.state.aiWpm*5)/60/4;this.state.aiInt=setInterval(()=>{if(this.state.go)return;aiP+=aiInc;const aiL=(aiP/this.state.totalChars)*90;aiCar.style.left=`${aiL}%`;if(aiL>=90)this.end('You Lose!')},250)};this.end=(m)=>{if(this.state.go)return;this.state.go=true;clearInterval(this.state.aiInt);hInput.oninput=handleTyping;ui.overlay.innerHTML=`<h2>${m}</h2><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Play Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Play Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Play Hard</button></div>`;ui.overlay.style.display='flex';ui.overlay.querySelectorAll('.difficulty-btn').forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty))};ui.difficultyBtns.forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));ui.backBtn.onclick=()=>{this.end();showView('menu','game')}}}, keyDefender: { state: {}, init() { const c=dom.gameViews.keyDefender; const ui=gameUtils.createGameUI(c,'Key Defender',{canvas:`<canvas id="kd-canvas" class="game-canvas" width="800" height="500"></canvas>`,ui:`<div class="game-ui"><div>Score: <span id="kd-score">0</span></div><div>Base HP: <span id="kd-hp">100</span></div></div>`,input:`<input type="text" id="kd-input" class="game-input" placeholder="Type enemy words..." autocomplete="off">`,instructions:'Destroy enemies by typing their words before they reach your base.'}); const canvas=c.querySelector('#kd-canvas'),ctx=canvas.getContext('2d'),input=c.querySelector('#kd-input'),scoreEl=c.querySelector('#kd-score'),hpEl=c.querySelector('#kd-hp'); const reset=(d)=>{const s={easy:{s:.5,r:3000,hp:150},medium:{s:.8,r:2500,hp:100},hard:{s:1.2,r:1800,hp:75}};this.state={e:[],p:[],sc:0,go:false,af:null,lvl:1,...s[d]}};const explosion=(x,y)=>{for(let i=0;i<20;i++)this.state.p.push({x,y,vx:(Math.random()-.5)*8,vy:(Math.random()-.5)*8,a:1,s:Math.random()*3+1})};const loop=()=>{if(this.state.go)return;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--correct-char');ctx.strokeStyle=ctx.fillStyle;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(20,0);ctx.bezierCurveTo(60,canvas.height/2,60,canvas.height/2,20,canvas.height);ctx.closePath();ctx.globalAlpha=.3;ctx.fill();ctx.globalAlpha=1;ctx.stroke();const textColor=getComputedStyle(document.body).getPropertyValue('--primary-text');ctx.fillStyle=textColor;ctx.font='24px Courier New';this.state.e.forEach((e,i)=>{e.x-=e.speed;const tW=ctx.measureText(e.text).width;ctx.strokeRect(e.x-5,e.y-25,tW+10,35);ctx.fillText(e.text,e.x,e.y);if(e.x<20){this.state.e.splice(i,1);this.state.hp-=10;hpEl.textContent=this.state.hp;canvas.classList.add('shake');setTimeout(()=>canvas.classList.remove('shake'),300);if(this.state.hp<=0)this.end('Your base was destroyed!')}});ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--accent-color');this.state.p.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;p.a-=.04;ctx.globalAlpha=p.a;ctx.fillRect(p.x,p.y,p.s,p.s);if(p.a<=0)this.state.p.splice(i,1)});ctx.globalAlpha=1;this.state.af=requestAnimationFrame(loop)}; const spawn=()=>{if(this.state.go)return;this.state.e.push({text:gameUtils.getRandomWord(4,8),x:canvas.width,y:30+Math.random()*(canvas.height-60),speed:this.state.baseSpeed+Math.random()*.5});if(this.state.sc>this.state.lvl*100){this.state.lvl++;this.state.baseSpeed+=.1;this.state.spawnRate=Math.max(500,this.state.spawnRate*.95)}setTimeout(spawn,this.state.spawnRate)};input.addEventListener('keyup',(e)=>{if(e.key!=='Enter'||this.state.go)return;const t=input.value.trim();const idx=this.state.e.findIndex(w=>w.text===t);if(idx!==-1){const en=this.state.e[idx];explosion(en.x,en.y);this.state.e.splice(idx,1);this.state.sc+=t.length;scoreEl.textContent=this.state.sc;input.value=''}});this.start=(d)=>{reset(d);ui.overlay.style.display='none';input.disabled=false;input.focus();scoreEl.textContent=this.state.sc;hpEl.textContent=this.state.hp;setTimeout(spawn,1000);this.state.af=requestAnimationFrame(loop)};this.end=(m='Game Over')=>{this.state.go=true;cancelAnimationFrame(this.state.af);ui.overlay.innerHTML=`<h2>${m}</h2><p>Final Score: ${this.state.sc}</p><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Play Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Play Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Play Hard</button></div>`;ui.overlay.style.display='flex';ui.overlay.querySelectorAll('.difficulty-btn').forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));input.disabled=true};ui.difficultyBtns.forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));ui.backBtn.onclick=()=>{this.end();showView('menu','game')}}}, typingSprint: { init() { const c=document.querySelector('.game-card[data-game="typingSprint"]'),p=c.querySelector('p'),s=document.createElement('div');s.className='difficulty-select';s.style.justifyContent='center';s.innerHTML=`<button class="difficulty-btn easy" data-difficulty="easy">Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Hard</button>`;s.style.display='none';c.appendChild(s);c.addEventListener('click',(e)=>{if(e.target.classList.contains('difficulty-btn')){appState.testConfig.sprintDifficulty=e.target.dataset.difficulty;showPage('practice');startPractice(true);p.style.display='block';s.style.display='none'}else if(!s.style.display||s.style.display==='none'){p.style.display='none';s.style.display='flex'}})}}, wordBuilder: { state: {}, init() { const c=dom.gameViews.wordBuilder; const ui=gameUtils.createGameUI(c,'Word Builder',{ui:`<div class="word-builder-ui"><div class="scrambled-letters" id="wb-letters"></div><div class="game-ui" style="flex-direction: column; text-align: right;"><div>Time: <span id="wb-time">60</span>s</div><div>Score: <span id="wb-score">0</span></div></div></div><ul id="wb-found-words" class="found-words-list"></ul>`,input:`<input type="text" id="wb-input" class="game-input" placeholder="Build words..." autocomplete="off">`,instructions:'Find as many English words as you can from the given letters.'}); const lEl=c.querySelector('#wb-letters'),tEl=c.querySelector('#wb-time'),sEl=c.querySelector('#wb-score'),fEl=c.querySelector('#wb-found-words'),input=c.querySelector('#wb-input');const reset=(d)=>{const s={easy:{t:90,min:5,max:6},medium:{t:60,min:6,max:7},hard:{t:45,min:7,max:8}};const w=wordCache.find(w=>w.length>=s[d].min&&w.length<=s[d].max)||'default';this.state={l:[...w].sort(()=>Math.random()-.5),f:new Set(),sc:0,go:false,tmr:null,bW:w,tL:s[d].t}};const canMake=(w,l)=>{let tL=[...l];for(const c of w){const i=tL.indexOf(c);if(i===-1)return false;tL.splice(i,1)}return true};input.addEventListener('keyup',(e)=>{if(e.key!=='Enter'||this.state.go)return;const t=input.value.trim().toLowerCase();if(t.length<3)return;if(!this.state.f.has(t)&&canMake(t,this.state.l)&&wordCache.includes(t)){this.state.f.add(t);this.state.sc+=t.length*10;sEl.textContent=this.state.sc;const li=document.createElement('li');li.textContent=t;fEl.prepend(li);input.value='';input.dispatchEvent(new Event('input'))}});input.addEventListener('input',()=>{const t=input.value.toLowerCase();let tL=[...this.state.l];lEl.innerHTML=this.state.l.map(l=>`<span>${l.toUpperCase()}</span>`).join('');for(const c of t){const i=tL.indexOf(c);if(i!==-1){const mS=Array.from(lEl.children).find(s=>s.textContent.toLowerCase()===c&&!s.classList.contains('used'));if(mS)mS.classList.add('used');tL[i]=null}}});this.start=(d)=>{reset(d);ui.overlay.style.display='none';input.disabled=false;input.focus();lEl.innerHTML=this.state.l.map(l=>`<span>${l.toUpperCase()}</span>`).join('');sEl.textContent='0';tEl.textContent=this.state.tL;fEl.innerHTML='';this.state.tmr=setInterval(()=>{this.state.tL--;tEl.textContent=this.state.tL;if(this.state.tL<=0)this.end('Time\'s up!')},1000)};this.end=(m='Game Over')=>{this.state.go=true;clearInterval(this.state.tmr);ui.overlay.innerHTML=`<h2>${m}</h2><p>Final Score: ${this.state.sc}</p><div class="difficulty-select"><button class="difficulty-btn easy" data-difficulty="easy">Play Easy</button><button class="difficulty-btn medium" data-difficulty="medium">Play Medium</button><button class="difficulty-btn hard" data-difficulty="hard">Play Hard</button></div>`;ui.overlay.style.display='flex';ui.overlay.querySelectorAll('.difficulty-btn').forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));input.disabled=true};ui.difficultyBtns.forEach(b=>b.onclick=()=>this.start(b.dataset.difficulty));ui.backBtn.onclick=()=>{this.end();showView('menu','game')}}} };
-            
-            const requestLandscape = () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().then(() => {
-                        if (screen.orientation && screen.orientation.lock) {
-                            screen.orientation.lock('landscape').catch(e => console.warn('Orientation lock failed:', e));
-                        }
-                    }).catch(err => {
-                         console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-                         alert('Could not enter fullscreen. Please rotate your device manually.');
-                    });
-                } else {
-                    if (screen.orientation && screen.orientation.lock) {
-                        screen.orientation.lock('landscape').catch(e => console.warn('Orientation lock failed:', e));
-                    }
-                }
-            };
-
-            // Event Listeners
-            dom.settings.practiceGameBtn.addEventListener('click', () => showPage('game'));
-            dom.game.backToPracticeBtn.addEventListener('click', () => showPage('practice'));
-            dom.setup.startBtn.addEventListener('click', () => startPractice(false));
-            dom.typing.hiddenInput.addEventListener('input', handleTyping);
-            dom.typing.hiddenInput.addEventListener('keydown', (e) => { if (appState.testStats.timeLeft <= 0) return; if (appState.testStats.startTime === 0) { appState.testStats.startTime = Date.now(); startTimer(); } appState.testStats.keystrokes++; if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) e.preventDefault(); });
-            dom.typing.typingArea.addEventListener('click', () => dom.typing.hiddenInput.focus());
-            dom.typing.submitTestBtn.addEventListener('click', endPractice);
-            dom.results.practiceAgainBtn.addEventListener('click', () => startPractice(false));
-            dom.results.newTestBtn.addEventListener('click', () => showView('setup'));
-            
-            dom.settings.fontIncreaseBtn.addEventListener('click', () => { if(appState.settings.fontScale < 1.5) appState.settings.fontScale = parseFloat((appState.settings.fontScale + 0.1).toFixed(2)); applySettings(); saveState(); });
-            dom.settings.fontDecreaseBtn.addEventListener('click', () => { if(appState.settings.fontScale > 0.7) appState.settings.fontScale = parseFloat((appState.settings.fontScale - 0.1).toFixed(2)); applySettings(); saveState(); });
-            dom.rotateOverlayBtn.addEventListener('click', requestLandscape);
-
-            dom.setup.languageBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelector('.lang-btn.active').classList.remove('active');
-                    btn.classList.add('active');
-                    appState.testConfig.language = btn.dataset.lang;
-                    
-                    const nonHindiMethods = ["1. Home Row Practice", "2. Top Row Practice", "3. Bottom Row Practice", "4. Number Row Practice", "5. Shift Key & Capitals", "6. Punctuation Practice", "7. Number Pad Practice", "8. Common Words Practice", "11. Random Words", "17. Mixed Text Practice", "18. Email / Letter Typing", "19. News Article Typing", "20. Programming Code (JS)"];
-                    const methodSelect = dom.setup.methodSelect;
-                    
-                    Array.from(methodSelect.options).forEach(opt => {
-                        const methodText = opt.text;
-                        const isNonHindi = nonHindiMethods.includes(methodText);
-                        opt.disabled = (appState.testConfig.language === 'hindi' && isNonHindi);
-                    });
-                    
-                    if (methodSelect.options[methodSelect.selectedIndex].disabled) {
-                        methodSelect.value = "Skill Building:9. Sentence Practice";
-                    }
-                });
-            });
-
-            dom.game.gameCards.forEach(card => {
-                const gameName = card.dataset.game;
-                if (gameName !== 'typingSprint') { card.addEventListener('click', () => { if (games[gameName]) { appState.activeGame = games[gameName]; showView(gameName, 'game'); } }); }
-            });
-
-            const init = async () => {
-                loadState();
-                populateMethods();
-                applySettings();
-                updateStreak();
-                updateHistoryList();
+                const wrapper = dom.textDisplayWrapper;
+                const textContainer = dom.textDisplay;
                 
-                await Promise.all([
-                    loadPracticeSentences(),
-                    fetchWords(500)
-                ]);
+                // Try to position the current line about one-third of the way down the box.
+                const desiredPositionInBox = wrapper.clientHeight / 3; 
+                let desiredScrollTop = currentEl.offsetTop - desiredPositionInBox;
+                
+                // Ensure we don't scroll past the top or bottom boundaries.
+                const maxScrollTop = textContainer.scrollHeight - wrapper.clientHeight;
+                desiredScrollTop = Math.max(0, desiredScrollTop);
+                desiredScrollTop = Math.min(desiredScrollTop, maxScrollTop > 0 ? maxScrollTop : 0);
+                
+                textContainer.style.transform = `translateY(-${desiredScrollTop}px)`;
+            };
 
-                for (const game in games) {
-                    if (games[game].init) games[game].init();
+            const updateStatsDisplay = () => {
+                const duration = appState.config.level === 'Free Hand' && appState.isPracticeActive ? Math.floor((Date.now() - appState.session.startTime) / 1000) : Math.max(0, appState.session.timeLeft);
+                const minutes = Math.floor(duration / 60);
+                const seconds = duration % 60;
+                dom.stats.time.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                
+                if (!appState.isPracticeActive && appState.session.startTime === 0) return;
+                
+                const elapsedMinutes = (Date.now() - appState.session.startTime) / 60000;
+                if(elapsedMinutes <= 0) return;
+
+                const typedWords = appState.session.typedText.trim().split(/\s+/).filter(Boolean);
+                const grossWpm = (appState.session.typedText.length / 5) / elapsedMinutes;
+                
+                let wordErrors = 0;
+                if (appState.config.level !== 'Free Hand') {
+                    typedWords.forEach((word, index) => { if (index < appState.config.sourceWords.length && word !== appState.config.sourceWords[index]) { wordErrors++; } });
                 }
+                
+                const netWpm = Math.max(0, grossWpm - (wordErrors / elapsedMinutes));
+                const correctWords = typedWords.length - wordErrors;
+                const accuracy = typedWords.length > 0 ? (correctWords / typedWords.length) * 100 : 100;
+
+                dom.stats.grossWpm.textContent = Math.round(grossWpm);
+                dom.stats.netWpm.textContent = Math.round(netWpm);
+                dom.stats.errors.textContent = wordErrors;
+                dom.stats.accuracy.textContent = `${Math.round(accuracy)}%`;
+            };
+
+            const endPractice = () => {
+                if (!appState.isPracticeActive && appState.session.startTime > 0) return;
+                if (appState.timerId) clearInterval(appState.timerId);
+                appState.isPracticeActive = false;
+                appState.session.timeLeft = 0;
+                updateStatsDisplay();
+                dom.hiddenInput.blur();
+                dom.freeHandArea.blur();
+                showResults();
+            };
+            
+            const showResults = () => {
+                const isFreeHand = appState.config.level === 'Free Hand';
+                const timeTakenSec = isFreeHand 
+                    ? (appState.session.startTime > 0 ? Math.floor((Date.now() - appState.session.startTime) / 1000) : 0)
+                    : (appState.config.duration - Math.max(0, appState.session.timeLeft));
+                
+                const timeTakenMin = timeTakenSec > 0 ? timeTakenSec / 60 : (appState.config.duration / 60);
+                const typedWordsArray = appState.session.typedText.trim().split(/\s+/).filter(Boolean);
+                const totalWordsTyped = typedWordsArray.length;
+                let wordErrors = 0;
+                if (!isFreeHand) {
+                    typedWordsArray.forEach((word, index) => { if (index < appState.config.sourceWords.length && word !== appState.config.sourceWords[index]) { wordErrors++; } });
+                }
+                const correctWords = totalWordsTyped - wordErrors;
+                const grossWpm = timeTakenMin > 0 ? (appState.session.typedText.length / 5) / timeTakenMin : 0;
+                const netWpm = timeTakenMin > 0 ? Math.max(0, grossWpm - (wordErrors / timeTakenMin)) : 0;
+                const accuracy = totalWordsTyped > 0 ? (correctWords / totalWordsTyped) * 100 : 0;
+
+                let finalWpm = netWpm;
+                dom.results.minusMarkingSummary.textContent = "Minus marking was disabled.";
+                if (appState.config.minusMarking.enabled && !isFreeHand) {
+                    const deduction = wordErrors * appState.config.minusMarking.value;
+                    finalWpm = Math.max(0, netWpm - deduction);
+                    dom.results.minusMarkingSummary.innerHTML = `<strong>Minus Marking:</strong> ${wordErrors} errors × ${appState.config.minusMarking.value} WPM penalty = <strong>${deduction.toFixed(0)} WPM deducted</strong>.`;
+                }
+
+                dom.results.grossWpm.textContent = Math.round(grossWpm);
+                dom.results.netWpm.textContent = Math.round(netWpm);
+                dom.results.accuracy.textContent = accuracy.toFixed(1);
+                dom.results.errors.textContent = wordErrors;
+                dom.results.totalWords.textContent = totalWordsTyped;
+                dom.results.correctWords.textContent = correctWords;
+                dom.results.keystrokes.textContent = appState.session.keystrokes;
+                const minutes = Math.floor(timeTakenSec / 60);
+                const seconds = timeTakenSec % 60;
+                dom.results.timeTaken.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                dom.results.finalWpm.textContent = Math.round(finalWpm);
+                
+                let summaryText = `You achieved a final speed of ${Math.round(finalWpm)} WPM with ${accuracy.toFixed(1)}% accuracy. `;
+                if (Math.round(finalWpm) >= 50 && accuracy >= 95) {
+                    summaryText += "Excellent job! Your speed and accuracy are impressive.";
+                } else if (Math.round(finalWpm) >= 35 && accuracy >= 90) {
+                    summaryText += "Good work! Keep practicing to increase your speed.";
+                } else {
+                    summaryText += "You're on the right track! Consistent practice will lead to great improvements.";
+                }
+                dom.results.summary.textContent = summaryText;
+
+                dom.resultsModal.classList.add('active');
+            };
+            
+            const hideResults = () => dom.resultsModal.classList.remove('active');
+
+            const init = () => {
+                resetState();
+                populateLevels();
+                populateMethods();
+
+                dom.levelSelect.addEventListener('change', populateMethods);
+                dom.methodSelect.addEventListener('change', handleMethodChange);
+                dom.minusMarkingEnabled.addEventListener('change', (e) => { dom.minusMarkingValue.disabled = !e.target.checked; });
+                [dom.langEnglishBtn, dom.langHindiBtn].forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        dom.langEnglishBtn.classList.remove('active');
+                        dom.langHindiBtn.classList.remove('active');
+                        btn.classList.add('active');
+                        appState.lang = btn.dataset.lang;
+                    });
+                });
+                dom.startBtn.addEventListener('click', startPractice);
+                dom.submitBtn.addEventListener('click', endPractice);
+                dom.hiddenInput.addEventListener('input', handleTyping);
+                dom.hiddenInput.addEventListener('keydown', (e) => { 
+                    appState.session.keystrokes++;
+                    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) e.preventDefault(); 
+                });
+                dom.freeHandArea.addEventListener('input', handleTyping);
+                dom.freeHandArea.addEventListener('keydown', () => { appState.session.keystrokes++; });
+                dom.textDisplayWrapper.addEventListener('click', () => { appState.config.level === 'Free Hand' ? dom.freeHandArea.focus() : dom.hiddenInput.focus(); });
+                dom.resultActions.retry.addEventListener('click', () => {
+                    hideResults();
+                    const oldConfig = { ...appState.config }; resetSession(); appState.config = oldConfig;
+                    if(appState.config.level !== 'Free Hand') { dom.textDisplay.innerHTML = appState.config.sourceChars.map(char => `<span class="char">${char}</span>`).join(''); }
+                    switchView('practice');
+                    appState.config.level === 'Free Hand' ? dom.freeHandArea.focus() : dom.hiddenInput.focus();
+                });
+                dom.resultActions.newTest.addEventListener('click', () => { hideResults(); startPractice(); });
+                dom.resultActions.backToHome.addEventListener('click', () => { hideResults(); switchView('setup'); });
             };
 
             init();
