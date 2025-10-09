@@ -871,11 +871,9 @@
                 const wrapper = dom.textDisplayWrapper;
                 const textContainer = dom.textDisplay;
                 
-                // Try to position the current line about one-third of the way down the box.
                 const desiredPositionInBox = wrapper.clientHeight / 3; 
                 let desiredScrollTop = currentEl.offsetTop - desiredPositionInBox;
                 
-                // Ensure we don't scroll past the top or bottom boundaries.
                 const maxScrollTop = textContainer.scrollHeight - wrapper.clientHeight;
                 desiredScrollTop = Math.max(0, desiredScrollTop);
                 desiredScrollTop = Math.min(desiredScrollTop, maxScrollTop > 0 ? maxScrollTop : 0);
@@ -894,21 +892,18 @@
                 const elapsedMinutes = (Date.now() - appState.session.startTime) / 60000;
                 if(elapsedMinutes <= 0) return;
 
-                const typedWords = appState.session.typedText.trim().split(/\s+/).filter(Boolean);
-                const grossWpm = (appState.session.typedText.length / 5) / elapsedMinutes;
+                const totalTypedChars = appState.session.typedText.length;
+                const grossWpm = (totalTypedChars / 5) / elapsedMinutes;
+
+                const errorCount = appState.session.errorCount;
+                const correctChars = totalTypedChars - errorCount;
                 
-                let wordErrors = 0;
-                if (appState.config.level !== 'Free Hand') {
-                    typedWords.forEach((word, index) => { if (index < appState.config.sourceWords.length && word !== appState.config.sourceWords[index]) { wordErrors++; } });
-                }
-                
-                const netWpm = Math.max(0, grossWpm - (wordErrors / elapsedMinutes));
-                const correctWords = typedWords.length - wordErrors;
-                const accuracy = typedWords.length > 0 ? (correctWords / typedWords.length) * 100 : 100;
+                const netWpm = elapsedMinutes > 0 ? (correctChars / 5) / elapsedMinutes : 0;
+                const accuracy = totalTypedChars > 0 ? (correctChars / totalTypedChars) * 100 : 100;
 
                 dom.stats.grossWpm.textContent = Math.round(grossWpm);
-                dom.stats.netWpm.textContent = Math.round(netWpm);
-                dom.stats.errors.textContent = wordErrors;
+                dom.stats.netWpm.textContent = Math.round(Math.max(0, netWpm));
+                dom.stats.errors.textContent = errorCount;
                 dom.stats.accuracy.textContent = `${Math.round(accuracy)}%`;
             };
 
@@ -929,7 +924,21 @@
                     ? (appState.session.startTime > 0 ? Math.floor((Date.now() - appState.session.startTime) / 1000) : 0)
                     : (appState.config.duration - Math.max(0, appState.session.timeLeft));
                 
-                const timeTakenMin = timeTakenSec > 0 ? timeTakenSec / 60 : (appState.config.duration / 60);
+                const timeTakenMin = timeTakenSec > 0 ? timeTakenSec / 60 : (appState.config.duration / 60 || 1);
+                
+                // Character-based calculations for precision
+                const totalCharsTyped = appState.session.typedText.length;
+                const characterErrors = appState.session.errorCount;
+                const correctChars = appState.session.correctChars;
+                
+                // WPM Calculations (Standard Government Exam Formulas)
+                const grossWpm = timeTakenMin > 0 ? (totalCharsTyped / 5) / timeTakenMin : 0;
+                const netWpm = timeTakenMin > 0 ? (correctChars / 5) / timeTakenMin : 0;
+                
+                // Accuracy Calculation
+                const accuracy = totalCharsTyped > 0 ? (correctChars / totalCharsTyped) * 100 : 100;
+                
+                // Supplementary Word Counts
                 const typedWordsArray = appState.session.typedText.trim().split(/\s+/).filter(Boolean);
                 const totalWordsTyped = typedWordsArray.length;
                 let wordErrors = 0;
@@ -937,22 +946,21 @@
                     typedWordsArray.forEach((word, index) => { if (index < appState.config.sourceWords.length && word !== appState.config.sourceWords[index]) { wordErrors++; } });
                 }
                 const correctWords = totalWordsTyped - wordErrors;
-                const grossWpm = timeTakenMin > 0 ? (appState.session.typedText.length / 5) / timeTakenMin : 0;
-                const netWpm = timeTakenMin > 0 ? Math.max(0, grossWpm - (wordErrors / timeTakenMin)) : 0;
-                const accuracy = totalWordsTyped > 0 ? (correctWords / totalWordsTyped) * 100 : 0;
 
+                // Final WPM with Minus Marking
                 let finalWpm = netWpm;
                 dom.results.minusMarkingSummary.textContent = "Minus marking was disabled.";
                 if (appState.config.minusMarking.enabled && !isFreeHand) {
-                    const deduction = wordErrors * appState.config.minusMarking.value;
+                    const deduction = characterErrors * appState.config.minusMarking.value;
                     finalWpm = Math.max(0, netWpm - deduction);
-                    dom.results.minusMarkingSummary.innerHTML = `<strong>Minus Marking:</strong> ${wordErrors} errors × ${appState.config.minusMarking.value} WPM penalty = <strong>${deduction.toFixed(0)} WPM deducted</strong>.`;
+                    dom.results.minusMarkingSummary.innerHTML = `<strong>Minus Marking:</strong> ${characterErrors} character errors × ${appState.config.minusMarking.value} WPM penalty = <strong>${deduction.toFixed(0)} WPM deducted</strong>.`;
                 }
 
+                // Display results
                 dom.results.grossWpm.textContent = Math.round(grossWpm);
                 dom.results.netWpm.textContent = Math.round(netWpm);
                 dom.results.accuracy.textContent = accuracy.toFixed(1);
-                dom.results.errors.textContent = wordErrors;
+                dom.results.errors.textContent = characterErrors; // Display character errors
                 dom.results.totalWords.textContent = totalWordsTyped;
                 dom.results.correctWords.textContent = correctWords;
                 dom.results.keystrokes.textContent = appState.session.keystrokes;
