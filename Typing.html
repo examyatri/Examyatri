@@ -226,7 +226,8 @@
             font-size: 1.5rem;
             line-height: 1.8;
             text-align: left;
-            overflow: hidden;
+            overflow-y: auto;
+            scroll-behavior: smooth;
             height: 250px;
             position: relative;
             flex-shrink: 0;
@@ -237,11 +238,10 @@
         #text-display {
             color: #888;
             position: relative;
-            transition: transform 0.2s ease-out;
             overflow-wrap: break-word; /* Prevents text from overflowing horizontally */
         }
         #text-display.hindi {
-            font-family: 'Tiro Devanagari Hindi', serif;
+            font-family: 'Noto Sans Devanagari', serif;
         }
 
         .char {
@@ -391,12 +391,37 @@
             .setup-grid { grid-template-columns: 1fr; }
             #text-display-wrapper { font-size: 1.2rem; height: 200px; }
             .stat-item .value { font-size: 1rem; }
-            .results-content { padding: 1.5rem; }
             .result-item p { font-size: 1.5rem; }
             .result-item.final-wpm p { font-size: 1.8rem; }
+            
+            #results-modal {
+                align-items: flex-start;
+                padding-top: 5vh;
+            }
+            .results-content {
+                padding: 1.5rem;
+                height: 95vh;
+                overflow-y: auto;
+                padding-bottom: 200px; /* Space for stacked buttons */
+            }
+            .results-actions {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: #222;
+                padding: 1rem;
+                border-top: 1px solid var(--border-color);
+                flex-direction: column;
+                gap: 0.75rem;
+                z-index: 1001;
+            }
+            .results-actions button {
+                width: 100%;
+            }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/index.css">
 </head>
 <body>
@@ -479,7 +504,7 @@
                 <div class="result-item"><h3>Total Words</h3><p><span id="result-total-words">0</span></p></div>
                 <div class="result-item"><h3>Correct Words</h3><p><span id="result-correct-words">0</span></p></div>
                 <div class="result-item"><h3>Time Taken</h3><p id="result-time-taken">00:00</p></div>
-                <div class="result-item"><h3>Keystrokes</h3><p id="result-keystrokes">0</p></div>
+                <div class="result-item"><h3>Keystrokes</h3><p><span id="result-keystrokes">0</span></p></div>
                 <div class="result-item final-wpm"><h3>Final WPM</h3><p><span id="result-final-wpm">0</span> WPM</p></div>
             </div>
             <p id="minus-marking-summary" style="font-size: 0.9rem; text-align: left;"></p>
@@ -493,6 +518,11 @@
     </div>
 
     <textarea id="hidden-input" autofocus autocapitalize="none" autocorrect="off"></textarea>
+    
+    <footer style="margin-top: auto; padding: 1rem 0; font-size: 0.9rem; color: #888; border-top: 1px solid var(--border-color);">
+        Visitor Count: <span id="visitCount">0</span>
+    </footer>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -661,18 +691,55 @@
                 console.warn("All online sources failed. Using offline fallback.");
                 return getRandomFallback(language);
             };
+
+            const appendMoreText = async () => {
+                if (appState.session.isFetchingMoreText || !appState.isPracticeActive) return;
+                
+                appState.session.isFetchingMoreText = true;
+                dom.loadingStatus.textContent = 'Generating more text...';
+                try {
+                    const newText = await appState.config.textGenerator();
+                    if (newText && appState.isPracticeActive) {
+                        const separator = ' ';
+                        
+                        appState.config.sourceText += separator + newText;
+                        const newChars = splitTextToChars(separator + newText);
+                        appState.config.sourceChars.push(...newChars);
+                        appState.config.sourceWords = appState.config.sourceText.split(/\s+/).filter(Boolean);
+
+                        const newHtml = newChars.map(char => `<span class="char">${char}</span>`).join('');
+                        dom.textDisplay.insertAdjacentHTML('beforeend', newHtml);
+                    }
+                } catch (error) {
+                    console.error("Failed to generate/fetch more text:", error);
+                } finally {
+                    dom.loadingStatus.textContent = '';
+                    appState.session.isFetchingMoreText = false;
+                }
+            };
             
-             const practiceLevels = {
+            const HINDI_BEGINNER_PRACTICE = {
+                "1. Home Row": "कर हम तरस; महक कसक; कमल महल; सिर किस; केसर कोमल; हमेशा समर;",
+                "2. Top Row": "पठ छठ; पीठ मीठी; पाठ पीठ; कैसा बैठा; फौजी चौकी; मीठा पाठ;",
+                "3. Bottom Row": "जग मग गज; अब जब; धन बढ़; गड़बड़ अजय; अगर डगर; भजन गगन;",
+                "4. Home + Top": "टिकट मिठाई; कठोर कठिन; ठीक ठाक; पहला पहर; महफिल शामिल;",
+                "5. Home + Bottom": "जगह महल; गरम खबर; सहज समझ; बाहर भजन; मदद मकसद;",
+                "6. Top + Bottom": "अटक भटक; पढ़ना चढ़ना; गठन बचपन; अजय अचल;",
+                "7. Word Formation": "किसान किताब; बारिश शामिल; टोकरी कटोरी; पहचान मेहमान;",
+                "9. Random Row Mix": "भारत महान; बचपन की याद; समय का महत्व; सड़क पर गजराज; कलम दवात;"
+            };
+
+            const practiceLevels = {
                 "Beginner": {
-                    "1. Home Row": () => generateRandomText(KEYS[appState.lang].home, 5, 20),
-                    "2. Top Row": () => generateRandomText(KEYS[appState.lang].top, 5, 20),
-                    "3. Bottom Row": () => generateRandomText(KEYS[appState.lang].bottom, 5, 20),
-                    "4. Home + Top": () => generateRandomText(KEYS[appState.lang].home + KEYS[appState.lang].top, 6, 25),
-                    "5. Home + Bottom": () => generateRandomText(KEYS[appState.lang].home + KEYS[appState.lang].bottom, 6, 25),
-                    "6. Top + Bottom": () => generateRandomText(KEYS[appState.lang].top + KEYS[appState.lang].bottom, 6, 25),
-                    "7. Word Formation": () => generateRandomText(KEYS[appState.lang].home + KEYS[appState.lang].top, 4, 30),
+                    "1. Home Row": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["1. Home Row"]) : generateRandomText(KEYS.en.home, 5, 20),
+                    "2. Top Row": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["2. Top Row"]) : generateRandomText(KEYS.en.top, 5, 20),
+                    "3. Bottom Row": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["3. Bottom Row"]) : generateRandomText(KEYS.en.bottom, 5, 20),
+                    "4. Home + Top": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["4. Home + Top"]) : generateRandomText(KEYS.en.home + KEYS.en.top, 6, 25),
+                    "5. Home + Bottom": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["5. Home + Bottom"]) : generateRandomText(KEYS.en.home + KEYS.en.bottom, 6, 25),
+                    "6. Top + Bottom": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["6. Top + Bottom"]) : generateRandomText(KEYS.en.top + KEYS.en.bottom, 6, 25),
+                    "7. Word Formation": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["7. Word Formation"]) : generateRandomText(KEYS.en.home + KEYS.en.top, 4, 30),
                     "8. Small Sentences": () => Promise.resolve(getRandomFallback(appState.lang)),
-                    "9. Random Row Mix": () => generateRandomText(KEYS[appState.lang].home + KEYS[appState.lang].top + KEYS[appState.lang].bottom, 6, 25),
+                    "9. Random Row Mix": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["9. Random Row Mix"]) : generateRandomText(KEYS.en.home + KEYS.en.top + KEYS.en.bottom, 6, 25),
                     "10. Numeric Practice": () => generateRandomText(KEYS.en.numbers + ' ', 5, 20),
                 },
                 "Skill Building": {
@@ -731,8 +798,8 @@
             const resetState = () => {
                 appState = {
                     lang: 'en', timerId: null, isPracticeActive: false,
-                    config: { level: '', method: '', duration: 0, minusMarking: { enabled: false, value: 1 }, sourceText: '', sourceWords: [], sourceChars: [], },
-                    session: { startTime: 0, timeLeft: 0, typedText: '', charIndex: 0, correctChars: 0, errorCount: 0, keystrokes: 0, },
+                    config: { level: '', method: '', duration: 0, minusMarking: { enabled: false, value: 1 }, sourceText: '', sourceWords: [], sourceChars: [], isDynamicText: false, textGenerator: null },
+                    session: { startTime: 0, timeLeft: 0, typedText: '', charIndex: 0, correctChars: 0, errorCount: 0, keystrokes: 0, isFetchingMoreText: false },
                 };
             };
             
@@ -759,12 +826,18 @@
                 dom.startBtn.disabled = true;
                 dom.loadingStatus.textContent = 'Fetching text...';
                 try {
+                    const level = dom.levelSelect.value;
+                    const method = dom.methodSelect.value;
+                    const textGenerator = practiceLevels[level][method];
+
                     appState.config = {
-                        level: dom.levelSelect.value,
-                        method: dom.methodSelect.value,
+                        level: level,
+                        method: method,
                         duration: parseInt(dom.durationSelect.value, 10) * 60,
                         minusMarking: { enabled: dom.minusMarkingEnabled.checked, value: parseInt(dom.minusMarkingValue.value, 10) },
-                        sourceText: await practiceLevels[dom.levelSelect.value][dom.methodSelect.value](),
+                        isDynamicText: level !== 'Free Hand',
+                        textGenerator: textGenerator,
+                        sourceText: await textGenerator(),
                     };
                     if (!appState.config.sourceText && appState.config.level !== 'Free Hand') {
                         appState.config.sourceText = getRandomFallback(appState.lang);
@@ -798,15 +871,15 @@
                 if (appState.timerId) clearInterval(appState.timerId);
                 appState.isPracticeActive = false;
                 appState.timerId = null;
-                appState.session = { startTime: 0, timeLeft: appState.config.duration, typedText: '', charIndex: 0, correctChars: 0, errorCount: 0, keystrokes: 0, };
+                appState.session = { startTime: 0, timeLeft: appState.config.duration, typedText: '', charIndex: 0, correctChars: 0, errorCount: 0, keystrokes: 0, isFetchingMoreText: false };
                 dom.hiddenInput.value = '';
-                dom.textDisplay.style.transform = 'translateY(0px)';
+                dom.textDisplayWrapper.scrollTop = 0;
                 updateStatsDisplay();
                 updateTextDisplay();
             };
 
             const handleTyping = () => {
-                if (appState.session.timeLeft <= 0 && appState.config.level !== 'Free Hand') return;
+                if (appState.session.timeLeft <= 0 && appState.config.level !== 'Free Hand' && appState.config.duration > 0) return;
                 if (!appState.isPracticeActive && appState.config.duration > 0) {
                     appState.isPracticeActive = true;
                     appState.session.startTime = Date.now();
@@ -814,7 +887,15 @@
                 }
                 appState.session.typedText = appState.config.level === 'Free Hand' ? dom.freeHandArea.value : dom.hiddenInput.value;
                 updateTextDisplay();
-                if (appState.config.level !== 'Free Hand' && appState.session.charIndex === appState.config.sourceChars.length) { endPractice(); }
+
+                const remainingChars = appState.config.sourceChars.length - appState.session.charIndex;
+                if (appState.config.isDynamicText && remainingChars < 100) {
+                    appendMoreText();
+                }
+                
+                if (appState.config.level !== 'Free Hand' && appState.session.charIndex === appState.config.sourceChars.length && !appState.config.isDynamicText) {
+                    endPractice();
+                }
             };
             
             const startTimer = () => {
@@ -865,24 +946,25 @@
                 }
 
                 dom.caret.style.display = 'block';
+                const currentElRect = currentEl.getBoundingClientRect();
                 dom.caret.style.left = `${currentEl.offsetLeft + (isAtEnd ? currentEl.offsetWidth : 0)}px`;
                 dom.caret.style.top = `${currentEl.offsetTop}px`;
-
+                
                 const wrapper = dom.textDisplayWrapper;
-                const textContainer = dom.textDisplay;
-                
-                const desiredPositionInBox = wrapper.clientHeight / 3; 
-                let desiredScrollTop = currentEl.offsetTop - desiredPositionInBox;
-                
-                const maxScrollTop = textContainer.scrollHeight - wrapper.clientHeight;
-                desiredScrollTop = Math.max(0, desiredScrollTop);
-                desiredScrollTop = Math.min(desiredScrollTop, maxScrollTop > 0 ? maxScrollTop : 0);
-                
-                textContainer.style.transform = `translateY(-${desiredScrollTop}px)`;
+                const caretTop = currentEl.offsetTop;
+                const caretHeight = currentEl.offsetHeight;
+
+                if (caretTop < wrapper.scrollTop) {
+                    wrapper.scrollTop = caretTop - caretHeight;
+                } else if (caretTop + caretHeight > wrapper.scrollTop + wrapper.clientHeight) {
+                    wrapper.scrollTop = caretTop + caretHeight - wrapper.clientHeight;
+                }
             };
 
             const updateStatsDisplay = () => {
-                const duration = appState.config.level === 'Free Hand' && appState.isPracticeActive ? Math.floor((Date.now() - appState.session.startTime) / 1000) : Math.max(0, appState.session.timeLeft);
+                const duration = appState.config.duration > 0 
+                    ? Math.max(0, appState.session.timeLeft)
+                    : (appState.isPracticeActive ? Math.floor((Date.now() - appState.session.startTime) / 1000) : 0);
                 const minutes = Math.floor(duration / 60);
                 const seconds = duration % 60;
                 dom.stats.time.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
@@ -926,19 +1008,15 @@
                 
                 const timeTakenMin = timeTakenSec > 0 ? timeTakenSec / 60 : (appState.config.duration / 60 || 1);
                 
-                // Character-based calculations for precision
                 const totalCharsTyped = appState.session.typedText.length;
                 const characterErrors = appState.session.errorCount;
                 const correctChars = appState.session.correctChars;
                 
-                // WPM Calculations (Standard Government Exam Formulas)
                 const grossWpm = timeTakenMin > 0 ? (totalCharsTyped / 5) / timeTakenMin : 0;
                 const netWpm = timeTakenMin > 0 ? (correctChars / 5) / timeTakenMin : 0;
                 
-                // Accuracy Calculation
                 const accuracy = totalCharsTyped > 0 ? (correctChars / totalCharsTyped) * 100 : 100;
                 
-                // Supplementary Word Counts
                 const typedWordsArray = appState.session.typedText.trim().split(/\s+/).filter(Boolean);
                 const totalWordsTyped = typedWordsArray.length;
                 let wordErrors = 0;
@@ -947,7 +1025,6 @@
                 }
                 const correctWords = totalWordsTyped - wordErrors;
 
-                // Final WPM with Minus Marking
                 let finalWpm = netWpm;
                 dom.results.minusMarkingSummary.textContent = "Minus marking was disabled.";
                 if (appState.config.minusMarking.enabled && !isFreeHand) {
@@ -956,7 +1033,6 @@
                     dom.results.minusMarkingSummary.innerHTML = `<strong>Minus Marking:</strong> ${characterErrors} character errors × ${appState.config.minusMarking.value} WPM penalty = <strong>${deduction.toFixed(0)} WPM deducted</strong>.`;
                 }
 
-                // Display results
                 dom.results.grossWpm.textContent = Math.round(grossWpm);
                 dom.results.netWpm.textContent = Math.round(netWpm);
                 dom.results.accuracy.textContent = accuracy.toFixed(1);
@@ -989,6 +1065,14 @@
                 populateLevels();
                 populateMethods();
 
+                const visitCountEl = document.getElementById("visitCount");
+                if (visitCountEl) {
+                    let count = parseInt(localStorage.getItem("visitorCount") || "0");
+                    count++;
+                    localStorage.setItem("visitorCount", String(count));
+                    visitCountEl.textContent = count.toLocaleString();
+                }
+
                 dom.levelSelect.addEventListener('change', populateMethods);
                 dom.methodSelect.addEventListener('change', handleMethodChange);
                 dom.minusMarkingEnabled.addEventListener('change', (e) => { dom.minusMarkingValue.disabled = !e.target.checked; });
@@ -1013,7 +1097,10 @@
                 dom.resultActions.retry.addEventListener('click', () => {
                     hideResults();
                     const oldConfig = { ...appState.config }; resetSession(); appState.config = oldConfig;
-                    if(appState.config.level !== 'Free Hand') { dom.textDisplay.innerHTML = appState.config.sourceChars.map(char => `<span class="char">${char}</span>`).join(''); }
+                    if(appState.config.level !== 'Free Hand') {
+                        dom.textDisplay.innerHTML = appState.config.sourceChars.map(char => `<span class="char">${char}</span>`).join('');
+                        dom.textDisplay.className = appState.lang === 'hi' ? 'hindi' : '';
+                    }
                     switchView('practice');
                     appState.config.level === 'Free Hand' ? dom.freeHandArea.focus() : dom.hiddenInput.focus();
                 });
