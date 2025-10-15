@@ -3479,6 +3479,7 @@ CRITICAL INSTRUCTIONS (MUST be followed):
 6.  **Completeness:** Each question MUST have a question, all options, a single correct answer letter, and a detailed explanation.
 7.  **Math/Physics Symbols:** Use valid LaTeX for all formulas. Enclose all inline math with \\( ... \\) delimiters (e.g., \\(x^2\\)) and all display math with \\[ ... \\]. DO NOT use $ or $$.
 8.  **Terminology:** Use the term "questions" or "assessment". DO NOT use the word "quiz".
+9.  **Option Randomizer:** For every set of questions, place the correct answer randomly among options A, B, C, and D. Ensure equal distribution — about 25% of correct answers as A, 25% as B, 25% as C, and 25% as D. No fixed order or repetition allowed
 
 --- ASSESSMENT PARAMETERS ---
 *   **Number of Questions:** ${numQuestions}
@@ -3489,7 +3490,6 @@ CRITICAL INSTRUCTIONS (MUST be followed):
 *   **Question Format:** ${QUESTION_FORMATS[formatKey].name}
 *   **Target Exam:** ${exam}
 *   **Target Exam Instructions:** Generate questions based on analysis of previous year questions that are relevant, and match the syllabus, question pattern, and difficulty level of the '${exam}' exam.
-*   **Option Randomizer:** Shuffle and place the correct answer randomly among options A, B, C, and D. Never follow any fixed order or pattern
 --- SOURCE MATERIAL INSTRUCTIONS ---
 `;
 
