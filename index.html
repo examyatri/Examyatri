@@ -3479,7 +3479,7 @@ CRITICAL INSTRUCTIONS (MUST be followed):
 6.  **Completeness:** Each question MUST have a question, all options, a single correct answer letter, and a detailed explanation.
 7.  **Math/Physics Symbols:** Use valid LaTeX for all formulas. Enclose all inline math with \\( ... \\) delimiters (e.g., \\(x^2\\)) and all display math with \\[ ... \\]. DO NOT use $ or $$.
 8.  **Terminology:** Use the term "questions" or "assessment". DO NOT use the word "quiz".
-9.  **Option Randomizer:** For every set of questions, place the correct answer randomly among options A, B, C, and D. Ensure equal distribution — about 25% of correct answers as A, 25% as B, 25% as C, and 25% as D. No fixed order or repetition allowed
+9.  **Option Randomizer:** Place the correct answer in a completely random position among options A, B, C, and D. Do not follow any fixed or repeating pattern, Ensure two adjacent questions never have the same correct option
 
 --- ASSESSMENT PARAMETERS ---
 *   **Number of Questions:** ${numQuestions}
@@ -3499,7 +3499,7 @@ CRITICAL INSTRUCTIONS (MUST be followed):
     *   For 'Medium', 'Hard', and 'Expert' difficulties, increase the conceptual depth of the questions
     *   use your external knowledge to properly frame the questions, ensure they are conceptually sound, and match the difficulty and style of the specified target exam.`;
         } else { // For topic, text, image
-            prompt += `*   **Knowledge Base:** Use your own internal knowledge to create the questions. The "Primary Topic", "Subject", and "Source Material" (if provided) should be used as a guide and context. Your primary goal is to create new, high-quality questions that accurately match the standard, syllabus, and difficulty level of the specified target exam.`;
+            prompt += `*   **Knowledge Base:** Use only the extracted text as the reference source. Create new, original, and high-quality questions inspired by this text. Focus on understanding each line and concept — do not copy sentences directly. Slightly twist or reframe questions so they test conceptual understanding, not rote recall. Never introduce any new terms, topics, or facts that are not present in the source text. Use your own knowledge only to clarify and structure the question correctly, not to add new content. All questions must stay strictly within the syllabus and context of the extracted material.`;
         }
 
         prompt += `
