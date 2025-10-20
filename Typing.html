@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-color: #000000;
@@ -309,8 +310,7 @@
             justify-content: center;
             z-index: 1000;
             animation: fadeIn 0.3s ease;
-            overflow-y: auto;
-            padding: 2rem 0;
+            padding: 1rem;
         }
         
         @keyframes fadeIn {
@@ -327,12 +327,14 @@
             padding: 1.5rem;
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            width: 95%;
+            width: 100%;
             max-width: 850px;
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
             color: #e0e0e0;
+            max-height: calc(100vh - 2rem);
+            overflow-y: auto;
         }
 
         .results-header {
@@ -454,6 +456,14 @@
             flex-wrap: wrap;
             border-top: 1px solid var(--border-color);
             padding-top: 1.5rem;
+            position: sticky;
+            bottom: -1.5rem;
+            background-color: #2a2a2e;
+            margin-left: -1.5rem;
+            margin-right: -1.5rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            padding-bottom: 1.5rem;
         }
 
         .results-actions button {
@@ -464,6 +474,47 @@
             color: var(--text-color);
             font-family: var(--font-family);
             cursor: pointer;
+        }
+
+        /* New styles for analytics */
+        #mistakes-analysis ul, #improvement-tips ul {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 0.5rem;
+        }
+        #mistakes-analysis li, #improvement-tips li {
+            margin-bottom: 0.5rem;
+        }
+        #improvement-tips li {
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        #improvement-tips li::before {
+            content: '💡';
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+
+        .mistake-word {
+            color: var(--error-color);
+            font-weight: bold;
+        }
+        .suggestion-word {
+            color: var(--primary-color);
+        }
+        
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+             .charts-container {
+                grid-template-columns: 1fr 1fr;
+            }
         }
         
         @media (max-width: 768px) {
@@ -479,6 +530,14 @@
             .stat-item .value { font-size: 1rem; }
             .results-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
             .results-content { padding: 1rem; }
+            .results-actions {
+                bottom: -1rem;
+                margin-left: -1rem;
+                margin-right: -1rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+                padding-bottom: 1rem;
+            }
             .results-grid { 
                 grid-template-columns: 1fr 1fr;
                 gap: 0.5rem;
@@ -496,7 +555,6 @@
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/index.css">
 </head>
 <body>
     <header>
@@ -620,6 +678,39 @@
                 <span id="res-formula-note">Calculation of Net Speed = (Total Keystrokes / 5) / Time in Minutes.</span>
             </div>
              <div id="res-keystroke-warning" style="color: var(--error-color); text-align: center; font-size: 0.9rem; margin-top: 1rem;"></div>
+            
+             <div id="practice-duration-summary" class="result-card" style="text-align: left; display: none; background-color: #333338;">
+                <div class="title">Practice Duration Summary</div>
+                <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem; font-size: 0.9rem; color: #e0e0e0; padding-top: 0.5rem;">
+                    <div>Today's Practice: <strong id="res-today-practice-time" style="color: #fff; font-weight: bold;">0m 0s</strong></div>
+                    <div>Total on Device: <strong id="res-total-practice-time" style="color: #fff; font-weight: bold;">0h 0m 0s</strong></div>
+                </div>
+            </div>
+            
+            <!-- New Analytics Sections -->
+            <div id="performance-review-section" class="result-card" style="text-align: left; display: none; background-color: #333338;">
+                <div class="title">Performance Review</div>
+                <div id="performance-feedback" class="value" style="font-size: 1rem; white-space: pre-wrap; color: #e0e0e0; line-height: 1.5;"></div>
+            </div>
+
+            <div id="weakness-analysis-section" class="result-card" style="text-align: left; display: none; background-color: #333338;">
+                <div class="title">Common Mistakes & Weak Areas</div>
+                <div id="mistakes-analysis" style="font-size: 0.9rem; color: #e0e0e0;"></div>
+            </div>
+            
+            <div id="improvement-tips-section" class="result-card" style="text-align: left; display: none; background-color: #333338;">
+                <div class="title">Tips for Improvement</div>
+                <div id="improvement-tips" style="font-size: 0.9rem; color: #e0e0e0;"></div>
+            </div>
+
+            <div id="progress-graphs-section" style="display: none;">
+                <h3 style="text-align: left; margin: 1rem 0 0.5rem; color: #e0e0e0;">Your Progress</h3>
+                <div class="charts-container">
+                    <canvas id="speed-chart"></canvas>
+                    <canvas id="accuracy-chart"></canvas>
+                </div>
+            </div>
+
             <div class="results-comparison">
                 <div class="comparison-toggle">
                     <label for="comparison-switch">Detailed Comparison</label>
@@ -703,6 +794,19 @@
                 },
                 langEnglishBtn: document.getElementById('lang-english-btn'),
                 langHindiBtn: document.getElementById('lang-hindi-btn'),
+                // New analytics elements
+                practiceDurationSummary: document.getElementById('practice-duration-summary'),
+                resTodayPracticeTime: document.getElementById('res-today-practice-time'),
+                resTotalPracticeTime: document.getElementById('res-total-practice-time'),
+                performanceReviewSection: document.getElementById('performance-review-section'),
+                performanceFeedback: document.getElementById('performance-feedback'),
+                weaknessAnalysisSection: document.getElementById('weakness-analysis-section'),
+                mistakesAnalysis: document.getElementById('mistakes-analysis'),
+                improvementTipsSection: document.getElementById('improvement-tips-section'),
+                improvementTips: document.getElementById('improvement-tips'),
+                progressGraphsSection: document.getElementById('progress-graphs-section'),
+                speedChartCanvas: document.getElementById('speed-chart'),
+                accuracyChartCanvas: document.getElementById('accuracy-chart'),
             };
 
             const GRAPHEME_SPLITTER = new Intl.Segmenter();
@@ -751,9 +855,53 @@
                 "Expert": { "1. Long Paragraph": () => getTypingText(appState.lang), "2. Letter Writing": () => Promise.resolve(STATIC_TEXTS[appState.lang].letter), "3. Report Typing": () => getTypingText(appState.lang), "4. Press Release": () => getTypingText(appState.lang), "5. Data Table Typing": () => Promise.resolve("ID,Product,Price,Stock\n101,Laptop,1200,50\n102,Mouse,25,200\n103,Keyboard,75,150\n104,Monitor,300,80"), "6. Essay Typing": () => getTypingText(appState.lang), "7. Mixed Format": () => Promise.resolve(`${STATIC_TEXTS[appState.lang].letter} \n\n ${STATIC_TEXTS[appState.lang].legal}`), "8. Official Document": () => getTypingText(appState.lang), "9. English-Hindi Mix": () => Promise.resolve("This is an English sentence. यह एक हिंदी वाक्य है। We need to type both. हमें दोनों टाइप करने होंगे।"), "10. Multiple Passages": () => getTypingText(appState.lang), },
                 "Exam Type": { "1. SSC Exam Mode": () => getTypingText(appState.lang), "2. CPCT Mode": () => getTypingText(appState.lang), "3. RSMSSB Mode": () => getTypingText(appState.lang), "4. UP Police Clerk": () => getTypingText(appState.lang), "5. Bank Clerk Mode": () => getTypingText(appState.lang), "6. Railway Typing": () => getTypingText(appState.lang), "7. High Court Clerk": () => getTypingText(appState.lang), "8. Insurance Typing": () => getTypingText(appState.lang), "9. MP DEO Typing": () => getTypingText(appState.lang), "10. Custom Exam Sim": () => getTypingText(appState.lang), },
                 "Free Hand": { "Free Practice": () => Promise.resolve(""), },
-                "Custom Text": { "Paste Your Text": () => Promise.resolve(dom.pasteTextArea.value) }
+                "Uplode Your Text": { "Paste Your Text And Start Practice": () => Promise.resolve(dom.pasteTextArea.value) }
             };
             let appState = {};
+            let speedChart, accuracyChart; // Chart instances
+            const BACKUP_KEY = 'ExamYatriTypingPermanentBackup';
+            const DURATION_KEYS = {
+                TODAY: 'ExamYatriTodayPracticeTime',
+                TOTAL: 'ExamYatriTotalPracticeTime',
+                DATE: 'ExamYatriLastPracticeDate'
+            };
+
+            const getStoredResults = () => { try { return JSON.parse(localStorage.getItem(BACKUP_KEY)) || []; } catch (e) { return []; } };
+            const saveResults = (results) => { localStorage.setItem(BACKUP_KEY, JSON.stringify(results)); };
+            
+            const formatDuration = (totalSeconds) => {
+                if (totalSeconds < 60) return `${totalSeconds}s`;
+                if (totalSeconds < 3600) {
+                    const minutes = Math.floor(totalSeconds / 60);
+                    const seconds = totalSeconds % 60;
+                    return `${minutes}m ${seconds}s`;
+                }
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                return `${hours}h ${minutes}m`;
+            };
+
+            const updatePracticeTime = (sessionSeconds) => {
+                const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+                const lastPracticeDate = localStorage.getItem(DURATION_KEYS.DATE);
+                
+                let todaySeconds = parseInt(localStorage.getItem(DURATION_KEYS.TODAY) || '0', 10);
+                let totalSeconds = parseInt(localStorage.getItem(DURATION_KEYS.TOTAL) || '0', 10);
+                
+                if (today !== lastPracticeDate) {
+                    todaySeconds = 0; // Reset for new day
+                }
+                
+                todaySeconds += sessionSeconds;
+                totalSeconds += sessionSeconds;
+                
+                localStorage.setItem(DURATION_KEYS.TODAY, todaySeconds);
+                localStorage.setItem(DURATION_KEYS.TOTAL, totalSeconds);
+                localStorage.setItem(DURATION_KEYS.DATE, today);
+
+                return { todaySeconds, totalSeconds };
+            };
+
 
             const resetState = () => {
                 appState = { lang: 'en', timerId: null, isPracticeActive: false, config: { level: '', method: '', duration: 0, minusMarking: { enabled: false, value: 1 }, sourceText: '', sourceWords: [], sourceChars: [], isDynamicText: false, textGenerator: null }, session: { startTime: 0, timeLeft: 0, typedText: '', charIndex: 0, correctChars: 0, errorCount: 0, keystrokes: 0, backspaceCount: 0, isFetchingMoreText: false }, };
@@ -761,15 +909,15 @@
             const populateLevels = () => { dom.levelSelect.innerHTML = Object.keys(practiceLevels).map(level => `<option value="${level}">${level}</option>`).join(''); };
             const populateMethods = () => { const selectedLevel = dom.levelSelect.value; const methods = Object.keys(practiceLevels[selectedLevel]); dom.methodSelect.innerHTML = methods.map(method => `<option value="${method}">${method}</option>`).join(''); handleMethodChange(); };
             const handleMethodChange = () => {
-                 const isFreeHand = dom.levelSelect.value === 'Free Hand'; const isPasteText = dom.levelSelect.value === 'Custom Text'; dom.durationSelect.disabled = isFreeHand; dom.minusMarkingEnabled.disabled = isFreeHand; if (isFreeHand && dom.minusMarkingEnabled.checked) { dom.minusMarkingEnabled.click(); } dom.pasteTextContainer.style.display = isPasteText ? 'block' : 'none';
+                 const isFreeHand = dom.levelSelect.value === 'Free Hand'; const isPasteText = dom.levelSelect.value === 'Uplode Your Text'; dom.durationSelect.disabled = isFreeHand; dom.minusMarkingEnabled.disabled = isFreeHand; if (isFreeHand && dom.minusMarkingEnabled.checked) { dom.minusMarkingEnabled.click(); } dom.pasteTextContainer.style.display = isPasteText ? 'block' : 'none';
             };
             const switchView = (view) => { dom.setupView.classList.toggle('active', view === 'setup'); dom.practiceView.classList.toggle('active', view === 'practice'); };
             const startPractice = async () => {
-                if (dom.levelSelect.value === 'Custom Text' && dom.pasteTextArea.value.trim() === '') { alert("Please paste your text before starting."); return; }
+                if (dom.levelSelect.value === 'Uplode Your Text' && dom.pasteTextArea.value.trim() === '') { alert("Please paste your text before starting."); return; }
                 dom.startBtn.disabled = true; dom.loadingStatus.textContent = 'Fetching text...';
                 try {
                     const level = dom.levelSelect.value; const method = dom.methodSelect.value; const textGenerator = practiceLevels[level][method];
-                    appState.config = { level: level, method: method, duration: parseInt(dom.durationSelect.value, 10) * 60, minusMarking: { enabled: dom.minusMarkingEnabled.checked, value: parseInt(dom.minusMarkingValue.value, 10) }, isDynamicText: level !== 'Free Hand' && level !== 'Custom Text', textGenerator: textGenerator, sourceText: await textGenerator(), };
+                    appState.config = { level: level, method: method, duration: parseInt(dom.durationSelect.value, 10) * 60, minusMarking: { enabled: dom.minusMarkingEnabled.checked, value: parseInt(dom.minusMarkingValue.value, 10) }, isDynamicText: level !== 'Free Hand' && level !== 'Uplode Your Text', textGenerator: textGenerator, sourceText: await textGenerator(), };
                     if (!appState.config.sourceText && appState.config.level !== 'Free Hand') { appState.config.sourceText = getRandomFallback(appState.lang); }
                     if (appState.config.level === 'Free Hand') {
                         dom.textDisplay.style.display = 'none'; dom.caret.style.display = 'none'; dom.freeHandArea.style.display = 'block'; dom.freeHandArea.value = '';
@@ -826,7 +974,7 @@
             };
 
             const showResults = () => {
-                const timeTakenSec = appState.isPracticeActive ? 0 : (appState.session.startTime > 0 ? Math.floor((Date.now() - appState.session.startTime) / 1000) : appState.config.duration);
+                const timeTakenSec = appState.isPracticeActive ? 0 : (appState.session.startTime > 0 ? Math.round((Date.now() - appState.session.startTime) / 1000) : appState.config.duration);
                 const durationMinutes = appState.config.duration / 60;
                 const timeTakenMin = timeTakenSec > 0 ? timeTakenSec / 60 : durationMinutes;
                 
@@ -864,8 +1012,8 @@
 
                 const isQualified = netWPM >= 30 && accuracy >= 90;
                 
-                const minKeystrokes = 125 * durationMinutes;
-                const keystrokeWarning = totalKeystrokes < minKeystrokes && durationMinutes > 0 ? `Key strokes typed (${totalKeystrokes}) are less than minimum required (${minKeystrokes}). Calculation may be affected.` : '';
+                const minKeystrokes = 125 * timeTakenMin;
+                const keystrokeWarning = totalKeystrokes < minKeystrokes && timeTakenMin > 0 ? `Key strokes typed (${totalKeystrokes}) are less than minimum required (${Math.round(minKeystrokes)}). Calculation may be affected.` : '';
 
                 dom.newResults.passageTitle.textContent = `${appState.config.level}: ${appState.config.method}`;
                 dom.newResults.timeDuration.textContent = `${durationMinutes.toFixed(2)}`;
@@ -907,13 +1055,196 @@
                 dom.newResults.originalPassage.innerHTML = originalHTML;
                 dom.newResults.typedPassage.innerHTML = typedHTML;
 
+                const currentResult = {
+                    timestamp: Date.now(),
+                    level: appState.config.level,
+                    method: appState.config.method,
+                    lang: appState.lang,
+                    duration: durationMinutes,
+                    grossWPM: parseFloat(grossWPM.toFixed(2)),
+                    netWPM: parseFloat(Math.max(0, netWPM).toFixed(2)),
+                    accuracy: parseFloat(accuracy.toFixed(2)),
+                    errors: totalWrongWords,
+                    keystrokes: totalKeystrokes,
+                    backspaceCount: appState.session.backspaceCount,
+                    qualified: isQualified,
+                    wordAnalysis,
+                };
+
+                const allResults = getStoredResults();
+                allResults.push(currentResult);
+                saveResults(allResults);
+
+                const { todaySeconds, totalSeconds } = updatePracticeTime(timeTakenSec);
+                dom.practiceDurationSummary.style.display = 'block';
+                dom.resTodayPracticeTime.textContent = formatDuration(todaySeconds);
+                dom.resTotalPracticeTime.textContent = formatDuration(totalSeconds);
+
+                renderAnalytics(allResults);
+
                 dom.resultsModal.classList.add('active');
             };
 
-            const hideResults = () => dom.resultsModal.classList.remove('active');
+            const hideResults = () => {
+                dom.resultsModal.classList.remove('active');
+                if (speedChart) speedChart.destroy();
+                if (accuracyChart) accuracyChart.destroy();
+                dom.practiceDurationSummary.style.display = 'none';
+                dom.performanceReviewSection.style.display = 'none';
+                dom.weaknessAnalysisSection.style.display = 'none';
+                dom.improvementTipsSection.style.display = 'none';
+                dom.progressGraphsSection.style.display = 'none';
+            };
+
+            const renderAnalytics = (results) => {
+                const currentResult = results[results.length - 1];
+                renderPerformanceReview(results);
+                renderWeaknessAnalysis(results);
+                renderProgressGraphs(results);
+                renderImprovementTips(currentResult);
+            };
+
+            const renderPerformanceReview = (results) => {
+                if (results.length < 2) {
+                    dom.performanceReviewSection.style.display = 'none';
+                    return;
+                }
+                dom.performanceReviewSection.style.display = 'block';
+                const current = results[results.length - 1];
+                const previous = results[results.length - 2];
+                
+                let feedback = [];
+                const wpmDiff = current.netWPM - previous.netWPM;
+                const accDiff = current.accuracy - previous.accuracy;
+                const errDiff = current.errors - previous.errors;
+
+                if (wpmDiff > 0) feedback.push(`Speed improved by <span style="color:var(--primary-color)">+${wpmDiff.toFixed(2)} WPM</span>.`);
+                else if (wpmDiff < 0) feedback.push(`Speed decreased by <span style="color:var(--error-color)">${wpmDiff.toFixed(2)} WPM</span>.`);
+                
+                if (accDiff > 0) feedback.push(`Accuracy increased by <span style="color:var(--primary-color)">+${accDiff.toFixed(2)}%</span>.`);
+                else if (accDiff < 0) feedback.push(`Accuracy decreased by <span style="color:var(--error-color)">${accDiff.toFixed(2)}%</span>.`);
+
+                if (errDiff < 0) feedback.push(`Errors reduced by <span style="color:var(--primary-color)">${-errDiff}</span>.`);
+                else if (errDiff > 0) feedback.push(`Errors increased by <span style="color:var(--error-color)">${errDiff}</span>.`);
+
+                if (feedback.length === 0) feedback.push("Your performance is consistent. Keep practicing!");
+                else if (wpmDiff > 0 && accDiff > 0) feedback.push("Excellent improvement! Keep up the great work!");
+                else if (wpmDiff < 0 || accDiff < 0) feedback.push("Focus on consistency and accuracy in your next session.");
+                
+                dom.performanceFeedback.innerHTML = feedback.join('\n');
+            };
+
+            const renderWeaknessAnalysis = (results) => {
+                const mistakeMap = new Map();
+                results.flatMap(r => r.wordAnalysis || [])
+                    .filter(w => w.status !== 'correct' && w.source)
+                    .forEach(w => {
+                        if (!mistakeMap.has(w.source)) {
+                            mistakeMap.set(w.source, { count: 0, typedAs: new Map() });
+                        }
+                        const entry = mistakeMap.get(w.source);
+                        entry.count++;
+                        if (w.typed) {
+                            entry.typedAs.set(w.typed, (entry.typedAs.get(w.typed) || 0) + 1);
+                        }
+                    });
+
+                if (mistakeMap.size === 0) {
+                    dom.weaknessAnalysisSection.style.display = 'none';
+                    return;
+                }
+                dom.weaknessAnalysisSection.style.display = 'block';
+                const sortedMistakes = [...mistakeMap.entries()].sort((a, b) => b[1].count - a[1].count).slice(0, 5);
+                
+                let html = '<ul>';
+                sortedMistakes.forEach(([source, data]) => {
+                    const commonTyped = [...data.typedAs.entries()].sort((a, b) => b[1] - a[1])[0];
+                    html += `<li>You often mistype '<span class="mistake-word">${source}</span>' (${data.count} times)`;
+                    if (commonTyped) {
+                         html += `, e.g., as '<span class="suggestion-word">${commonTyped[0]}</span>'`;
+                    }
+                    html += `.</li>`;
+                });
+                html += '</ul>';
+                dom.mistakesAnalysis.innerHTML = html;
+            };
+
+            const renderImprovementTips = (currentResult) => {
+                const { accuracy, netWPM, grossWPM, backspaceCount, wordAnalysis } = currentResult;
+                let tips = [];
+
+                if (accuracy < 90) {
+                    tips.push("Your accuracy is low. Try to focus on typing correctly rather than speed. Precision is key!");
+                } else if (accuracy < 95) {
+                    tips.push("Good accuracy! Slow down just a bit to eliminate those few remaining errors.");
+                }
+
+                const wpmDifference = grossWPM - netWPM;
+                if (wpmDifference > 10) {
+                    tips.push("A high number of errors is reducing your Net Speed. Focus on accuracy to see a big improvement.");
+                }
+
+                if (backspaceCount > (currentResult.keystrokes / 20)) { // If backspace is more than 5% of keystrokes
+                    tips.push("You're using the backspace key frequently. Try to type more deliberately to build a better rhythm and flow.");
+                }
+                
+                const halfMistakes = (wordAnalysis || []).filter(w => w.status === 'half').length;
+                const fullMistakes = (wordAnalysis || []).filter(w => w.status === 'full').length;
+                if (halfMistakes > fullMistakes && halfMistakes > 3) {
+                     tips.push("You're making many minor typos (half mistakes). Double-check for small errors like an extra or missed letter before moving on.");
+                }
+
+                if (tips.length === 0) {
+                    tips.push("Great work! Your performance is solid. Keep practicing regularly to maintain and improve your skills.");
+                }
+                
+                dom.improvementTips.innerHTML = '<ul>' + tips.map(tip => `<li>${tip}</li>`).join('') + '</ul>';
+                dom.improvementTipsSection.style.display = 'block';
+            };
+
+
+            const renderProgressGraphs = (results) => {
+                if (results.length < 2) {
+                    dom.progressGraphsSection.style.display = 'none';
+                    return;
+                }
+                dom.progressGraphsSection.style.display = 'block';
+
+                if (speedChart) speedChart.destroy();
+                if (accuracyChart) accuracyChart.destroy();
+
+                const labels = results.map((_, i) => `Test ${i + 1}`);
+                const speedData = {
+                    labels,
+                    datasets: [
+                        { label: 'Gross WPM', data: results.map(r => r.grossWPM), borderColor: '#2196F3', tension: 0.1, backgroundColor: 'rgba(33, 150, 243, 0.1)', fill: true },
+                        { label: 'Net WPM', data: results.map(r => r.netWPM), borderColor: 'var(--primary-color)', tension: 0.1, backgroundColor: 'rgba(76, 175, 80, 0.1)', fill: true }
+                    ]
+                };
+                const accuracyData = {
+                    labels,
+                    datasets: [
+                        { label: 'Accuracy (%)', data: results.map(r => r.accuracy), borderColor: '#FFC107', tension: 0.1, yAxisID: 'y', backgroundColor: 'rgba(255, 193, 7, 0.1)', fill: true },
+                        { label: 'Errors', data: results.map(r => r.errors), borderColor: 'var(--error-color)', tension: 0.1, yAxisID: 'y1', backgroundColor: 'rgba(244, 67, 54, 0.1)', fill: true }
+                    ]
+                };
+                
+                const chartOptions = {
+                    responsive: true, maintainAspectRatio: true,
+                    plugins: { legend: { labels: { color: '#ccc' } } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#444' }, ticks: { color: '#ccc' } },
+                        x: { grid: { color: '#444' }, ticks: { color: '#ccc', maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }
+                    }
+                };
+
+                speedChart = new Chart(dom.speedChartCanvas, { type: 'line', data: speedData, options: { ...chartOptions, plugins: { ...chartOptions.plugins, title: { display: true, text: 'Typing Speed (WPM)', color: '#fff' } } } });
+                accuracyChart = new Chart(dom.accuracyChartCanvas, { type: 'line', data: accuracyData, options: { ...chartOptions, plugins: { ...chartOptions.plugins, title: { display: true, text: 'Accuracy & Errors', color: '#fff' } }, scales: { ...chartOptions.scales, y1: { type: 'linear', display: true, position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, ticks: { color: '#ccc' } } } } });
+            };
 
             const init = () => {
                 resetState(); populateLevels(); populateMethods();
+                Chart.defaults.color = '#ccc'; Chart.defaults.borderColor = '#444';
                 const visitCountEl = document.getElementById("visitCount"); if (visitCountEl) { let count = parseInt(localStorage.getItem("visitorCount") || "0"); count++; localStorage.setItem("visitorCount", String(count)); visitCountEl.textContent = count.toLocaleString(); }
                 dom.levelSelect.addEventListener('change', populateMethods);
                 dom.methodSelect.addEventListener('change', handleMethodChange);
@@ -939,12 +1270,12 @@
                     appState.config.level === 'Free Hand' ? dom.freeHandArea.focus() : dom.hiddenInput.focus();
                 });
                 dom.resultActions.newTest.addEventListener('click', () => {
-                    if (appState.config.level === 'Custom Text') dom.pasteTextArea.value = '';
+                    if (appState.config.level === 'Uplode Your Text') dom.pasteTextArea.value = '';
                     hideResults();
                     startPractice();
                 });
                 dom.resultActions.backToHome.addEventListener('click', () => {
-                    if (appState.config.level === 'Custom Text') dom.pasteTextArea.value = '';
+                    if (appState.config.level === 'Uplode Your Text') dom.pasteTextArea.value = '';
                     hideResults();
                     switchView('setup');
                 });
@@ -953,6 +1284,5 @@
             init();
         });
     </script>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>
