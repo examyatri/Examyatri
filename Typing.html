@@ -511,82 +511,6 @@
             margin-top: 1rem;
         }
 
-        /* Rules Modal */
-        #rules-modal {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.9);
-            display: none; /* Initially hidden */
-            align-items: center;
-            justify-content: center;
-            z-index: 1001; /* Above results modal */
-            animation: fadeIn 0.3s ease;
-            padding: 1rem;
-        }
-        #rules-modal.active {
-            display: flex;
-        }
-        .rules-content {
-            background-color: #2a2a2e;
-            padding: 2rem;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            width: 100%;
-            max-width: 800px;
-            max-height: calc(100vh - 4rem);
-            overflow-y: auto;
-            color: #e0e0e0;
-            text-align: left;
-            position: relative;
-        }
-        .rules-content h2, .rules-content h3 {
-            color: var(--primary-color);
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
-        }
-        .rules-content h2:first-child {
-            margin-top: 0;
-        }
-        .rules-content h4 {
-            color: #ccc;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
-        }
-        .rules-content p, .rules-content ul, .rules-content ol {
-            margin-bottom: 1rem;
-            line-height: 1.7;
-        }
-        .rules-content ul, .rules-content ol {
-            padding-left: 2rem;
-        }
-        .rules-content li {
-            margin-bottom: 0.5rem;
-        }
-        .rules-content code {
-            background-color: #1e1e1e;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: var(--font-family);
-            color: #f0f0f0;
-        }
-        .rules-content .close-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1.5rem;
-            font-size: 2rem;
-            font-weight: bold;
-            color: #aaa;
-            background: none;
-            border: none;
-            cursor: pointer;
-            line-height: 1;
-        }
-        .rules-content .close-btn:hover {
-            color: #fff;
-        }
-
         .learn-more-link {
             display: block;
             text-align: center;
@@ -619,8 +543,6 @@
             .stat-item .value { font-size: 1rem; }
             .results-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
             .results-content { padding: 1rem; }
-            .rules-content { padding: 1.5rem 1rem; }
-            .rules-content .close-btn { top: 0.5rem; right: 1rem; }
             .results-actions {
                 bottom: -1rem;
                 margin-left: -1rem;
@@ -768,7 +690,6 @@
             <div class="results-formula-note">
                 <span id="res-formula-note">Calculation of Net Speed = (Total Keystrokes / 5) / Time in Minutes.</span>
             </div>
-            <a id="learn-more-btn" class="learn-more-link">Learn how mistakes are calculated...</a>
              <div id="res-keystroke-warning" style="color: var(--error-color); text-align: center; font-size: 0.9rem; margin-top: 1rem;"></div>
             
              <div id="practice-duration-summary" class="result-card" style="text-align: left; display: none; background-color: #333338;">
@@ -787,7 +708,16 @@
 
             <div id="weakness-analysis-section" class="result-card" style="text-align: left; display: none; background-color: #333338;">
                 <div class="title">Common Mistakes & Weak Areas</div>
-                <div id="mistakes-analysis" style="font-size: 0.9rem; color: #e0e0e0;"></div>
+                <div id="mistakes-analysis" style="font-size: 0.9rem; color: #e0e0e0;">
+                    <div id="english-mistakes-container" style="display: none; margin-bottom: 1rem;">
+                        <h4 style="color: #ccc; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem;">English Mistakes</h4>
+                        <div id="english-mistakes-list"></div>
+                    </div>
+                    <div id="hindi-mistakes-container" style="display: none;">
+                        <h4 style="color: #ccc; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem;">Hindi Mistakes</h4>
+                        <div id="hindi-mistakes-list"></div>
+                    </div>
+                </div>
             </div>
             
             <div id="improvement-tips-section" class="result-card" style="text-align: left; display: none; background-color: #333338;">
@@ -820,90 +750,6 @@
             </div>
         </div>
     </div>
-    
-    <!-- Rules Modal -->
-    <div id="rules-modal">
-        <div class="rules-content">
-            <button id="close-rules-btn" class="close-btn">&times;</button>
-            <h2>Understanding Typing Mistakes & Scoring</h2>
-            
-            <h3>1. What is a Full Word Mistake?</h3>
-            <p>A full-word mistake means the entire word is incorrect, missing, extra, or completely misplaced in the sentence. The examiner or software will not count it as correct even if one letter is missing or added in such a way that the meaning or spelling changes completely.</p>
-            <p><strong>Examples:</strong></p>
-            <ul>
-                <li>Original text: <code>भारत सरकार ने योजना शुरू की।</code><br>Typed text: <code>भारत सरकर ने योजना शुरू की।</code><br>Here, the word “सरकार” is typed as “सरकर”. The whole word meaning changes, so it is counted as one full-word mistake.</li>
-                <li>Original text: <code>भारत सरकार ने योजना शुरू की।</code><br>Typed text: <code>भारत ने योजना शुरू की।</code><br>The word “सरकार” is completely missing. This is also one full-word mistake.</li>
-                <li>Original text: <code>भारत सरकार ने योजना शुरू की।</code><br>Typed text: <code>भारत सरकार योजना शुरू की।</code><br>The word “ने” is missing, so again one full-word mistake.</li>
-            </ul>
-            <p>In short, whenever a complete word is either missing, added extra, or spelled so wrongly that it loses its correct identity — it is a full-word mistake.</p>
-            
-            <hr style="border-color: var(--border-color); margin: 1.5rem 0;">
-
-            <h3>✏️ 2. What is a Half Word Mistake?</h3>
-            <p>A half-word mistake means that only a small part of the word is incorrect — for example, one letter is extra, missing, or slightly misplaced — but the word is still understandable.</p>
-            <p><strong>Examples:</strong></p>
-            <ul>
-                <li>Original: <code>भारत सरकार</code><br>Typed: <code>भारता सरकार</code><br>One extra letter “ा” added at the end of “भारत”. It still looks like “भारत”, so it’s a half-word mistake.</li>
-                <li>Original: <code>भारत सरकार</code><br>Typed: <code>भारत सरका</code><br>The last letter “र” of “सरकार” is missing. The word is almost correct, so again half-word mistake.</li>
-                <li>Original: <code>विद्यालय</code><br>Typed: <code>विधालय</code><br>One character missing in between but readable → half-word mistake.</li>
-            </ul>
-            <p>👉 In general typing exams, two half-word mistakes = one full-word mistake.</p>
-
-            <hr style="border-color: var(--border-color); margin: 1.5rem 0;">
-
-            <h3>⚙️ 3. How Mistakes Affect WPM (Words Per Minute)</h3>
-            <p>Typing speed is calculated in two parts — Gross speed and Net speed.</p>
-            <ol>
-                <li><strong>Gross WPM</strong> means your total speed without considering mistakes.<br>Formula: <code>Gross WPM = (Total characters typed ÷ 5) ÷ Time in minutes</code></li>
-                <li><strong>Error penalty</strong> depends on the number of full and half mistakes.<br>Formula: <code>Error Penalty = (Full-word mistakes + Half-word mistakes ÷ 2)</code></li>
-                <li><strong>Net WPM</strong> means your final correct speed after deducting the penalty.<br>Formula: <code>Net WPM = Gross WPM − Error Penalty</code></li>
-            </ol>
-
-            <hr style="border-color: var(--border-color); margin: 1.5rem 0;">
-
-            <h3>📘 4. Calculation Examples</h3>
-            <h4>Example 1 – With Few Mistakes</h4>
-            <p>Suppose you typed 2500 characters in 10 minutes.<br>
-            Gross WPM = 2500 ÷ 5 ÷ 10 = 50 WPM<br>
-            You made:<br>
-            &nbsp;&nbsp;• 4 full-word mistakes<br>
-            &nbsp;&nbsp;• 2 half-word mistakes = 1 full mistake<br>
-            Total = 5 full-word mistakes.<br>
-            Net WPM = 50 − 5 = 45 WPM<br>
-            Your accuracy = (Net ÷ Gross) × 100 = (45 ÷ 50) × 100 = 90%</p>
-
-            <h4>Example 2 – With More Mistakes</h4>
-            <p>You typed 2000 characters in 10 minutes.<br>
-            Gross WPM = 2000 ÷ 5 ÷ 10 = 40 WPM<br>
-            Mistakes:<br>
-            6 full-word mistakes + 4 half-word mistakes = 6 + 2 = 8 full mistakes<br>
-            Net WPM = 40 − 8 = 32 WPM<br>
-            Accuracy = (32 ÷ 40) × 100 = 80%</p>
-            
-            <hr style="border-color: var(--border-color); margin: 1.5rem 0;">
-
-            <h3>🧠 5. Important Notes for Exams</h3>
-            <ul>
-                <li>If you type extra words not present in the passage → full-word mistake.</li>
-                <li>If you skip a word → full-word mistake.</li>
-                <li>If spacing is missing between two words (e.g., “भारतसरकार”) → half-word mistake, but if it creates confusion → full-word mistake.</li>
-                <li>Punctuation errors (like missing full stop or comma) → usually half mistake, unless exam rules say otherwise.</li>
-                <li>Always check exam instructions, because some boards (like CPCT) have slightly different marking patterns.</li>
-            </ul>
-            
-            <hr style="border-color: var(--border-color); margin: 1.5rem 0;">
-
-            <h3>💡 6. Summary in Simple Words</h3>
-            <ul>
-                <li>Full-word mistake = Entire word wrong / missing / added</li>
-                <li>Half-word mistake = Minor spelling or letter issue</li>
-                <li>2 half mistakes = 1 full mistake</li>
-                <li>Net WPM = Gross WPM − Total full mistakes</li>
-                <li>Accuracy (%) = (Net ÷ Gross) × 100</li>
-            </ul>
-        </div>
-    </div>
-
 
     <textarea id="hidden-input" autofocus autocapitalize="none" autocorrect="off"></textarea>
     
@@ -977,19 +823,38 @@
                 performanceFeedback: document.getElementById('performance-feedback'),
                 weaknessAnalysisSection: document.getElementById('weakness-analysis-section'),
                 mistakesAnalysis: document.getElementById('mistakes-analysis'),
+                englishMistakesContainer: document.getElementById('english-mistakes-container'),
+                englishMistakesList: document.getElementById('english-mistakes-list'),
+                hindiMistakesContainer: document.getElementById('hindi-mistakes-container'),
+                hindiMistakesList: document.getElementById('hindi-mistakes-list'),
                 improvementTipsSection: document.getElementById('improvement-tips-section'),
                 improvementTips: document.getElementById('improvement-tips'),
                 progressGraphsSection: document.getElementById('progress-graphs-section'),
                 speedChartCanvas: document.getElementById('speed-chart'),
                 accuracyChartCanvas: document.getElementById('accuracy-chart'),
-                // Rules modal elements
-                rulesModal: document.getElementById('rules-modal'),
-                closeRulesBtn: document.getElementById('close-rules-btn'),
-                learnMoreBtn: document.getElementById('learn-more-btn'),
             };
-
-            const GRAPHEME_SPLITTER = new Intl.Segmenter();
-            const splitTextToChars = (text) => [...GRAPHEME_SPLITTER.segment(text)].map(s => s.segment);
+            
+            // FIX 1 (IMPLEMENTED): Use Intl.Segmenter for correct Unicode grapheme splitting.
+            // This is the new section to handle Hindi (and other complex scripts) correctly.
+            // The previous method `Array.from(text)` was insufficient for Hindi conjuncts and matras.
+            const splitTextToChars = (text) => {
+                // Intl.Segmenter is the modern, correct way to split strings into what users
+                // perceive as characters (grapheme clusters).
+                if (typeof Intl.Segmenter === 'function') {
+                    // We use the appState.lang to create a locale-specific segmenter.
+                    // This is crucial for scripts like Devanagari (Hindi).
+                    try {
+                        const segmenter = new Intl.Segmenter(appState.lang, { granularity: 'grapheme' });
+                        return Array.from(segmenter.segment(text)).map(g => g.segment);
+                    } catch (e) {
+                        // Fallback in case of an invalid language tag, though 'en' and 'hi' are safe.
+                        console.warn("Intl.Segmenter failed, falling back.", e);
+                        return Array.from(text);
+                    }
+                }
+                // Fallback for older browsers that don't support Intl.Segmenter.
+                return Array.from(text);
+            };
             
             const KEYS = {
                 en: { home: "asdfjkl;", top: "qwertyuiop", bottom: "zxcvbnm,.", numbers: "1234567890", symbols: "!@#$%^&*()_+-=[]{}|;':\",./<>?" },
@@ -1018,7 +883,8 @@
                 if (appState.session.isFetchingMoreText || !appState.isPracticeActive) return;
                 appState.session.isFetchingMoreText = true; dom.loadingStatus.textContent = 'Generating more text...';
                 try {
-                    const newText = await appState.config.textGenerator();
+                    // FIX 1: Normalize new text
+                    const newText = (await appState.config.textGenerator() || '').normalize("NFC");
                     if (newText && appState.isPracticeActive) {
                         const separator = ' '; appState.config.sourceText += separator + newText; const newChars = splitTextToChars(separator + newText); appState.config.sourceChars.push(...newChars); appState.config.sourceWords = appState.config.sourceText.split(/\s+/).filter(Boolean);
                         const newHtml = newChars.map(char => `<span class="char">${char}</span>`).join(''); dom.textDisplay.insertAdjacentHTML('beforeend', newHtml);
@@ -1096,8 +962,10 @@
                 dom.startBtn.disabled = true; dom.loadingStatus.textContent = 'Fetching text...';
                 try {
                     const level = dom.levelSelect.value; const method = dom.methodSelect.value; const textGenerator = practiceLevels[level][method];
-                    appState.config = { level: level, method: method, duration: parseInt(dom.durationSelect.value, 10) * 60, minusMarking: { enabled: dom.minusMarkingEnabled.checked, value: parseInt(dom.minusMarkingValue.value, 10) }, isDynamicText: level !== 'Free Hand' && level !== 'Uplode Your Text', textGenerator: textGenerator, sourceText: await textGenerator(), };
-                    if (!appState.config.sourceText && appState.config.level !== 'Free Hand') { appState.config.sourceText = getRandomFallback(appState.lang); }
+                    // FIX 1: Normalize source text
+                    const sourceText = (await textGenerator() || '').normalize("NFC");
+                    appState.config = { level: level, method: method, duration: parseInt(dom.durationSelect.value, 10) * 60, minusMarking: { enabled: dom.minusMarkingEnabled.checked, value: parseInt(dom.minusMarkingValue.value, 10) }, isDynamicText: level !== 'Free Hand' && level !== 'Uplode Your Text', textGenerator: textGenerator, sourceText: sourceText, };
+                    if (!appState.config.sourceText && appState.config.level !== 'Free Hand') { appState.config.sourceText = getRandomFallback(appState.lang).normalize("NFC"); }
                     if (appState.config.level === 'Free Hand') {
                         dom.textDisplay.style.display = 'none'; dom.caret.style.display = 'none'; dom.freeHandArea.style.display = 'block'; dom.freeHandArea.value = '';
                     } else {
@@ -1117,16 +985,59 @@
             const startTimer = () => { if (appState.timerId || appState.config.duration <= 0) return; appState.timerId = setInterval(() => { if (appState.isPracticeActive) { const elapsed = Math.floor((Date.now() - appState.session.startTime) / 1000); appState.session.timeLeft = appState.config.duration - elapsed; updateStatsDisplay(); } if (appState.session.timeLeft <= 0) { endPractice(); } }, 250); };
             const updateTextDisplay = () => {
                 if (appState.config.level === 'Free Hand') return;
-                const typedChars = splitTextToChars(appState.session.typedText); const charElements = dom.textDisplay.querySelectorAll('.char'); appState.session.charIndex = typedChars.length; let correctCount = 0; let errorCount = 0;
+                // FIX 1: Normalize user input before comparison
+                const typedChars = splitTextToChars(appState.session.typedText.normalize("NFC"));
+                const charElements = dom.textDisplay.querySelectorAll('.char'); 
+                appState.session.charIndex = typedChars.length; 
+                let correctCount = 0; 
+                let errorCount = 0;
                 charElements.forEach((charEl, index) => { if (index < appState.session.charIndex) { if (typedChars[index] === appState.config.sourceChars[index]) { charEl.className = 'char correct'; correctCount++; } else { charEl.className = 'char incorrect'; errorCount++; } } else { charEl.className = 'char'; } });
-                appState.session.correctChars = correctCount; appState.session.errorCount = errorCount; updateCaretPosition();
+                appState.session.correctChars = correctCount; 
+                appState.session.errorCount = errorCount; 
+                updateCaretPosition();
             };
-            const updateCaretPosition = () => {
-                const charElements = dom.textDisplay.querySelectorAll('.char'); const isAtEnd = appState.session.charIndex >= charElements.length; const currentEl = isAtEnd ? charElements[charElements.length - 1] : charElements[appState.session.charIndex];
-                if (!currentEl) { dom.caret.style.display = 'none'; return; }
-                dom.caret.style.display = 'block'; const currentElRect = currentEl.getBoundingClientRect(); dom.caret.style.left = `${currentEl.offsetLeft + (isAtEnd ? currentEl.offsetWidth : 0)}px`; dom.caret.style.top = `${currentEl.offsetTop}px`;
-                const wrapper = dom.textDisplayWrapper; const caretTop = currentEl.offsetTop; const caretHeight = currentEl.offsetHeight;
-                if (caretTop < wrapper.scrollTop) { wrapper.scrollTop = caretTop - caretHeight; } else if (caretTop + caretHeight > wrapper.scrollTop + wrapper.clientHeight) { wrapper.scrollTop = caretTop + caretHeight - wrapper.clientHeight; }
+             const updateCaretPosition = () => {
+                const charElements = dom.textDisplay.querySelectorAll('.char');
+                const charIndex = appState.session.charIndex;
+
+                // Hide caret if no text is displayed
+                if (charElements.length === 0) {
+                    dom.caret.style.display = 'none';
+                    return;
+                }
+
+                dom.caret.style.display = 'block';
+
+                const wrapper = dom.textDisplayWrapper;
+                const wrapperRect = wrapper.getBoundingClientRect();
+
+                let targetEl, targetRect, left, top;
+
+                if (charIndex >= charElements.length) {
+                    // At the end of the text, position after the last character
+                    targetEl = charElements[charElements.length - 1];
+                    targetRect = targetEl.getBoundingClientRect();
+                    left = targetRect.right - wrapperRect.left;
+                    top = targetRect.top - wrapperRect.top;
+                } else {
+                    // Position at the beginning of the current character
+                    targetEl = charElements[charIndex];
+                    targetRect = targetEl.getBoundingClientRect();
+                    left = targetRect.left - wrapperRect.left;
+                    top = targetRect.top - wrapperRect.top;
+                }
+                
+                dom.caret.style.left = `${left}px`;
+                dom.caret.style.top = `${top}px`;
+
+                // Auto-scroll logic (offsetTop is fine relative to its parent for scrolling)
+                const caretTopInWrapper = targetEl.offsetTop;
+                const caretHeight = targetEl.offsetHeight;
+                if (caretTopInWrapper < wrapper.scrollTop) {
+                    wrapper.scrollTop = caretTopInWrapper;
+                } else if (caretTopInWrapper + caretHeight > wrapper.scrollTop + wrapper.clientHeight) {
+                    wrapper.scrollTop = caretTopInWrapper + caretHeight - wrapper.clientHeight;
+                }
             };
             const updateStatsDisplay = () => {
                 const duration = appState.config.duration > 0 ? Math.max(0, appState.session.timeLeft) : (appState.isPracticeActive ? Math.floor((Date.now() - appState.session.startTime) / 1000) : 0);
@@ -1391,38 +1302,63 @@
             };
 
             const renderWeaknessAnalysis = (results) => {
-                const mistakeMap = new Map();
-                results.flatMap(r => r.wordAnalysis || [])
-                    .filter(w => w.status !== 'correct' && w.source)
-                    .forEach(w => {
-                        if (!mistakeMap.has(w.source)) {
-                            mistakeMap.set(w.source, { count: 0, typedAs: new Map() });
-                        }
-                        const entry = mistakeMap.get(w.source);
-                        entry.count++;
-                        if (w.typed) {
-                            entry.typedAs.set(w.typed, (entry.typedAs.get(w.typed) || 0) + 1);
-                        }
-                    });
+                const generateMistakeList = (filteredResults) => {
+                    const mistakeMap = new Map();
+                    filteredResults.flatMap(r => r.wordAnalysis || [])
+                        .filter(w => w.status !== 'correct' && w.source)
+                        .forEach(w => {
+                            if (!mistakeMap.has(w.source)) {
+                                mistakeMap.set(w.source, { count: 0, typedAs: new Map() });
+                            }
+                            const entry = mistakeMap.get(w.source);
+                            entry.count++;
+                            if (w.typed) {
+                                entry.typedAs.set(w.typed, (entry.typedAs.get(w.typed) || 0) + 1);
+                            }
+                        });
 
-                if (mistakeMap.size === 0) {
-                    dom.weaknessAnalysisSection.style.display = 'none';
-                    return;
+                    if (mistakeMap.size === 0) return null;
+
+                    const sortedMistakes = [...mistakeMap.entries()].sort((a, b) => b[1].count - a[1].count).slice(0, 5);
+                    
+                    let html = '<ul>';
+                    sortedMistakes.forEach(([source, data]) => {
+                        const commonTyped = [...data.typedAs.entries()].sort((a, b) => b[1] - a[1])[0];
+                        html += `<li>Mistyped '<span class="mistake-word">${source}</span>' (${data.count} times)`;
+                        if (commonTyped) {
+                             html += `, often as '<span class="suggestion-word">${commonTyped[0]}</span>'`;
+                        }
+                        html += `.</li>`;
+                    });
+                    html += '</ul>';
+                    return html;
+                };
+
+                const englishResults = results.filter(r => r.lang === 'en');
+                const hindiResults = results.filter(r => r.lang === 'hi');
+
+                const englishMistakesHTML = generateMistakeList(englishResults);
+                const hindiMistakesHTML = generateMistakeList(hindiResults);
+
+                let anyMistakesFound = false;
+
+                if (englishMistakesHTML) {
+                    dom.englishMistakesContainer.style.display = 'block';
+                    dom.englishMistakesList.innerHTML = englishMistakesHTML;
+                    anyMistakesFound = true;
+                } else {
+                    dom.englishMistakesContainer.style.display = 'none';
                 }
-                dom.weaknessAnalysisSection.style.display = 'block';
-                const sortedMistakes = [...mistakeMap.entries()].sort((a, b) => b[1].count - a[1].count).slice(0, 5);
-                
-                let html = '<ul>';
-                sortedMistakes.forEach(([source, data]) => {
-                    const commonTyped = [...data.typedAs.entries()].sort((a, b) => b[1] - a[1])[0];
-                    html += `<li>You often mistype '<span class="mistake-word">${source}</span>' (${data.count} times)`;
-                    if (commonTyped) {
-                         html += `, e.g., as '<span class="suggestion-word">${commonTyped[0]}</span>'`;
-                    }
-                    html += `.</li>`;
-                });
-                html += '</ul>';
-                dom.mistakesAnalysis.innerHTML = html;
+
+                if (hindiMistakesHTML) {
+                    dom.hindiMistakesContainer.style.display = 'block';
+                    dom.hindiMistakesList.innerHTML = hindiMistakesHTML;
+                    anyMistakesFound = true;
+                } else {
+                    dom.hindiMistakesContainer.style.display = 'none';
+                }
+
+                dom.weaknessAnalysisSection.style.display = anyMistakesFound ? 'block' : 'none';
             };
 
             const renderImprovementTips = (currentResult) => {
@@ -1505,7 +1441,14 @@
                 dom.levelSelect.addEventListener('change', populateMethods);
                 dom.methodSelect.addEventListener('change', handleMethodChange);
                 dom.minusMarkingEnabled.addEventListener('change', (e) => { dom.minusMarkingValue.disabled = !e.target.checked; });
-                [dom.langEnglishBtn, dom.langHindiBtn].forEach(btn => { btn.addEventListener('click', () => { dom.langEnglishBtn.classList.remove('active'); dom.langHindiBtn.classList.remove('active'); btn.classList.add('active'); appState.lang = btn.dataset.lang; }); });
+                [dom.langEnglishBtn, dom.langHindiBtn].forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        dom.langEnglishBtn.classList.remove('active');
+                        dom.langHindiBtn.classList.remove('active');
+                        btn.classList.add('active');
+                        appState.lang = btn.dataset.lang;
+                    });
+                });
                 dom.startBtn.addEventListener('click', startPractice);
                 dom.submitBtn.addEventListener('click', endPractice);
                 dom.hiddenInput.addEventListener('input', handleTyping);
@@ -1534,19 +1477,6 @@
                     if (appState.config.level === 'Uplode Your Text') dom.pasteTextArea.value = '';
                     hideResults();
                     switchView('setup');
-                });
-                
-                // Rules modal listeners
-                dom.learnMoreBtn.addEventListener('click', () => {
-                    dom.rulesModal.classList.add('active');
-                });
-                dom.closeRulesBtn.addEventListener('click', () => {
-                    dom.rulesModal.classList.remove('active');
-                });
-                dom.rulesModal.addEventListener('click', (e) => {
-                    if (e.target === dom.rulesModal) { // Click on backdrop
-                        dom.rulesModal.classList.remove('active');
-                    }
                 });
             };
 
