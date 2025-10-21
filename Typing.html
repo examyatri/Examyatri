@@ -585,15 +585,15 @@
         <section id="setup-view" class="view active">
             <div class="setup-grid">
                 <div class="setup-card">
-                    <label for="level-select">1. Difficulty Level</label>
+                    <label for="level-select">Difficulty Level</label>
                     <select id="level-select" class="custom-select"></select>
                 </div>
                 <div class="setup-card">
-                    <label for="method-select">2. Practice Method</label>
+                    <label for="method-select">Practice Method</label>
                     <select id="method-select" class="custom-select"></select>
                 </div>
                 <div class="setup-card">
-                    <label for="duration-select">3. Duration</label>
+                    <label for="duration-select">Duration</label>
                     <select id="duration-select" class="custom-select">
                         <option value="1">1 Minute</option>
                         <option value="2">2 Minutes</option>
@@ -602,17 +602,6 @@
                         <option value="15">15 Minutes</option>
                         <option value="30">30 Minutes</option>
                     </select>
-                </div>
-                <div class="setup-card minus-marking-controls">
-                    <label>4. Minus Marking</label>
-                    <div>
-                        <input type="checkbox" id="minus-marking-enabled">
-                        <label for="minus-marking-enabled">Enable</label>
-                    </div>
-                    <div>
-                        <input type="number" id="minus-marking-value" min="0" max="5" value="1" disabled>
-                        <label for="minus-marking-value">WPM per error</label>
-                    </div>
                 </div>
             </div>
             <div id="paste-text-container" style="display: none; width: 100%; margin-bottom: 1rem;">
@@ -766,8 +755,6 @@
                 levelSelect: document.getElementById('level-select'),
                 methodSelect: document.getElementById('method-select'),
                 durationSelect: document.getElementById('duration-select'),
-                minusMarkingEnabled: document.getElementById('minus-marking-enabled'),
-                minusMarkingValue: document.getElementById('minus-marking-value'),
                 loadingStatus: document.getElementById('loading-status'),
                 startBtn: document.getElementById('start-practice-btn'),
                 pasteTextContainer: document.getElementById('paste-text-container'),
@@ -949,12 +936,12 @@
 
 
             const resetState = () => {
-                appState = { lang: 'en', timerId: null, isPracticeActive: false, config: { level: '', method: '', duration: 0, minusMarking: { enabled: false, value: 1 }, sourceText: '', sourceWords: [], sourceChars: [], isDynamicText: false, textGenerator: null }, session: { startTime: 0, timeLeft: 0, typedText: '', charIndex: 0, correctChars: 0, errorCount: 0, keystrokes: 0, backspaceCount: 0, isFetchingMoreText: false }, };
+                appState = { lang: 'en', timerId: null, isPracticeActive: false, config: { level: '', method: '', duration: 0, sourceText: '', sourceWords: [], sourceChars: [], isDynamicText: false, textGenerator: null }, session: { startTime: 0, timeLeft: 0, typedText: '', charIndex: 0, correctChars: 0, errorCount: 0, keystrokes: 0, backspaceCount: 0, isFetchingMoreText: false }, };
             };
             const populateLevels = () => { dom.levelSelect.innerHTML = Object.keys(practiceLevels).map(level => `<option value="${level}">${level}</option>`).join(''); };
             const populateMethods = () => { const selectedLevel = dom.levelSelect.value; const methods = Object.keys(practiceLevels[selectedLevel]); dom.methodSelect.innerHTML = methods.map(method => `<option value="${method}">${method}</option>`).join(''); handleMethodChange(); };
             const handleMethodChange = () => {
-                 const isFreeHand = dom.levelSelect.value === 'Free Hand'; const isPasteText = dom.levelSelect.value === 'Uplode Your Text'; dom.durationSelect.disabled = isFreeHand; dom.minusMarkingEnabled.disabled = isFreeHand; if (isFreeHand && dom.minusMarkingEnabled.checked) { dom.minusMarkingEnabled.click(); } dom.pasteTextContainer.style.display = isPasteText ? 'block' : 'none';
+                 const isFreeHand = dom.levelSelect.value === 'Free Hand'; const isPasteText = dom.levelSelect.value === 'Uplode Your Text'; dom.durationSelect.disabled = isFreeHand; dom.pasteTextContainer.style.display = isPasteText ? 'block' : 'none';
             };
             const switchView = (view) => { dom.setupView.classList.toggle('active', view === 'setup'); dom.practiceView.classList.toggle('active', view === 'practice'); };
             const startPractice = async () => {
@@ -964,7 +951,7 @@
                     const level = dom.levelSelect.value; const method = dom.methodSelect.value; const textGenerator = practiceLevels[level][method];
                     // FIX 1: Normalize source text
                     const sourceText = (await textGenerator() || '').normalize("NFC");
-                    appState.config = { level: level, method: method, duration: parseInt(dom.durationSelect.value, 10) * 60, minusMarking: { enabled: dom.minusMarkingEnabled.checked, value: parseInt(dom.minusMarkingValue.value, 10) }, isDynamicText: level !== 'Free Hand' && level !== 'Uplode Your Text', textGenerator: textGenerator, sourceText: sourceText, };
+                    appState.config = { level: level, method: method, duration: parseInt(dom.durationSelect.value, 10) * 60, isDynamicText: level !== 'Free Hand' && level !== 'Uplode Your Text', textGenerator: textGenerator, sourceText: sourceText, };
                     if (!appState.config.sourceText && appState.config.level !== 'Free Hand') { appState.config.sourceText = getRandomFallback(appState.lang).normalize("NFC"); }
                     if (appState.config.level === 'Free Hand') {
                         dom.textDisplay.style.display = 'none'; dom.caret.style.display = 'none'; dom.freeHandArea.style.display = 'block'; dom.freeHandArea.value = '';
@@ -1011,33 +998,60 @@
                 const wrapper = dom.textDisplayWrapper;
                 const wrapperRect = wrapper.getBoundingClientRect();
 
-                let targetEl, targetRect, left, top;
-
+                let targetEl;
                 if (charIndex >= charElements.length) {
-                    // At the end of the text, position after the last character
+                    // At the end of the text, use the last character.
                     targetEl = charElements[charElements.length - 1];
-                    targetRect = targetEl.getBoundingClientRect();
-                    left = targetRect.right - wrapperRect.left;
-                    top = targetRect.top - wrapperRect.top;
                 } else {
-                    // Position at the beginning of the current character
+                    // Use the current character.
                     targetEl = charElements[charIndex];
-                    targetRect = targetEl.getBoundingClientRect();
-                    left = targetRect.left - wrapperRect.left;
-                    top = targetRect.top - wrapperRect.top;
                 }
                 
+                // If no target character (e.g., text is empty), hide caret.
+                if (!targetEl) {
+                    dom.caret.style.display = 'none';
+                    return;
+                }
+
+                const targetRect = targetEl.getBoundingClientRect();
+                
+                // Calculate caret's left position relative to the wrapper.
+                let left;
+                if (charIndex >= charElements.length) {
+                    // Position after the last character.
+                    left = targetRect.right - wrapperRect.left;
+                } else {
+                    // Position at the beginning of the current character.
+                    left = targetRect.left - wrapperRect.left;
+                }
+                
+                // **FIX 3**: Correctly calculate top position by accounting for the wrapper's scroll.
+                const top = targetRect.top - wrapperRect.top + wrapper.scrollTop;
+
                 dom.caret.style.left = `${left}px`;
                 dom.caret.style.top = `${top}px`;
 
-                // Auto-scroll logic (offsetTop is fine relative to its parent for scrolling)
-                const caretTopInWrapper = targetEl.offsetTop;
-                const caretHeight = targetEl.offsetHeight;
-                if (caretTopInWrapper < wrapper.scrollTop) {
-                    wrapper.scrollTop = caretTopInWrapper;
-                } else if (caretTopInWrapper + caretHeight > wrapper.scrollTop + wrapper.clientHeight) {
-                    wrapper.scrollTop = caretTopInWrapper + caretHeight - wrapper.clientHeight;
+                // **FIX 2**: Improved auto-scroll logic to keep the current line comfortably in view.
+                const caretLineTop = targetEl.offsetTop; // Position relative to parent (#text-display)
+                const caretLineHeight = targetEl.offsetHeight;
+                const wrapperHeight = wrapper.clientHeight;
+                const currentScrollTop = wrapper.scrollTop;
+
+                // Define a vertical "comfort zone" where no scrolling is needed.
+                // e.g., from 30% down to 70% down the visible area.
+                const comfortZoneTop = currentScrollTop + wrapperHeight * 0.3;
+                const comfortZoneBottom = currentScrollTop + wrapperHeight * 0.7;
+
+                if (caretLineTop < comfortZoneTop) {
+                    // If the current line is above the comfort zone, scroll up to re-center it.
+                    const newScrollTop = Math.max(0, caretLineTop - wrapperHeight * 0.4); // Aim for 40% from top
+                    wrapper.scrollTop = newScrollTop;
+                } else if (caretLineTop + caretLineHeight > comfortZoneBottom) {
+                    // If the current line is below the comfort zone, scroll down to re-center it.
+                    const newScrollTop = caretLineTop + caretLineHeight - wrapperHeight * 0.5; // Aim for 50% from top
+                    wrapper.scrollTop = newScrollTop;
                 }
+                // If within the comfort zone, do nothing to prevent distracting, jittery scrolling.
             };
             const updateStatsDisplay = () => {
                 const duration = appState.config.duration > 0 ? Math.max(0, appState.session.timeLeft) : (appState.isPracticeActive ? Math.floor((Date.now() - appState.session.startTime) / 1000) : 0);
@@ -1069,98 +1083,98 @@
             }
 
             const computeTypingMetrics = ({ referenceText = "", typedText = "", timeSeconds = 1 }) => {
-              // --- START OF CORRECTION ---
-              // This function is corrected to prevent counting untyped words as mistakes
-              // and to ensure that the total number of wrong words does not exceed the number of typed words.
-              
-              const warnings = [];
-              if (timeSeconds <= 0) {
-                warnings.push("Invalid timeSeconds; must be > 0. Using 1 second as fallback.");
-                timeSeconds = 1;
-              }
-              const ref = referenceText.trim().replace(/\s+/g, " ");
-              const typed = typedText.trim().replace(/\s+/g, " ");
-              const refWords = ref.length ? ref.split(" ") : [];
-              const typedWords = typed.length ? typed.split(" ") : [];
-              const totalKeystrokes = typed.length;
-              const wordsTypedCount = typedWords.length;
+                const warnings = [];
+                if (timeSeconds <= 0) {
+                    warnings.push("Invalid timeSeconds; must be > 0. Using 1 second as fallback.");
+                    timeSeconds = 1;
+                }
+                const ref = referenceText.trim().replace(/\s+/g, " ");
+                const typed = typedText.trim().replace(/\s+/g, " ");
+                const refWords = ref.length ? ref.split(" ") : [];
+                const typedWords = typed.length ? typed.split(" ") : [];
+                const totalKeystrokes = typed.length;
+                const wordsTypedCount = typedWords.length;
 
-              let fullMistakes = 0, halfMistakes = 0;
-              const perWord = [];
+                let fullMistakes = 0;
+                let halfMistakes = 0;
+                const perWord = [];
+                let refIndex = 0;
 
-              // CHANGE 1: Iterate only up to the number of words the user actually typed.
-              // This is the core fix. It prevents the loop from continuing through the rest of the
-              // reference text and marking all untyped words as "omitted" mistakes.
-              const comparisonLength = typedWords.length;
+                for (let i = 0; i < typedWords.length; i++) {
+                    const typedWord = typedWords[i];
 
-              for (let i = 0; i < comparisonLength; i++) {
-                const typedWord = typedWords[i];
-                const refWord = refWords[i] ?? null;
+                    if (refIndex >= refWords.length) {
+                        // User typed more words than available in the reference text.
+                        fullMistakes++;
+                        perWord.push({ source: null, typed: typedWord, status: "extra" });
+                        continue;
+                    }
 
-                if (refWord === null) {
-                  // This handles cases where the user types more words than are in the reference text.
-                  // These are considered "extra" words and are counted as full mistakes.
-                  fullMistakes++;
-                  perWord.push({ source: null, typed: typedWord, status: "extra" });
-                  continue;
+                    // Try to find a match for the typed word at or after the current reference index.
+                    let matchIndex = -1;
+                    // Look for an exact match in a small forward window to allow for skipped words.
+                    for (let j = 0; j < 5 && (refIndex + j) < refWords.length; j++) {
+                        if (refWords[refIndex + j] === typedWord) {
+                            matchIndex = refIndex + j;
+                            break;
+                        }
+                    }
+
+                    if (matchIndex !== -1) {
+                        // Found a match. Any words between refIndex and matchIndex are considered skipped.
+                        for (let k = refIndex; k < matchIndex; k++) {
+                            perWord.push({ source: refWords[k], typed: null, status: "full" });
+                            fullMistakes++;
+                        }
+                        // The matched word is correct.
+                        perWord.push({ source: refWords[matchIndex], typed: typedWord, status: "correct" });
+                        refIndex = matchIndex + 1;
+                    } else {
+                        // No exact match found nearby. This is a mistyped word (substitution or insertion).
+                        // We'll treat it as a substitution for the current reference word.
+                        const currentRefWord = refWords[refIndex];
+                        const distance = levenshtein(currentRefWord, typedWord);
+                        const threshold = Math.ceil(currentRefWord.length / 2);
+
+                        if (distance > 0 && distance < threshold) {
+                            halfMistakes++;
+                            perWord.push({ source: currentRefWord, typed: typedWord, status: "half" });
+                        } else {
+                            fullMistakes++;
+                            perWord.push({ source: currentRefWord, typed: typedWord, status: "full" });
+                        }
+                        refIndex++;
+                    }
+                }
+
+                // Any remaining words in the reference text are considered omitted but not counted as mistakes for score calculation.
+                if (refIndex < refWords.length) {
+                    for (let i = refIndex; i < refWords.length; i++) {
+                        perWord.push({ source: refWords[i], typed: null, status: "omitted" });
+                    }
                 }
                 
-                if (typedWord === refWord) {
-                  // The typed word matches the reference word.
-                  perWord.push({ source: refWord, typed: typedWord, status: "correct" });
-                  continue;
-                }
+                const totalWrongWords = fullMistakes + halfMistakes;
+                const errorPenaltyWords = fullMistakes + (halfMistakes / 2);
+                const minutes = timeSeconds / 60;
                 
-                // If we reach here, the words do not match, so it's a mistake.
-                // We use Levenshtein distance to determine if it's a half or full mistake.
-                // This logic remains the same as the original.
-                const distance = levenshtein(refWord, typedWord);
-                const threshold = Math.ceil(refWord.length / 2);
-                
-                if (distance > 0 && distance < threshold) {
-                  halfMistakes++;
-                  perWord.push({ source: refWord, typed: typedWord, status: "half" });
-                } else {
-                  fullMistakes++;
-                  perWord.push({ source: refWord, typed: typedWord, status: "full" });
-                }
-              }
+                const grossWPM = minutes > 0 ? (totalKeystrokes / 5) / minutes : 0;
+                const errorPenaltyRate = minutes > 0 ? errorPenaltyWords / minutes : 0;
+                const netWPM = Math.max(0, grossWPM - errorPenaltyRate);
+                const accuracy = grossWPM > 0 ? (netWPM / grossWPM) * 100 : 0;
 
-              // CHANGE 2: Handle the display of untyped (omitted) words for the results comparison UI.
-              // After checking the typed words, we loop through the remainder of the reference text.
-              // These words are marked as "omitted" for the visual comparison, but critically,
-              // they are NOT counted as mistakes, fixing the main bug.
-              if (refWords.length > typedWords.length) {
-                  for (let i = typedWords.length; i < refWords.length; i++) {
-                      perWord.push({ source: refWords[i], typed: null, status: "omitted" });
-                  }
-              }
-
-              const totalWrongWords = fullMistakes + halfMistakes;
-              
-              // The logic below for calculating WPM and accuracy remains unchanged, as requested.
-              // It now operates on the correctly calculated mistake counts.
-              const errorPenaltyWords = fullMistakes + (halfMistakes / 2);
-              const minutes = timeSeconds / 60;
-              
-              const grossWPM = minutes > 0 ? (totalKeystrokes / 5) / minutes : 0;
-              const errorPenaltyRate = minutes > 0 ? errorPenaltyWords / minutes : 0;
-              const netWPM = Math.max(0, grossWPM - errorPenaltyRate);
-              const accuracy = grossWPM > 0 ? (netWPM / grossWPM) * 100 : 0;
-
-              return {
-                totalKeystrokes,
-                wordsTypedCount,
-                fullMistakes,
-                halfMistakes,
-                totalWrongWords,
-                grossWPM: +grossWPM.toFixed(2),
-                netWPM: +netWPM.toFixed(2),
-                accuracyPercent: +accuracy.toFixed(2),
-                wordAnalysis: perWord,
-                warnings
-              };
-              // --- END OF CORRECTION ---
+                return {
+                    totalKeystrokes,
+                    wordsTypedCount,
+                    fullMistakes,
+                    halfMistakes,
+                    totalWrongWords,
+                    grossWPM: +grossWPM.toFixed(2),
+                    netWPM: +netWPM.toFixed(2),
+                    accuracyPercent: +accuracy.toFixed(2),
+                    wordAnalysis: perWord,
+                    warnings
+                };
             }
 
             const showResults = () => {
@@ -1177,8 +1191,7 @@
 
                 const isQualified = metrics.netWPM >= 30 && metrics.accuracyPercent >= 90;
                 
-                const minKeystrokes = 125 * timeTakenMin;
-                const keystrokeWarning = metrics.totalKeystrokes < minKeystrokes && timeTakenMin > 0 ? `Key strokes typed (${metrics.totalKeystrokes}) are less than minimum required (${Math.round(minKeystrokes)}). Calculation may be affected.` : (metrics.warnings.length > 0 ? metrics.warnings.join(' ') : '');
+                const keystrokeWarning = metrics.warnings.length > 0 ? metrics.warnings.join(' ') : '';
 
 
                 dom.newResults.passageTitle.textContent = `${appState.config.level}: ${appState.config.method}`;
@@ -1396,7 +1409,9 @@
 
 
             const renderProgressGraphs = (results) => {
-                if (results.length < 2) {
+                const recentResults = results.slice(-10);
+
+                if (recentResults.length < 2) {
                     dom.progressGraphsSection.style.display = 'none';
                     return;
                 }
@@ -1405,19 +1420,19 @@
                 if (speedChart) speedChart.destroy();
                 if (accuracyChart) accuracyChart.destroy();
 
-                const labels = results.map((_, i) => `Test ${i + 1}`);
+                const labels = recentResults.map((_, i) => `Test ${results.length - recentResults.length + i + 1}`);
                 const speedData = {
                     labels,
                     datasets: [
-                        { label: 'Gross WPM', data: results.map(r => r.grossWPM), borderColor: '#2196F3', tension: 0.1, backgroundColor: 'rgba(33, 150, 243, 0.1)', fill: true },
-                        { label: 'Net WPM', data: results.map(r => r.netWPM), borderColor: 'var(--primary-color)', tension: 0.1, backgroundColor: 'rgba(76, 175, 80, 0.1)', fill: true }
+                        { label: 'Gross WPM', data: recentResults.map(r => r.grossWPM), borderColor: '#2196F3', tension: 0.1, backgroundColor: 'rgba(33, 150, 243, 0.1)', fill: true },
+                        { label: 'Net WPM', data: recentResults.map(r => r.netWPM), borderColor: 'var(--primary-color)', tension: 0.1, backgroundColor: 'rgba(76, 175, 80, 0.1)', fill: true }
                     ]
                 };
                 const accuracyData = {
                     labels,
                     datasets: [
-                        { label: 'Accuracy (%)', data: results.map(r => r.accuracy), borderColor: '#FFC107', tension: 0.1, yAxisID: 'y', backgroundColor: 'rgba(255, 193, 7, 0.1)', fill: true },
-                        { label: 'Errors', data: results.map(r => r.errors), borderColor: 'var(--error-color)', tension: 0.1, yAxisID: 'y1', backgroundColor: 'rgba(244, 67, 54, 0.1)', fill: true }
+                        { label: 'Accuracy (%)', data: recentResults.map(r => r.accuracy), borderColor: '#FFC107', tension: 0.1, yAxisID: 'y', backgroundColor: 'rgba(255, 193, 7, 0.1)', fill: true },
+                        { label: 'Errors', data: recentResults.map(r => r.errors), borderColor: 'var(--error-color)', tension: 0.1, yAxisID: 'y1', backgroundColor: 'rgba(244, 67, 54, 0.1)', fill: true }
                     ]
                 };
                 
@@ -1440,7 +1455,6 @@
                 const visitCountEl = document.getElementById("visitCount"); if (visitCountEl) { let count = parseInt(localStorage.getItem("visitorCount") || "0"); count++; localStorage.setItem("visitorCount", String(count)); visitCountEl.textContent = count.toLocaleString(); }
                 dom.levelSelect.addEventListener('change', populateMethods);
                 dom.methodSelect.addEventListener('change', handleMethodChange);
-                dom.minusMarkingEnabled.addEventListener('change', (e) => { dom.minusMarkingValue.disabled = !e.target.checked; });
                 [dom.langEnglishBtn, dom.langHindiBtn].forEach(btn => {
                     btn.addEventListener('click', () => {
                         dom.langEnglishBtn.classList.remove('active');
