@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -337,6 +336,30 @@
             max-height: calc(100vh - 2rem);
             overflow-y: auto;
         }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        .results-content.sad {
+            animation: shake 0.5s;
+        }
+
+        @keyframes celebrate-fall {
+            0% { transform: translateY(-100px) rotateZ(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotateZ(720deg); opacity: 0; }
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2000;
+            animation-name: celebrate-fall;
+            animation-timing-function: linear;
+        }
 
         .results-header {
             display: flex;
@@ -429,11 +452,12 @@
             padding: 1px 0;
         }
 
-        .correct-word { color: var(--primary-color); }
-        .wrong-word { color: var(--error-color); background-color: rgba(244, 67, 54, 0.2); text-decoration: line-through; }
-        .half-mistake-word { color: #FFA500; background-color: rgba(255, 165, 0, 0.2); text-decoration: underline; text-decoration-style: wavy; }
-        .omitted-word { background-color: rgba(244, 67, 54, 0.3); border-radius: 3px; padding: 0 2px; }
-        .merged-word, .split-word, .space-error-word { color: #FFC107; background-color: rgba(255, 193, 7, 0.2); text-decoration: underline; text-decoration-style: dotted; }
+        .correct-word, .passage-display .correct { color: var(--primary-color); }
+        .wrong-word, .passage-display .full { color: var(--error-color); background-color: rgba(244, 67, 54, 0.2); text-decoration: line-through; }
+        .half-mistake-word, .passage-display .half { color: #FFA500; background-color: rgba(255, 165, 0, 0.2); text-decoration: underline wavy; }
+        .omitted-word, .passage-display .omitted { background-color: rgba(158, 158, 158, 0.3); border-radius: 3px; padding: 0 2px; }
+        .passage-display .extra { color: var(--error-color); background-color: rgba(244, 67, 54, 0.2); }
+        .passage-display .merged, .passage-display .split, .passage-display .space-error { color: #ff9800; background-color: rgba(255, 152, 0, 0.2); }
 
 
         .results-actions {
@@ -762,6 +786,7 @@
                 submitBtn: document.getElementById('submit-test-btn'),
 
                 resultsModal: document.getElementById('results-modal'),
+                resultsContent: document.querySelector('.results-content'),
                 newResults: {
                     passageTitle: document.getElementById('res-passage-title'),
                     timeDuration: document.getElementById('res-time-duration'),
@@ -789,6 +814,7 @@
                 },
                 langEnglishBtn: document.getElementById('lang-english-btn'),
                 langHindiBtn: document.getElementById('lang-hindi-btn'),
+                // New analytics elements
                 practiceDurationSummary: document.getElementById('practice-duration-summary'),
                 resTodayPracticeTime: document.getElementById('res-today-practice-time'),
                 resTotalPracticeTime: document.getElementById('res-total-practice-time'),
@@ -808,17 +834,21 @@
             };
             
             const computeTypingMetrics = ({ referenceText = "", typedText = "", timeSeconds = 1 }) => {
-                const normalizeText = (txt) => txt
-                    .replace(/\u200B|\u200C|\u200D/g, "")
-                    .replace(/\r?\n/g, " ")
-                    .replace(/\s+/g, " ")
-                    .replace(/[\u0964\u0965]/g, ".")
-                    .trim();
+                const typedWordsArray = typedText.trim().split(/\s+/).filter(Boolean);
+                const referenceSlice = referenceText.trim().split(/\s+/).filter(Boolean).slice(0, typedWordsArray.length).join(" ");
+            
+                const normalizeText = (t) =>
+                    t
+                        .replace(/\u200B|\u200C|\u200D/g, "")   // remove zero-width characters
+                        .replace(/\s+/g, " ")                   // normalize spaces
+                        .replace(/[\u0964\u0965]/g, ".")        // convert Hindi danda to dot
+                        .trim();
 
-                const ref = normalizeText(referenceText);
+                const ref = normalizeText(referenceSlice);
                 const typed = normalizeText(typedText);
-                const refWords = ref.split(" ").filter(Boolean);
-                const typedWords = typed.split(" ").filter(Boolean);
+                const refWords = ref.length > 0 ? ref.split(" ") : [];
+                const typedWords = typed.length > 0 ? typed.split(" ") : [];
+
                 if (!timeSeconds || timeSeconds <= 0) timeSeconds = 1;
 
                 const levenshtein = (a, b) => {
@@ -826,14 +856,14 @@
                     for (let i = 0; i <= a.length; i++) dp[i][0] = i;
                     for (let j = 0; j <= b.length; j++) dp[0][j] = j;
                     for (let i = 1; i <= a.length; i++) {
-                    for (let j = 1; j <= b.length; j++) {
-                        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-                        dp[i][j] = Math.min(
-                        dp[i - 1][j] + 1,
-                        dp[i][j - 1] + 1,
-                        dp[i - 1][j - 1] + cost
-                        );
-                    }
+                        for (let j = 1; j <= b.length; j++) {
+                            const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                            dp[i][j] = Math.min(
+                                dp[i - 1][j] + 1,
+                                dp[i][j - 1] + 1,
+                                dp[i - 1][j - 1] + cost
+                            );
+                        }
                     }
                     return dp[a.length][b.length];
                 };
@@ -843,48 +873,51 @@
                     const dp = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
                     for (let i = 0; i <= n; i++) dp[i][0] = i;
                     for (let j = 0; j <= m; j++) dp[0][j] = j;
+
                     for (let i = 1; i <= n; i++) {
-                    for (let j = 1; j <= m; j++) {
-                        const cost = refWords[i - 1] === typedWords[j - 1] ? 0 : 1;
-                        dp[i][j] = Math.min(
-                        dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost
-                        );
+                        for (let j = 1; j <= m; j++) {
+                            const cost = refWords[i - 1] === typedWords[j - 1] ? 0 : 1;
+                            dp[i][j] = Math.min(
+                                dp[i - 1][j] + 1,       // omission
+                                dp[i][j - 1] + 1,       // insertion (extra)
+                                dp[i - 1][j - 1] + cost // substitution
+                            );
+                        }
                     }
-                    }
-                    const res = [];
+
+                    const aligned = [];
                     let i = n, j = m;
                     while (i > 0 || j > 0) {
-                    if (i > 0 && j > 0 && refWords[i - 1] === typedWords[j - 1]) {
-                        res.unshift({ source: refWords[i - 1], typed: typedWords[j - 1], status: "correct" });
-                        i--; j--;
-                    } else if (i > 0 && j > 0 && dp[i][j] === dp[i - 1][j - 1] + 1) {
-                        res.unshift({ source: refWords[i - 1], typed: typedWords[j - 1], status: "full" });
-                        i--; j--;
-                    } else if (i > 0 && dp[i][j] === dp[i - 1][j] + 1) {
-                        res.unshift({ source: refWords[i - 1], typed: null, status: "omitted" });
-                        i--;
-                    } else {
-                        res.unshift({ source: null, typed: typedWords[j - 1], status: "extra" });
-                        j--;
+                        if (i > 0 && j > 0 && refWords[i - 1] === typedWords[j - 1]) {
+                            aligned.unshift({ source: refWords[i - 1], typed: typedWords[j - 1], status: "correct" });
+                            i--; j--;
+                        } else if (i > 0 && j > 0 && dp[i][j] === dp[i - 1][j - 1] + 1) {
+                            aligned.unshift({ source: refWords[i - 1], typed: typedWords[j - 1], status: "full" });
+                            i--; j--;
+                        } else if (i > 0 && dp[i][j] === dp[i - 1][j] + 1) {
+                            aligned.unshift({ source: refWords[i - 1], typed: null, status: "omitted" });
+                            i--;
+                        } else {
+                            aligned.unshift({ source: null, typed: typedWords[j - 1], status: "extra" });
+                            j--;
+                        }
                     }
-                    }
-                    return res;
+                    return aligned;
                 };
 
                 const perWord = alignWords(refWords, typedWords);
-                perWord.forEach(item => {
+
+                perWord.forEach((item) => {
                     if (item.status === "full" && item.source && item.typed) {
-                    const dist = levenshtein(item.source, item.typed);
-                    const len = Math.max(item.source.length, item.typed.length);
-                    if (dist / len <= 0.4) item.status = "half";
+                        const distance = levenshtein(item.source, item.typed);
+                        const len = Math.max(item.source.length, item.typed.length);
+                        const ratio = distance / len;
+                        if (ratio <= 0.4) item.status = "half";
                     }
-                    if (item.source && item.typed) {
-                    if (item.typed.includes(item.source) && item.typed.length >= item.source.length * 2)
-                        item.status = "merged";
-                    if (item.source.length > 4 && item.typed.includes(" "))
-                        item.status = "split";
-                    if (item.source.replace(/\s/g, "") === item.typed.replace(/\s/g, "") && item.source !== item.typed)
-                        item.status = "space-error";
+                    if (item.typed && item.typed.includes(item.source) && item.typed.length > item.source.length + 2) item.status = "merged";
+                    if (item.source && item.source.length > 4 && item.typed && item.typed.includes(" ")) item.status = "split";
+                    if (item.source && item.typed && item.source.replace(/\s/g, "") === item.typed.replace(/\s/g, "")) {
+                        if (item.source !== item.typed) item.status = "space-error";
                     }
                 });
 
@@ -897,22 +930,16 @@
                 const wordsTypedCount = typedWords.length;
                 const minutes = timeSeconds / 60;
                 const grossWPM = (totalKeystrokes / 5) / minutes;
-                const errorPenalty = (fullMistakes + halfMistakes / 2 + omittedWords + extraWords) / minutes;
+                const errorPenalty = (fullMistakes + halfMistakes / 2) / minutes; // Omitted and extra words are NOT penalized
                 const netWPM = Math.max(0, grossWPM - errorPenalty);
                 const accuracy = grossWPM > 0 ? (netWPM / grossWPM) * 100 : 0;
 
                 return {
-                    totalKeystrokes,
-                    wordsTypedCount,
-                    fullMistakes,
-                    halfMistakes,
-                    omittedWords,
-                    extraWords,
-                    totalMistakes,
-                    grossWPM: +grossWPM.toFixed(2),
-                    netWPM: +netWPM.toFixed(2),
-                    accuracyPercent: +accuracy.toFixed(2),
-                    wordAnalysis: perWord
+                    totalKeystrokes, wordsTypedCount, fullMistakes, halfMistakes,
+                    omittedWords, extraWords, totalMistakes,
+                    grossWPM: +grossWPM.toFixed(2), netWPM: +netWPM.toFixed(2),
+                    accuracyPercent: +accuracy.toFixed(2), wordAnalysis: perWord,
+                    referenceSlice // Return the slice for comparison display
                 };
             };
             
@@ -975,7 +1002,7 @@
                 "Uplode Your Text": { "Paste Your Text And Start Practice": () => Promise.resolve(dom.pasteTextArea.value) }
             };
             let appState = {};
-            let speedChart, accuracyChart;
+            let speedChart, accuracyChart; // Chart instances
             const BACKUP_KEY = 'ExamYatriTypingPermanentBackup';
             const DURATION_KEYS = {
                 TODAY: 'ExamYatriTodayPracticeTime',
@@ -999,14 +1026,14 @@
             };
 
             const updatePracticeTime = (sessionSeconds) => {
-                const today = new Date().toISOString().slice(0, 10);
+                const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
                 const lastPracticeDate = localStorage.getItem(DURATION_KEYS.DATE);
                 
                 let todaySeconds = parseInt(localStorage.getItem(DURATION_KEYS.TODAY) || '0', 10);
                 let totalSeconds = parseInt(localStorage.getItem(DURATION_KEYS.TOTAL) || '0', 10);
                 
                 if (today !== lastPracticeDate) {
-                    todaySeconds = 0;
+                    todaySeconds = 0; // Reset for new day
                 }
                 
                 todaySeconds += sessionSeconds;
@@ -1069,57 +1096,27 @@
              const updateCaretPosition = () => {
                 const charElements = dom.textDisplay.querySelectorAll('.char');
                 const charIndex = appState.session.charIndex;
-
-                if (charElements.length === 0) {
-                    dom.caret.style.display = 'none';
-                    return;
-                }
-
+                if (charElements.length === 0) { dom.caret.style.display = 'none'; return; }
                 dom.caret.style.display = 'block';
-
                 const wrapper = dom.textDisplayWrapper;
                 const wrapperRect = wrapper.getBoundingClientRect();
-
-                let targetEl;
-                if (charIndex >= charElements.length) {
-                    targetEl = charElements[charElements.length - 1];
-                } else {
-                    targetEl = charElements[charIndex];
-                }
-                
-                if (!targetEl) {
-                    dom.caret.style.display = 'none';
-                    return;
-                }
-
+                let targetEl = charIndex >= charElements.length ? charElements[charElements.length - 1] : charElements[charIndex];
+                if (!targetEl) { dom.caret.style.display = 'none'; return; }
                 const targetRect = targetEl.getBoundingClientRect();
-                
-                let left;
-                if (charIndex >= charElements.length) {
-                    left = targetRect.right - wrapperRect.left;
-                } else {
-                    left = targetRect.left - wrapperRect.left;
-                }
-                
+                let left = charIndex >= charElements.length ? targetRect.right - wrapperRect.left : targetRect.left - wrapperRect.left;
                 const top = targetRect.top - wrapperRect.top + wrapper.scrollTop;
-
                 dom.caret.style.left = `${left}px`;
                 dom.caret.style.top = `${top}px`;
-
                 const caretLineTop = targetEl.offsetTop;
                 const caretLineHeight = targetEl.offsetHeight;
                 const wrapperHeight = wrapper.clientHeight;
                 const currentScrollTop = wrapper.scrollTop;
-
                 const comfortZoneTop = currentScrollTop + wrapperHeight * 0.3;
                 const comfortZoneBottom = currentScrollTop + wrapperHeight * 0.7;
-
                 if (caretLineTop < comfortZoneTop) {
-                    const newScrollTop = Math.max(0, caretLineTop - wrapperHeight * 0.4);
-                    wrapper.scrollTop = newScrollTop;
+                    wrapper.scrollTop = Math.max(0, caretLineTop - wrapperHeight * 0.4);
                 } else if (caretLineTop + caretLineHeight > comfortZoneBottom) {
-                    const newScrollTop = caretLineTop + caretLineHeight - wrapperHeight * 0.5;
-                    wrapper.scrollTop = newScrollTop;
+                    wrapper.scrollTop = caretLineTop + caretLineHeight - wrapperHeight * 0.5;
                 }
             };
             const updateStatsDisplay = () => {
@@ -1163,11 +1160,12 @@
                 dom.newResults.resultText.textContent = isQualified ? "Qualified" : "Not Qualified";
                 dom.newResults.resultCard.className = isQualified ? 'result-card qualified' : 'result-card not-qualified';
                 
-                const errorPenaltyWords = metrics.fullMistakes + (metrics.halfMistakes / 2) + metrics.omittedWords + metrics.extraWords;
+                const errorPenaltyWords = metrics.fullMistakes + (metrics.halfMistakes / 2);
                 const formulaParts = [
-                    `<code>Error Penalty = Full(${metrics.fullMistakes}) + Half(${metrics.halfMistakes}÷2) + Omitted(${metrics.omittedWords}) + Extra(${metrics.extraWords}) = ${errorPenaltyWords.toFixed(2)} words</code>`,
-                    `<code>Gross WPM = (Total Chars ÷ 5) ÷ Time = (${metrics.totalKeystrokes} ÷ 5) ÷ ${timeTakenMin.toFixed(2)} = ${metrics.grossWPM.toFixed(2)}</code>`,
+                    `<code>Error Penalty = Full (${metrics.fullMistakes}) + Half (${metrics.halfMistakes} ÷ 2) = ${errorPenaltyWords.toFixed(2)} words</code>`,
+                    `<code>Gross WPM = (Total Chars Typed ÷ 5) ÷ Time = (${metrics.totalKeystrokes} ÷ 5) ÷ ${timeTakenMin.toFixed(2)} = ${metrics.grossWPM.toFixed(2)}</code>`,
                     `<code>Net WPM = Gross WPM - (Error Penalty ÷ Time) = ${metrics.grossWPM.toFixed(2)} - (${errorPenaltyWords.toFixed(2)} ÷ ${timeTakenMin.toFixed(2)}) = ${metrics.netWPM.toFixed(2)}</code>`,
+                    `<code>Note: Omitted and Extra words are not penalized in Net WPM.</code>`
                 ];
                 dom.newResults.formulaNote.innerHTML = formulaParts.join('\n');
 
@@ -1175,31 +1173,18 @@
                 metrics.wordAnalysis.forEach(({ source, typed, status }) => {
                     const s = source || '';
                     const t = typed || '';
-                    let statusClass = '';
-                    switch(status) {
-                        case 'correct': statusClass = 'correct-word'; break;
-                        case 'half': statusClass = 'half-mistake-word'; break;
-                        case 'full': statusClass = 'wrong-word'; break;
-                        case 'omitted': statusClass = 'omitted-word'; break;
-                        case 'extra': statusClass = 'wrong-word'; break;
-                        case 'merged': statusClass = 'merged-word'; break;
-                        case 'split': statusClass = 'split-word'; break;
-                        case 'space-error': statusClass = 'space-error-word'; break;
-                    }
-
-                    if (status === 'omitted') {
-                         originalHTML += `<span class="${statusClass}">${s}</span> `;
-                         typedHTML += ` `;
-                    } else if (status === 'extra') {
-                        originalHTML += ` `;
-                        typedHTML += `<span class="${statusClass}">${t}</span> `;
-                    } else {
-                        originalHTML += `<span class="${statusClass}">${s}</span> `;
-                        typedHTML += `<span class="${statusClass}">${t}</span> `;
-                    }
+                    const statusClass = status === 'full' ? 'wrong-word' : status;
+                    if (source) originalHTML += `<span class="${statusClass}">${s}</span> `;
+                    if (typed) typedHTML += `<span class="${statusClass}">${t}</span> `;
+                    else if(status === 'omitted') typedHTML += ' ';
                 });
+                
+                const originalPassageWords = appState.config.sourceText.trim().split(/\s+/).filter(Boolean);
+                const referenceSliceWords = metrics.referenceSlice.trim().split(/\s+/).filter(Boolean);
+                const untypedWords = originalPassageWords.slice(referenceSliceWords.length);
+                const untypedHTML = untypedWords.map(word => `<span class="omitted-word">${word}</span>`).join(' ');
 
-                dom.newResults.originalPassage.innerHTML = originalHTML;
+                dom.newResults.originalPassage.innerHTML = originalHTML + ' ' + untypedHTML;
                 dom.newResults.typedPassage.innerHTML = typedHTML;
 
                 const currentResult = {
@@ -1230,6 +1215,22 @@
                 renderAnalytics(allResults);
 
                 dom.resultsModal.classList.add('active');
+
+                if (metrics.totalMistakes === 0 && metrics.wordsTypedCount > 0) {
+                     for (let i = 0; i < 40; i++) {
+                        const confetti = document.createElement("div");
+                        confetti.className = "confetti";
+                        confetti.style.left = Math.random() * 100 + "vw";
+                        confetti.style.top = "-20px";
+                        confetti.style.background = `hsl(${Math.random()*360},100%,60%)`;
+                        confetti.style.animationDuration = Math.random()*2+3 + "s";
+                        document.body.appendChild(confetti);
+                        setTimeout(() => confetti.remove(), 5000);
+                    }
+                } else {
+                    dom.resultsContent.classList.add("sad");
+                    setTimeout(() => dom.resultsContent.classList.remove("sad"), 600);
+                }
             };
 
             const hideResults = () => {
@@ -1356,7 +1357,7 @@
                     tips.push("A high number of errors is reducing your Net Speed. Focus on accuracy to see a big improvement.");
                 }
 
-                if (backspaceCount > (currentResult.keystrokes / 20)) {
+                if (backspaceCount > (currentResult.keystrokes / 20)) { // If backspace is more than 5% of keystrokes
                     tips.push("You're using the backspace key frequently. Try to type more deliberately to build a better rhythm and flow.");
                 }
                 
