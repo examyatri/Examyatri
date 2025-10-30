@@ -1465,5 +1465,33 @@
             init();
         });
     </script>
+    <!-- 🌐 Visitor Counter Section -->
+<div id="visitor-counter" style="text-align:center; margin-top:40px; padding:20px; font-family:'Roboto Mono', monospace;">
+  <p style="color:#aaa; font-size:14px; margin-bottom:6px;">👁️ Visitors Count</p>
+  <a href="https://hits.sh/examyatri.live/Typing.html/" target="_blank" style="text-decoration:none;">
+    <img id="hit-badge"
+         src="https://hits.sh/examyatri.live/Typing.html.svg?view=today-total&style=for-the-badge&color=brightgreen&label=ExamYatri%20Visitors"
+         alt="Visitor Counter"
+         style="transition: transform 0.4s ease, filter 0.4s ease; border-radius:8px;"/>
+  </a>
+  <p id="visitor-text" style="font-size:13px; color:#888; margin-top:8px;">Counting all visits today and total 🚀</p>
+</div>
+
+<!-- ✨ Animation Script -->
+<script>
+  const badge = document.getElementById('hit-badge');
+  const text = document.getElementById('visitor-text');
+  let glow = 0;
+
+  // Add pulse animation effect
+  setInterval(() => {
+    glow = (glow + 1) % 360;
+    badge.style.filter = `drop-shadow(0 0 10px hsl(${glow}, 100%, 70%))`;
+  }, 100);
+
+  // Hover scale effect
+  badge.addEventListener('mouseenter', () => badge.style.transform = 'scale(1.1)');
+  badge.addEventListener('mouseleave', () => badge.style.transform = 'scale(1)');
+</script>
 </body>
 </html>
