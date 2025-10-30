@@ -1600,7 +1600,7 @@ function showQuizSavedNotification() {
                 <span class="timer-face" id="face-happy">😊</span><span class="timer-face" id="face-worried">😟</span>
                 <span class="timer-face" id="face-sad">😥</span><span class="timer-face" id="face-crying">😭</span>
                 <span id="timer-text">00:00</span>
-              <span id="total-timer" style="font-size:0.9em; color:#aaa; margin-left:8px;">Total: 00:00</span>
+<span id="total-timer" style="margin-left:8px; color:#ffeb3b; font-weight:600; display:none;" style="margin-left:8px; color:#ffeb3b; font-weight:600; display:none;" style="margin-left:8px; color:#ffeb3b; font-weight:600;">Total: 00:00</span>
             </span>
             <span id="progress"></span>
             <div id="pressure-mode-container">
@@ -3966,17 +3966,32 @@ function generateTopicPrompt() {
     function triggerCongratsAnimation() { elements.congratsAnimationContainer.innerHTML = ''; const emojis = ['🎉', '🤩', '🥳', '✨', '👍', '💯']; for (let i = 0; i < 30; i++) { const emojiSpan = document.createElement('span'); emojiSpan.className = 'congrats-emoji'; emojiSpan.textContent = emojis[Math.floor(Math.random() * emojis.length)]; const angle = Math.random() * Math.PI * 2; const radius = Math.random() * (window.innerWidth / 2); const endX = Math.cos(angle) * radius; const endY = Math.sin(angle) * radius; emojiSpan.style.setProperty('--transform-end', `translate(${endX}px, ${endY}px)`); elements.congratsAnimationContainer.appendChild(emojiSpan); } clapSound.currentTime = 0; clapSound.play(); }
     function showSadReaction() { const sadEmojis = ['😥', '😭', '🤦', '😫']; elements.sadReactionEmoji.textContent = sadEmojis[Math.floor(Math.random() * sadEmojis.length)]; elements.sadReactionOverlay.classList.remove('hidden'); setTimeout(() => { elements.sadReactionOverlay.classList.add('hidden'); }, 1500); }
     function loadPressureModeSettings() { const shakeEnabled = localStorage.getItem('shakeReminderEnabled'); isShakeReminderEnabled = shakeEnabled === null ? true : shakeEnabled === 'true'; elements.shakeReminderToggle.checked = isShakeReminderEnabled; }
-    function resetAndStartQuestionTimer() { clearInterval(timerId); questionStartTime = new Date(); const emojiSequence = [elements.faces.happy, elements.faces.worried, elements.faces.sad, elements.faces.crying]; const updateTimerDisplay = () => { if (!questionStartTime) return; const elapsedTime = Math.round((new Date() - questionStartTime) / 1000); elements.timerText.textContent = `${String(Math.floor(elapsedTime / 60)).padStart(2, '0')}:${String(elapsedTime % 60).padStart(2, '0')}`; const emojiIntervalIndex = Math.floor(elapsedTime / 15); const currentEmoji = emojiSequence[emojiIntervalIndex % emojiSequence.length]; if (currentEmoji && !currentEmoji.classList.contains('visible')) { emojiSequence.forEach(face => face.classList.remove('visible')); currentEmoji.classList.add('visible'); } const pressureTextEl = document.getElementById('pressure-text-animation'); if (elapsedTime >= 45 && userAnswers[currentQuestionIndex].status !== 'answered') { if (isShakeReminderEnabled) { const checkBtn = document.getElementById('check-answer-btn'); if (checkBtn) checkBtn.classList.add('vibrating'); } if (pressureTextEl) { document.getElementById('pressure-mode-toggle-btn').classList.add('hidden'); pressureTextEl.classList.remove('hidden'); pressureTextEl.textContent = `Tik Tik ${pressureTextCounter}`; pressureTextCounter++; } } }; updateTimerDisplay(); timerId = setInterval(updateTimerDisplay, 1000); }
-  // Update total practice time (live)
-if (typeof totalSeconds === 'undefined') totalSeconds = 0;
-totalSeconds++;
-const totalTimerEl = document.getElementById('total-timer');
-if (totalTimerEl) {
-  totalTimerEl.textContent =
-    "Total: " + String(Math.floor(totalSeconds / 60)).padStart(2, '0') + ":" +
-    String(totalSeconds % 60).padStart(2, '0'); }
+    function resetAndStartQuestionTimer() {
+  currentQuestionStartTime = Date.now();
+ clearInterval(timerId); questionStartTime = new Date(); const emojiSequence = [elements.faces.happy, elements.faces.worried, elements.faces.sad, elements.faces.crying]; const updateTimerDisplay = () => { if (!questionStartTime) return; const elapsedTime = Math.round((new Date() - questionStartTime) / 1000); elements.timerText.textContent = `${String(Math.floor(elapsedTime / 60)).padStart(2, '0')}:${String(elapsedTime % 60).padStart(2, '0')}`; const emojiIntervalIndex = Math.floor(elapsedTime / 15); const currentEmoji = emojiSequence[emojiIntervalIndex % emojiSequence.length]; if (currentEmoji && !currentEmoji.classList.contains('visible')) { emojiSequence.forEach(face => face.classList.remove('visible')); currentEmoji.classList.add('visible'); } const pressureTextEl = document.getElementById('pressure-text-animation'); if (elapsedTime >= 45 && userAnswers[currentQuestionIndex].status !== 'answered') { if (isShakeReminderEnabled) { const checkBtn = document.getElementById('check-answer-btn'); if (checkBtn) checkBtn.classList.add('vibrating'); } if (pressureTextEl) { document.getElementById('pressure-mode-toggle-btn').classList.add('hidden'); pressureTextEl.classList.remove('hidden'); pressureTextEl.textContent = `Tik Tik ${pressureTextCounter}`; pressureTextCounter++; } } }; updateTimerDisplay(); timerId = setInterval(updateTimerDisplay, 1000); }
+/* START total timer insertion */
+if (!window.totalTimerStarted) {
+  window.totalSeconds = window.totalSeconds || 0;
+  window.totalTimerInterval = setInterval(function() {
+    window.totalSeconds++;
+    var el = document.getElementById('total-timer');
+    if (el) {
+      el.textContent = 'Total: ' + String(Math.floor(window.totalSeconds/60)).padStart(2,'0') + ':' + String(window.totalSeconds%60).padStart(2,'0');
+      el.style.color = '#ffeb3b';
+      el.style.fontWeight = '600';
+    }
+  }, 1000);
+  window.totalTimerStarted = true;
+}
+/* END total timer insertion */
+
     function startQuiz(){ showScreen('player'); quizStartTime=new Date(); currentQuestionIndex=0; userAnswers=quizData.map((q, i)=>({selected:null,isCorrect:null,status:'unseen', startTime: null, endTime: null})); bookmarkedQuestions.clear(); originalQuizData=JSON.parse(JSON.stringify(quizData)); loadQuestion(0); }
-    function loadQuestion(index){ if(index<0||index>=originalQuizData.length)return; currentQuestionIndex=index;selectedOptionIndex=null; const question=originalQuizData[currentQuestionIndex]; const answer=userAnswers[currentQuestionIndex]; elements.congratsAnimationContainer.innerHTML = ''; if (!clapSound.paused) { clapSound.pause(); clapSound.currentTime = 0; } pressureTextCounter = 1; const pressureTextEl = document.getElementById('pressure-text-animation'); if(pressureTextEl) pressureTextEl.classList.add('hidden'); document.getElementById('pressure-mode-toggle-btn').classList.remove('hidden'); if(answer.status==='answered'){ clearInterval(timerId); elements.timerText.textContent="--:--"; Object.values(elements.faces).forEach(face=>face.classList.remove('visible')) } else { resetAndStartQuestionTimer() } updateQuestionUI(question); updateOptionsAndExplanationState(); updateQuizActions(); if (window.MathJax) MathJax.typesetPromise([elements.quizPlayerContainer]); }
+    function loadQuestion(index){
+  // Add previous question time to total when navigating
+  try{ if (typeof currentQuestionIndex !== 'undefined' && currentQuestionIndex >= 0) stopQuestionTimerAndAddToTotal(); }catch(e){}
+ if(index<0||index>=originalQuizData.length)return; currentQuestionIndex=index;selectedOptionIndex=null; const question=originalQuizData[currentQuestionIndex]; const answer=userAnswers[currentQuestionIndex]; elements.congratsAnimationContainer.innerHTML = ''; if (!clapSound.paused) { clapSound.pause(); clapSound.currentTime = 0; } pressureTextCounter = 1; const pressureTextEl = document.getElementById('pressure-text-animation'); if(pressureTextEl) pressureTextEl.classList.add('hidden'); document.getElementById('pressure-mode-toggle-btn').classList.remove('hidden'); if(answer.status==='answered'){ clearInterval(timerId); elements.timerText.textContent="--:--"; Object.values(elements.faces).forEach(face=>face.classList.remove('visible')) } else { resetAndStartQuestionTimer() } updateQuestionUI(question); updateOptionsAndExplanationState(); updateQuizActions(); if (window.MathJax) MathJax.typesetPromise([elements.quizPlayerContainer]); 
+    try{ const totalEl = document.getElementById('total-timer'); if(totalEl){ if(index===0){ totalEl.style.display='none'; } else { totalEl.style.display='inline'; updateTotalTimerDisplay(); } } }catch(e){}
+}
     function updateQuestionUI(q) {
         elements.questionTopic.textContent = quizMetaData.topic || "";
         elements.progress.textContent = `Question ${currentQuestionIndex + 1} / ${originalQuizData.length}`;
