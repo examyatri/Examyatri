@@ -336,30 +336,6 @@
             max-height: calc(100vh - 2rem);
             overflow-y: auto;
         }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
-        }
-        .results-content.sad {
-            animation: shake 0.5s;
-        }
-
-        @keyframes celebrate-fall {
-            0% { transform: translateY(-100px) rotateZ(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotateZ(720deg); opacity: 0; }
-        }
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 2000;
-            animation-name: celebrate-fall;
-            animation-timing-function: linear;
-        }
 
         .results-header {
             display: flex;
@@ -452,12 +428,25 @@
             padding: 1px 0;
         }
 
-        .correct-word, .passage-display .correct { color: var(--primary-color); }
-        .wrong-word, .passage-display .full { color: var(--error-color); background-color: rgba(244, 67, 54, 0.2); text-decoration: line-through; }
-        .half-mistake-word, .passage-display .half { color: #FFA500; background-color: rgba(255, 165, 0, 0.2); text-decoration: underline wavy; }
-        .omitted-word, .passage-display .omitted { background-color: rgba(158, 158, 158, 0.3); border-radius: 3px; padding: 0 2px; }
-        .passage-display .extra { color: var(--error-color); background-color: rgba(244, 67, 54, 0.2); }
-        .passage-display .merged, .passage-display .split, .passage-display .space-error { color: #ff9800; background-color: rgba(255, 152, 0, 0.2); }
+        .correct-word {
+            color: var(--primary-color);
+        }
+        .wrong-word {
+            color: var(--error-color);
+            background-color: rgba(244, 67, 54, 0.2);
+            text-decoration: line-through;
+        }
+        .half-mistake-word {
+            color: #FFA500; /* Orange */
+            background-color: rgba(255, 165, 0, 0.2);
+            text-decoration: underline;
+            text-decoration-style: wavy;
+        }
+        .omitted-word {
+            background-color: rgba(244, 67, 54, 0.3);
+            border-radius: 3px;
+            padding: 0 2px;
+        }
 
 
         .results-actions {
@@ -753,7 +742,7 @@
 
     <textarea id="hidden-input" autofocus autocapitalize="none" autocorrect="off"></textarea>
     
-    <footer style="margin-top: auto; padding: 1rem 0; font-size: 0.9rem; color: #888; border-top: 1px solid var(--border-color); display:none;">
+    <footer style="margin-top: auto; padding: 1rem 0; font-size: 0.9rem; color: #888; border-top: 1px solid var(--border-color);">
         Visitor Count: <span id="visitCount">0</span>
     </footer>
 
@@ -786,7 +775,6 @@
                 submitBtn: document.getElementById('submit-test-btn'),
 
                 resultsModal: document.getElementById('results-modal'),
-                resultsContent: document.querySelector('.results-content'),
                 newResults: {
                     passageTitle: document.getElementById('res-passage-title'),
                     timeDuration: document.getElementById('res-time-duration'),
@@ -833,126 +821,25 @@
                 accuracyChartCanvas: document.getElementById('accuracy-chart'),
             };
             
-            const computeTypingMetrics = ({ referenceText = "", typedText = "", timeSeconds = 1 }) => {
-                const typedWordsArray = typedText.trim().split(/\s+/).filter(Boolean);
-                const referenceSlice = referenceText.trim().split(/\s+/).filter(Boolean).slice(0, typedWordsArray.length).join(" ");
-            
-                const normalizeText = (t) =>
-                    t
-                        .replace(/\u200B|\u200C|\u200D/g, "")   // remove zero-width characters
-                        .replace(/\s+/g, " ")                   // normalize spaces
-                        .replace(/[\u0964\u0965]/g, ".")        // convert Hindi danda to dot
-                        .trim();
-
-                const ref = normalizeText(referenceSlice);
-                const typed = normalizeText(typedText);
-                const refWords = ref.length > 0 ? ref.split(" ") : [];
-                const typedWords = typed.length > 0 ? typed.split(" ") : [];
-
-                if (!timeSeconds || timeSeconds <= 0) timeSeconds = 1;
-
-                const levenshtein = (a, b) => {
-                    const dp = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
-                    for (let i = 0; i <= a.length; i++) dp[i][0] = i;
-                    for (let j = 0; j <= b.length; j++) dp[0][j] = j;
-                    for (let i = 1; i <= a.length; i++) {
-                        for (let j = 1; j <= b.length; j++) {
-                            const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-                            dp[i][j] = Math.min(
-                                dp[i - 1][j] + 1,
-                                dp[i][j - 1] + 1,
-                                dp[i - 1][j - 1] + cost
-                            );
-                        }
-                    }
-                    return dp[a.length][b.length];
-                };
-
-                const alignWords = (refWords, typedWords) => {
-                    const n = refWords.length, m = typedWords.length;
-                    const dp = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
-                    for (let i = 0; i <= n; i++) dp[i][0] = i;
-                    for (let j = 0; j <= m; j++) dp[0][j] = j;
-
-                    for (let i = 1; i <= n; i++) {
-                        for (let j = 1; j <= m; j++) {
-                            const cost = refWords[i - 1] === typedWords[j - 1] ? 0 : 1;
-                            dp[i][j] = Math.min(
-                                dp[i - 1][j] + 1,       // omission
-                                dp[i][j - 1] + 1,       // insertion (extra)
-                                dp[i - 1][j - 1] + cost // substitution
-                            );
-                        }
-                    }
-
-                    const aligned = [];
-                    let i = n, j = m;
-                    while (i > 0 || j > 0) {
-                        if (i > 0 && j > 0 && refWords[i - 1] === typedWords[j - 1]) {
-                            aligned.unshift({ source: refWords[i - 1], typed: typedWords[j - 1], status: "correct" });
-                            i--; j--;
-                        } else if (i > 0 && j > 0 && dp[i][j] === dp[i - 1][j - 1] + 1) {
-                            aligned.unshift({ source: refWords[i - 1], typed: typedWords[j - 1], status: "full" });
-                            i--; j--;
-                        } else if (i > 0 && dp[i][j] === dp[i - 1][j] + 1) {
-                            aligned.unshift({ source: refWords[i - 1], typed: null, status: "omitted" });
-                            i--;
-                        } else {
-                            aligned.unshift({ source: null, typed: typedWords[j - 1], status: "extra" });
-                            j--;
-                        }
-                    }
-                    return aligned;
-                };
-
-                const perWord = alignWords(refWords, typedWords);
-
-                perWord.forEach((item) => {
-                    if (item.status === "full" && item.source && item.typed) {
-                        const distance = levenshtein(item.source, item.typed);
-                        const len = Math.max(item.source.length, item.typed.length);
-                        const ratio = distance / len;
-                        if (ratio <= 0.4) item.status = "half";
-                    }
-                    if (item.typed && item.typed.includes(item.source) && item.typed.length > item.source.length + 2) item.status = "merged";
-                    if (item.source && item.source.length > 4 && item.typed && item.typed.includes(" ")) item.status = "split";
-                    if (item.source && item.typed && item.source.replace(/\s/g, "") === item.typed.replace(/\s/g, "")) {
-                        if (item.source !== item.typed) item.status = "space-error";
-                    }
-                });
-
-                const fullMistakes = perWord.filter(w => ["full", "merged", "split", "space-error"].includes(w.status)).length;
-                const halfMistakes = perWord.filter(w => w.status === "half").length;
-                const omittedWords = perWord.filter(w => w.status === "omitted").length;
-                const extraWords = perWord.filter(w => w.status === "extra").length;
-                const totalMistakes = fullMistakes + halfMistakes + omittedWords + extraWords;
-                const totalKeystrokes = typed.length;
-                const wordsTypedCount = typedWords.length;
-                const minutes = timeSeconds / 60;
-                const grossWPM = (totalKeystrokes / 5) / minutes;
-                const errorPenalty = (fullMistakes + halfMistakes / 2) / minutes; // Omitted and extra words are NOT penalized
-                const netWPM = Math.max(0, grossWPM - errorPenalty);
-                const accuracy = grossWPM > 0 ? (netWPM / grossWPM) * 100 : 0;
-
-                return {
-                    totalKeystrokes, wordsTypedCount, fullMistakes, halfMistakes,
-                    omittedWords, extraWords, totalMistakes,
-                    grossWPM: +grossWPM.toFixed(2), netWPM: +netWPM.toFixed(2),
-                    accuracyPercent: +accuracy.toFixed(2), wordAnalysis: perWord,
-                    referenceSlice // Return the slice for comparison display
-                };
-            };
-            
+            // FIX 1 (IMPLEMENTED): Use Intl.Segmenter for correct Unicode grapheme splitting.
+            // This is the new section to handle Hindi (and other complex scripts) correctly.
+            // The previous method `Array.from(text)` was insufficient for Hindi conjuncts and matras.
             const splitTextToChars = (text) => {
+                // Intl.Segmenter is the modern, correct way to split strings into what users
+                // perceive as characters (grapheme clusters).
                 if (typeof Intl.Segmenter === 'function') {
+                    // We use the appState.lang to create a locale-specific segmenter.
+                    // This is crucial for scripts like Devanagari (Hindi).
                     try {
                         const segmenter = new Intl.Segmenter(appState.lang, { granularity: 'grapheme' });
                         return Array.from(segmenter.segment(text)).map(g => g.segment);
                     } catch (e) {
+                        // Fallback in case of an invalid language tag, though 'en' and 'hi' are safe.
                         console.warn("Intl.Segmenter failed, falling back.", e);
                         return Array.from(text);
                     }
                 }
+                // Fallback for older browsers that don't support Intl.Segmenter.
                 return Array.from(text);
             };
             
@@ -983,6 +870,7 @@
                 if (appState.session.isFetchingMoreText || !appState.isPracticeActive) return;
                 appState.session.isFetchingMoreText = true; dom.loadingStatus.textContent = 'Generating more text...';
                 try {
+                    // FIX 1: Normalize new text
                     const newText = (await appState.config.textGenerator() || '').normalize("NFC");
                     if (newText && appState.isPracticeActive) {
                         const separator = ' '; appState.config.sourceText += separator + newText; const newChars = splitTextToChars(separator + newText); appState.config.sourceChars.push(...newChars); appState.config.sourceWords = appState.config.sourceText.split(/\s+/).filter(Boolean);
@@ -1061,6 +949,7 @@
                 dom.startBtn.disabled = true; dom.loadingStatus.textContent = 'Fetching text...';
                 try {
                     const level = dom.levelSelect.value; const method = dom.methodSelect.value; const textGenerator = practiceLevels[level][method];
+                    // FIX 1: Normalize source text
                     const sourceText = (await textGenerator() || '').normalize("NFC");
                     appState.config = { level: level, method: method, duration: parseInt(dom.durationSelect.value, 10) * 60, isDynamicText: level !== 'Free Hand' && level !== 'Uplode Your Text', textGenerator: textGenerator, sourceText: sourceText, };
                     if (!appState.config.sourceText && appState.config.level !== 'Free Hand') { appState.config.sourceText = getRandomFallback(appState.lang).normalize("NFC"); }
@@ -1083,6 +972,7 @@
             const startTimer = () => { if (appState.timerId || appState.config.duration <= 0) return; appState.timerId = setInterval(() => { if (appState.isPracticeActive) { const elapsed = Math.floor((Date.now() - appState.session.startTime) / 1000); appState.session.timeLeft = appState.config.duration - elapsed; updateStatsDisplay(); } if (appState.session.timeLeft <= 0) { endPractice(); } }, 250); };
             const updateTextDisplay = () => {
                 if (appState.config.level === 'Free Hand') return;
+                // FIX 1: Normalize user input before comparison
                 const typedChars = splitTextToChars(appState.session.typedText.normalize("NFC"));
                 const charElements = dom.textDisplay.querySelectorAll('.char'); 
                 appState.session.charIndex = typedChars.length; 
@@ -1096,28 +986,72 @@
              const updateCaretPosition = () => {
                 const charElements = dom.textDisplay.querySelectorAll('.char');
                 const charIndex = appState.session.charIndex;
-                if (charElements.length === 0) { dom.caret.style.display = 'none'; return; }
+
+                // Hide caret if no text is displayed
+                if (charElements.length === 0) {
+                    dom.caret.style.display = 'none';
+                    return;
+                }
+
                 dom.caret.style.display = 'block';
+
                 const wrapper = dom.textDisplayWrapper;
                 const wrapperRect = wrapper.getBoundingClientRect();
-                let targetEl = charIndex >= charElements.length ? charElements[charElements.length - 1] : charElements[charIndex];
-                if (!targetEl) { dom.caret.style.display = 'none'; return; }
+
+                let targetEl;
+                if (charIndex >= charElements.length) {
+                    // At the end of the text, use the last character.
+                    targetEl = charElements[charElements.length - 1];
+                } else {
+                    // Use the current character.
+                    targetEl = charElements[charIndex];
+                }
+                
+                // If no target character (e.g., text is empty), hide caret.
+                if (!targetEl) {
+                    dom.caret.style.display = 'none';
+                    return;
+                }
+
                 const targetRect = targetEl.getBoundingClientRect();
-                let left = charIndex >= charElements.length ? targetRect.right - wrapperRect.left : targetRect.left - wrapperRect.left;
+                
+                // Calculate caret's left position relative to the wrapper.
+                let left;
+                if (charIndex >= charElements.length) {
+                    // Position after the last character.
+                    left = targetRect.right - wrapperRect.left;
+                } else {
+                    // Position at the beginning of the current character.
+                    left = targetRect.left - wrapperRect.left;
+                }
+                
+                // **FIX 3**: Correctly calculate top position by accounting for the wrapper's scroll.
                 const top = targetRect.top - wrapperRect.top + wrapper.scrollTop;
+
                 dom.caret.style.left = `${left}px`;
                 dom.caret.style.top = `${top}px`;
-                const caretLineTop = targetEl.offsetTop;
+
+                // **FIX 2**: Improved auto-scroll logic to keep the current line comfortably in view.
+                const caretLineTop = targetEl.offsetTop; // Position relative to parent (#text-display)
                 const caretLineHeight = targetEl.offsetHeight;
                 const wrapperHeight = wrapper.clientHeight;
                 const currentScrollTop = wrapper.scrollTop;
+
+                // Define a vertical "comfort zone" where no scrolling is needed.
+                // e.g., from 30% down to 70% down the visible area.
                 const comfortZoneTop = currentScrollTop + wrapperHeight * 0.3;
                 const comfortZoneBottom = currentScrollTop + wrapperHeight * 0.7;
+
                 if (caretLineTop < comfortZoneTop) {
-                    wrapper.scrollTop = Math.max(0, caretLineTop - wrapperHeight * 0.4);
+                    // If the current line is above the comfort zone, scroll up to re-center it.
+                    const newScrollTop = Math.max(0, caretLineTop - wrapperHeight * 0.4); // Aim for 40% from top
+                    wrapper.scrollTop = newScrollTop;
                 } else if (caretLineTop + caretLineHeight > comfortZoneBottom) {
-                    wrapper.scrollTop = caretLineTop + caretLineHeight - wrapperHeight * 0.5;
+                    // If the current line is below the comfort zone, scroll down to re-center it.
+                    const newScrollTop = caretLineTop + caretLineHeight - wrapperHeight * 0.5; // Aim for 50% from top
+                    wrapper.scrollTop = newScrollTop;
                 }
+                // If within the comfort zone, do nothing to prevent distracting, jittery scrolling.
             };
             const updateStatsDisplay = () => {
                 const duration = appState.config.duration > 0 ? Math.max(0, appState.session.timeLeft) : (appState.isPracticeActive ? Math.floor((Date.now() - appState.session.startTime) / 1000) : 0);
@@ -1130,6 +1064,119 @@
             };
             const endPractice = () => { if (!appState.isPracticeActive && appState.session.startTime > 0) return; if (appState.timerId) clearInterval(appState.timerId); appState.isPracticeActive = false; appState.session.timeLeft = 0; updateStatsDisplay(); dom.hiddenInput.blur(); dom.freeHandArea.blur(); showResults(); };
             
+            const levenshtein = (a, b) => {
+              if (a === b) return 0;
+              const n = a.length, m = b.length;
+              if (n === 0) return m;
+              if (m === 0) return n;
+              let prev = Array(m + 1).fill(0), cur = Array(m + 1).fill(0);
+              for (let j = 0; j <= m; j++) prev[j] = j;
+              for (let i = 1; i <= n; i++) {
+                cur[0] = i;
+                for (let j = 1; j <= m; j++) {
+                  const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                  cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+                }
+                [prev, cur] = [cur, prev];
+              }
+              return prev[m];
+            }
+
+            const computeTypingMetrics = ({ referenceText = "", typedText = "", timeSeconds = 1 }) => {
+                const warnings = [];
+                if (timeSeconds <= 0) {
+                    warnings.push("Invalid timeSeconds; must be > 0. Using 1 second as fallback.");
+                    timeSeconds = 1;
+                }
+                const ref = referenceText.trim().replace(/\s+/g, " ");
+                const typed = typedText.trim().replace(/\s+/g, " ");
+                const refWords = ref.length ? ref.split(" ") : [];
+                const typedWords = typed.length ? typed.split(" ") : [];
+                const totalKeystrokes = typed.length;
+                const wordsTypedCount = typedWords.length;
+
+                let fullMistakes = 0;
+                let halfMistakes = 0;
+                const perWord = [];
+                let refIndex = 0;
+
+                for (let i = 0; i < typedWords.length; i++) {
+                    const typedWord = typedWords[i];
+
+                    if (refIndex >= refWords.length) {
+                        // User typed more words than available in the reference text.
+                        fullMistakes++;
+                        perWord.push({ source: null, typed: typedWord, status: "extra" });
+                        continue;
+                    }
+
+                    // Try to find a match for the typed word at or after the current reference index.
+                    let matchIndex = -1;
+                    // Look for an exact match in a small forward window to allow for skipped words.
+                    for (let j = 0; j < 5 && (refIndex + j) < refWords.length; j++) {
+                        if (refWords[refIndex + j] === typedWord) {
+                            matchIndex = refIndex + j;
+                            break;
+                        }
+                    }
+
+                    if (matchIndex !== -1) {
+                        // Found a match. Any words between refIndex and matchIndex are considered skipped.
+                        for (let k = refIndex; k < matchIndex; k++) {
+                            perWord.push({ source: refWords[k], typed: null, status: "full" });
+                            fullMistakes++;
+                        }
+                        // The matched word is correct.
+                        perWord.push({ source: refWords[matchIndex], typed: typedWord, status: "correct" });
+                        refIndex = matchIndex + 1;
+                    } else {
+                        // No exact match found nearby. This is a mistyped word (substitution or insertion).
+                        // We'll treat it as a substitution for the current reference word.
+                        const currentRefWord = refWords[refIndex];
+                        const distance = levenshtein(currentRefWord, typedWord);
+                        const threshold = Math.ceil(currentRefWord.length / 2);
+
+                        if (distance > 0 && distance < threshold) {
+                            halfMistakes++;
+                            perWord.push({ source: currentRefWord, typed: typedWord, status: "half" });
+                        } else {
+                            fullMistakes++;
+                            perWord.push({ source: currentRefWord, typed: typedWord, status: "full" });
+                        }
+                        refIndex++;
+                    }
+                }
+
+                // Any remaining words in the reference text are considered omitted but not counted as mistakes for score calculation.
+                if (refIndex < refWords.length) {
+                    for (let i = refIndex; i < refWords.length; i++) {
+                        perWord.push({ source: refWords[i], typed: null, status: "omitted" });
+                    }
+                }
+                
+                const totalWrongWords = fullMistakes + halfMistakes;
+                const errorPenaltyWords = fullMistakes + (halfMistakes / 2);
+                const minutes = timeSeconds / 60;
+                
+                const grossWPM = minutes > 0 ? (totalKeystrokes / 5) / minutes : 0;
+                const errorPenaltyRate = minutes > 0 ? errorPenaltyWords / minutes : 0;
+                const netWPM = Math.max(0, grossWPM - errorPenaltyRate);
+                const accuracy = grossWPM > 0 ? (netWPM / grossWPM) * 100 : 0;
+
+                return {
+                    totalKeystrokes,
+                    wordsTypedCount,
+                    fullMistakes,
+                    halfMistakes,
+                    totalWrongWords,
+                    grossWPM: +grossWPM.toFixed(2),
+                    netWPM: +netWPM.toFixed(2),
+                    accuracyPercent: +accuracy.toFixed(2),
+                    wordAnalysis: perWord,
+                    warnings
+                };
+            }
+
             const showResults = () => {
                 const timeTakenSec = appState.isPracticeActive ? 0 : (appState.session.startTime > 0 ? Math.round((Date.now() - appState.session.startTime) / 1000) : appState.config.duration);
                 const durationMinutes = appState.config.duration / 60;
@@ -1143,6 +1190,9 @@
                 const timeTakenMin = (timeTakenSec > 0 ? timeTakenSec : appState.config.duration) / 60;
 
                 const isQualified = metrics.netWPM >= 30 && metrics.accuracyPercent >= 90;
+                
+                const keystrokeWarning = metrics.warnings.length > 0 ? metrics.warnings.join(' ') : '';
+
 
                 dom.newResults.passageTitle.textContent = `${appState.config.level}: ${appState.config.method}`;
                 dom.newResults.timeDuration.textContent = `${durationMinutes.toFixed(2)}`;
@@ -1151,7 +1201,7 @@
                 dom.newResults.wordsTyped.textContent = metrics.wordsTypedCount;
                 dom.newResults.fullMistakes.textContent = metrics.fullMistakes;
                 dom.newResults.halfMistakes.textContent = metrics.halfMistakes;
-                dom.newResults.totalWrongWords.textContent = metrics.totalMistakes;
+                dom.newResults.totalWrongWords.textContent = metrics.totalWrongWords;
                 dom.newResults.accuracy.textContent = metrics.accuracyPercent.toFixed(2);
                 dom.newResults.grossSpeed.textContent = metrics.grossWPM.toFixed(2);
                 dom.newResults.netSpeed.textContent = metrics.netWPM.toFixed(2);
@@ -1159,13 +1209,13 @@
                 
                 dom.newResults.resultText.textContent = isQualified ? "Qualified" : "Not Qualified";
                 dom.newResults.resultCard.className = isQualified ? 'result-card qualified' : 'result-card not-qualified';
+                dom.newResults.keystrokeWarning.textContent = keystrokeWarning;
                 
                 const errorPenaltyWords = metrics.fullMistakes + (metrics.halfMistakes / 2);
                 const formulaParts = [
                     `<code>Error Penalty = Full (${metrics.fullMistakes}) + Half (${metrics.halfMistakes} ÷ 2) = ${errorPenaltyWords.toFixed(2)} words</code>`,
                     `<code>Gross WPM = (Total Chars Typed ÷ 5) ÷ Time = (${metrics.totalKeystrokes} ÷ 5) ÷ ${timeTakenMin.toFixed(2)} = ${metrics.grossWPM.toFixed(2)}</code>`,
                     `<code>Net WPM = Gross WPM - (Error Penalty ÷ Time) = ${metrics.grossWPM.toFixed(2)} - (${errorPenaltyWords.toFixed(2)} ÷ ${timeTakenMin.toFixed(2)}) = ${metrics.netWPM.toFixed(2)}</code>`,
-                    `<code>Note: Omitted and Extra words are not penalized in Net WPM.</code>`
                 ];
                 dom.newResults.formulaNote.innerHTML = formulaParts.join('\n');
 
@@ -1173,18 +1223,16 @@
                 metrics.wordAnalysis.forEach(({ source, typed, status }) => {
                     const s = source || '';
                     const t = typed || '';
-                    const statusClass = status === 'full' ? 'wrong-word' : status;
-                    if (source) originalHTML += `<span class="${statusClass}">${s}</span> `;
-                    if (typed) typedHTML += `<span class="${statusClass}">${t}</span> `;
-                    else if(status === 'omitted') typedHTML += ' ';
+                    switch(status) {
+                        case 'correct': originalHTML += `<span class="correct-word">${s}</span> `; typedHTML += `<span class="correct-word">${t}</span> `; break;
+                        case 'half': originalHTML += `<span class="half-mistake-word">${s}</span> `; typedHTML += `<span class="half-mistake-word">${t}</span> `; break;
+                        case 'full': originalHTML += `<span class="wrong-word">${s}</span> `; typedHTML += `<span class="wrong-word">${t}</span> `; break;
+                        case 'omitted': originalHTML += `<span class="omitted-word">${s}</span> `; typedHTML += ` `; break;
+                        case 'extra': originalHTML += ` `; typedHTML += `<span class="wrong-word">${t}</span> `; break;
+                    }
                 });
-                
-                const originalPassageWords = appState.config.sourceText.trim().split(/\s+/).filter(Boolean);
-                const referenceSliceWords = metrics.referenceSlice.trim().split(/\s+/).filter(Boolean);
-                const untypedWords = originalPassageWords.slice(referenceSliceWords.length);
-                const untypedHTML = untypedWords.map(word => `<span class="omitted-word">${word}</span>`).join(' ');
 
-                dom.newResults.originalPassage.innerHTML = originalHTML + ' ' + untypedHTML;
+                dom.newResults.originalPassage.innerHTML = originalHTML;
                 dom.newResults.typedPassage.innerHTML = typedHTML;
 
                 const currentResult = {
@@ -1196,7 +1244,7 @@
                     grossWPM: metrics.grossWPM,
                     netWPM: metrics.netWPM,
                     accuracy: metrics.accuracyPercent,
-                    errors: metrics.totalMistakes,
+                    errors: metrics.totalWrongWords,
                     keystrokes: metrics.totalKeystrokes,
                     backspaceCount: appState.session.backspaceCount,
                     qualified: isQualified,
@@ -1215,22 +1263,6 @@
                 renderAnalytics(allResults);
 
                 dom.resultsModal.classList.add('active');
-
-                if (metrics.totalMistakes === 0 && metrics.wordsTypedCount > 0) {
-                     for (let i = 0; i < 40; i++) {
-                        const confetti = document.createElement("div");
-                        confetti.className = "confetti";
-                        confetti.style.left = Math.random() * 100 + "vw";
-                        confetti.style.top = "-20px";
-                        confetti.style.background = `hsl(${Math.random()*360},100%,60%)`;
-                        confetti.style.animationDuration = Math.random()*2+3 + "s";
-                        document.body.appendChild(confetti);
-                        setTimeout(() => confetti.remove(), 5000);
-                    }
-                } else {
-                    dom.resultsContent.classList.add("sad");
-                    setTimeout(() => dom.resultsContent.classList.remove("sad"), 600);
-                }
             };
 
             const hideResults = () => {
@@ -1465,12 +1497,307 @@
             init();
         });
     </script>
-    <!-- Simple Visitor Counter -->
-<div style="text-align:center; margin-top:30px;">
-  <a href="https://hits.sh/examyatri.live/Typing.html/">
-    <img src="https://hits.sh/examyatri.live/Typing.html.svg?view=today-total&label=Visitors&color=blue&style=for-the-badge" 
-         alt="Visitor Counter">
-  </a>
-</div>
+
+<!-- Unified metrics override script (appends at end). -->
+<script>
+(function(){
+  // Grapheme splitter using Intl.Segmenter if available; fallback to Array.from
+  function graphemes(s){
+    if (!s) return [];
+    try {
+      if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+        const seg = new Intl.Segmenter(undefined, {granularity: 'grapheme'});
+        const arr = [];
+        for (const part of seg.segment(s)) arr.push(part.segment);
+        return arr;
+      }
+    } catch (e){}
+    return Array.from(s);
+  }
+
+  // Compute edit distance (Levenshtein) between two arrays (graphemes)
+  function editDistanceArray(a, b) {
+    const n = a.length, m = b.length;
+    if (n === 0) return m;
+    if (m === 0) return n;
+    const dp = Array(n+1).fill(null).map(()=>Array(m+1).fill(0));
+    for (let i=0;i<=n;i++) dp[i][0]=i;
+    for (let j=0;j<=m;j++) dp[0][j]=j;
+    for (let i=1;i<=n;i++){
+      for (let j=1;j<=m;j++){
+        const cost = a[i-1] === b[j-1] ? 0 : 1;
+        dp[i][j] = Math.min(
+          dp[i-1][j] + 1,
+          dp[i][j-1] + 1,
+          dp[i-1][j-1] + cost
+        );
+      }
+    }
+    return dp[n][m];
+  }
+
+  // Unified computeTypingMetrics - replaces/falls back to original name
+  function unifiedComputeTypingMetrics({referenceText = "", typedText = "", timeSeconds = 1, keystrokesOverride = null} = {}) {
+    const ref = typeof referenceText === 'string' ? referenceText : String(referenceText || '');
+    const typed = typeof typedText === 'string' ? typedText : String(typedText || '');
+    const timeSec = (typeof timeSeconds === 'number' && timeSeconds > 0) ? timeSeconds : 1;
+    const minutes = timeSec / 60;
+
+    const typedG = graphemes(typed);
+    const refG = graphemes(ref);
+
+    // keystrokes = physical keystrokes if provided, else grapheme length of typed (counts IME/paste reasonably)
+    const totalKeystrokes = (keystrokesOverride != null) ? Number(keystrokesOverride) : typedG.length;
+    const totalKeystrokesSafe = totalKeystrokes > 0 ? totalKeystrokes : typedG.length;
+
+    // grossWPM per standard: (keystrokes / 5) / minutes
+    const grossWPM = minutes > 0 ? ((totalKeystrokesSafe / 5) / minutes) : 0;
+
+    // errors: use grapheme-level edit distance between reference and typed as errorChars
+    const errorChars = editDistanceArray(refG, typedG);
+
+    // netWPM: penalize by errors converted to "words" (5 chars per word)
+    const netWPM = minutes > 0 ? Math.max(0, ((totalKeystrokesSafe - errorChars) / 5) / minutes) : 0;
+
+    // accuracy by keystrokes
+    const accuracyPercent = totalKeystrokesSafe > 0 ? ((totalKeystrokesSafe - errorChars) / totalKeystrokesSafe) * 100 : 100;
+
+    // errors per minute and raw error count
+    const errorsPerMinute = minutes > 0 ? (errorChars / minutes) : errorChars;
+
+    // Provide a few convenience fields
+    return {
+      grossWPM,
+      netWPM,
+      accuracyPercent,
+      totalKeystrokes: totalKeystrokesSafe,
+      errorChars,
+      errorsPerMinute,
+      timeSeconds: timeSec,
+      // helpful formatted numbers for display
+      grossWPMDisplay: Math.round(grossWPM),
+      netWPMDisplay: Math.round(netWPM),
+      accuracyDisplay: Math.round(accuracyPercent),
+    };
+  }
+
+  // Attempt to replace existing computeTypingMetrics with the unified one
+  try {
+    if (typeof window !== 'undefined') {
+      window.computeTypingMetrics_unified = unifiedComputeTypingMetrics;
+      // Overwrite existing function if present, else create alias
+      window.computeTypingMetrics = unifiedComputeTypingMetrics;
+    }
+  } catch(e){ console.warn('Could not attach unified computeTypingMetrics to window', e); }
+
+  // Centralized calculator that reads appState and returns metrics
+  function calculateTypingStatsFromAppState() {
+    try {
+      const state = window.appState || window.state || {};
+      const cfg = state.config || {};
+      const session = state.session || {};
+      const refText = cfg.sourceText || cfg.referenceText || document.querySelector('#sourceText')?.textContent || '';
+      const typedText = session.typedText != null ? session.typedText : (document.querySelector('#hiddenInput')?.value || '');
+      const start = session.startTime || state.startTime || 0;
+      const now = Date.now();
+      const elapsedSec = (start && start > 0) ? Math.round((now - start)/1000) : (session.timeElapsed || cfg.duration || 0);
+      const safeSec = elapsedSec > 0 ? elapsedSec : 1;
+      const keystrokes = session.keystrokes != null ? session.keystrokes : null;
+
+      const metrics = unifiedComputeTypingMetrics({
+        referenceText: refText,
+        typedText: typedText,
+        timeSeconds: safeSec,
+        keystrokesOverride: keystrokes
+      });
+
+      // attach for debugging
+      session._latestMetrics = metrics;
+      if (window.appState) window.appState.session = session;
+      return metrics;
+    } catch (err) {
+      console.error('calculateTypingStatsFromAppState error', err);
+      return unifiedComputeTypingMetrics({referenceText:'', typedText:'', timeSeconds:1, keystrokesOverride:0});
+    }
+  }
+
+  // Patch updateStatsDisplay to use unified metrics (if updateStatsDisplay exists)
+  try {
+    if (typeof window.updateStatsDisplay === 'function') {
+      const oldUpdate = window.updateStatsDisplay;
+      window.updateStatsDisplay = function patched_updateStatsDisplay() {
+        try {
+          const metrics = calculateTypingStatsFromAppState();
+
+          // Try to update known DOM containers (be defensive - check existence)
+          // Common ids/classes that may exist in typical layouts:
+          const map = [
+            {id:'#gross-wpm', val: metrics.grossWPMDisplay},
+            {id:'#net-wpm', val: metrics.netWPMDisplay},
+            {id:'#accuracy', val: metrics.accuracyDisplay + '%'},
+            {id:'#errors', val: metrics.errorChars},
+            {id:'#keystrokes', val: metrics.totalKeystrokes}
+          ];
+          map.forEach(item=>{
+            const el = document.querySelector(item.id);
+            if (el) el.textContent = item.val;
+          });
+
+          // Also try to update dom.stats if present (old code used dom.stats.grossWpm etc.)
+          try {
+            if (window.dom && dom.stats) {
+              if (dom.stats.grossWpm) dom.stats.grossWpm.textContent = metrics.grossWPMDisplay;
+              if (dom.stats.netWpm) dom.stats.netWpm.textContent = metrics.netWPMDisplay;
+              if (dom.stats.accuracy) dom.stats.accuracy.textContent = metrics.accuracyDisplay + '%';
+              if (dom.stats.errors) dom.stats.errors.textContent = metrics.errorChars;
+              if (dom.stats.keystrokes) dom.stats.keystrokes.textContent = metrics.totalKeystrokes;
+            }
+          } catch(e){ /* ignore */ }
+
+        } catch(e){
+          console.error('patched_updateStatsDisplay error', e);
+        }
+
+        // Call original to preserve other behaviors (cursor, highlights). Wrap in try/catch.
+        try { oldUpdate.apply(this, arguments); } catch(e){ /* if original fails, ignore */ }
+      };
+      console.info('updateStatsDisplay patched to use unified metrics.');
+    } else {
+      // define a lightweight updateStatsDisplay if none exists
+      window.updateStatsDisplay = function(){
+        const metrics = calculateTypingStatsFromAppState();
+        const elGross = document.querySelector('#gross-wpm');
+        if (elGross) elGross.textContent = metrics.grossWPMDisplay;
+        const elNet = document.querySelector('#net-wpm');
+        if (elNet) elNet.textContent = metrics.netWPMDisplay;
+        const elAcc = document.querySelector('#accuracy');
+        if (elAcc) elAcc.textContent = metrics.accuracyDisplay + '%';
+        const elErr = document.querySelector('#errors');
+        if (elErr) elErr.textContent = metrics.errorChars;
+        const elKs = document.querySelector('#keystrokes');
+        if (elKs) elKs.textContent = metrics.totalKeystrokes;
+      };
+      console.info('updateStatsDisplay created (unified).');
+    }
+  } catch(e){ console.warn('Could not patch updateStatsDisplay', e); }
+
+  // Patch showResults to compute final metrics from unified calculator and write to UI / history
+  try {
+    if (typeof window.showResults === 'function') {
+      const oldShow = window.showResults;
+      window.showResults = function patched_showResults() {
+        try {
+          const metrics = calculateTypingStatsFromAppState();
+          // Try to populate typical result card elements (defensive)
+          const selectors = {
+            gross: ['#result-gross-wpm','#gross-wpm','#finalGrossWpm','.result-gross'],
+            net: ['#result-net-wpm','#net-wpm','#finalNetWpm','.result-net'],
+            acc: ['#result-accuracy','#accuracy','#finalAccuracy','.result-accuracy'],
+            err: ['#result-errors','#errors','.result-errors'],
+            ks:  ['#result-keystrokes','#keystrokes','.result-keystrokes']
+          };
+          function setFirst(selList, value){
+            for (const s of selList){
+              const el = document.querySelector(s);
+              if (el){ el.textContent = value; break; }
+            }
+          }
+          setFirst(selectors.gross, metrics.grossWPMDisplay);
+          setFirst(selectors.net, metrics.netWPMDisplay);
+          setFirst(selectors.acc, metrics.accuracyDisplay + '%');
+          setFirst(selectors.err, metrics.errorChars);
+          setFirst(selectors.ks, metrics.totalKeystrokes);
+
+          // If history saving function exists, try to update it with unified metrics
+          try {
+            if (typeof window.saveResultToHistory === 'function') {
+              // create a minimal result payload
+              const payload = {
+                time: Date.now(),
+                grossWPM: Math.round(metrics.grossWPM),
+                netWPM: Math.round(metrics.netWPM),
+                accuracy: Math.round(metrics.accuracyPercent),
+                keystrokes: metrics.totalKeystrokes,
+                errors: metrics.errorChars,
+                duration: metrics.timeSeconds
+              };
+              try { window.saveResultToHistory(payload); } catch(e){}
+            }
+          } catch(e){}
+
+        } catch(e){
+          console.error('patched_showResults error', e);
+        }
+        // call original to preserve UI flow
+        try { oldShow.apply(this, arguments); } catch(e){ /* ignore */ }
+      };
+      console.info('showResults patched to use unified metrics.');
+    } else {
+      window.showResults = function(){
+        const metrics = calculateTypingStatsFromAppState();
+        alert('Results — Gross: ' + Math.round(metrics.grossWPM) + ' WPM, Net: ' + Math.round(metrics.netWPM) + ' WPM, Accuracy: ' + Math.round(metrics.accuracyPercent) + '%');
+      };
+      console.info('showResults created (unified).');
+    }
+  } catch(e){ console.warn('Could not patch showResults', e); }
+
+  // Enhance keystroke capture: listen for input/paste on common inputs to update appState.session.keystrokes
+  try {
+    function safeIncKeystrokes(delta){
+      try {
+        if (!window.appState) window.appState = {};
+        if (!window.appState.session) window.appState.session = {};
+        if (!window.appState.session.keystrokes) window.appState.session.keystrokes = 0;
+        window.appState.session.keystrokes += Math.max(0, Math.floor(delta));
+      } catch(e){}
+    }
+
+    // Hook common input ids
+    const inputs = ['#hiddenInput', '#typingInput', '#freeHandArea', 'textarea', 'input[type="text"]'];
+    inputs.forEach(sel=>{
+      const el = document.querySelector(sel);
+      if (!el) return;
+      let prevLen = graphemes(el.value || '').length;
+      el.addEventListener('input', function(e){
+        const curlen = graphemes(el.value || '').length;
+        if (curlen > prevLen) safeIncKeystrokes(curlen - prevLen);
+        prevLen = curlen;
+      });
+      el.addEventListener('paste', function(e){
+        setTimeout(()=>{
+          const curlen = graphemes(el.value || '').length;
+          if (curlen > prevLen) safeIncKeystrokes(curlen - prevLen);
+          prevLen = curlen;
+        }, 0);
+      });
+      // keydown fallback
+      el.addEventListener('keydown', function(e){
+        if (e.key && e.key.length === 1) safeIncKeystrokes(1);
+      });
+    });
+
+    // Also global keydown to count keystrokes when typing in the app (defensive)
+    window.addEventListener('keydown', function(e){
+      // ignore modifier-only keys
+      if (!e.key || e.key.length !== 1) return;
+      // heuristic: ensure focus is within app area or body
+      safeIncKeystrokes(1);
+    }, true);
+
+    console.info('Keystroke capture enhanced (input/paste/keydown hooks).');
+  } catch(e){ console.warn('Could not enhance keystroke capture', e); }
+
+  // Expose a debug helper
+  window.typingMetricsDebug = {
+    calculate: calculateTypingStatsFromAppState,
+    compute: unifiedComputeTypingMetrics,
+    graphemes: graphemes
+  };
+
+  console.info('Unified typing metrics override installed. Metrics now use keystrokes/5 for gross, edit-distance punishment for errors, and accuracy based on keystroke correctness. This aligns with common exam-style scoring (SSC/UPSSSC/Railway).');
+
+})();
+</script>
+
 </body>
 </html>
