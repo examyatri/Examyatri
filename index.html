@@ -3514,10 +3514,11 @@ ${sampleFormat}
 Now, generate the questions based on all the instructions above and the following source material/details:
 --- START OF SOURCE MATERIAL ---
 ${sourceText}
---- END OF SOURCE MATERIAL ---`;
+--- END OF SOURCE MATERIAL --- 
+Before giving the final output, check and verify all questions, options, correct answers, and explanations. Ensure everything is factually correct and consistent. In the explanation, clearly discuss all options and justify why the correct one is right and others are wrong. Fix any contradiction or error automatically. `;
         } else {
              prompt += `
-Now, generate the questions based on all the instructions above.`;
+Now, generate the questions based on all the instructions above. Before giving the final output, check and verify all questions, options, correct answers, and explanations. Ensure everything is factually correct and consistent. In the explanation, clearly discuss all options and justify why the correct one is right and others are wrong. Fix any contradiction or error automatically. `;
         }
 
         promptForGemini = prompt;
