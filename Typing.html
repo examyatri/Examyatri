@@ -1684,7 +1684,9 @@
                 dom.textDisplayWrapper.addEventListener('click', () => dom.hiddenInput.focus());
                 
                 dom.hiddenInput.addEventListener('blur', () => {
-                    setTimeout(() => dom.hiddenInput.focus(), 10);
+                    if (appState.isPracticeActive) {
+                        setTimeout(() => dom.hiddenInput.focus(), 10);
+                    }
                 });
 
                 window.addEventListener('resize', () => {
