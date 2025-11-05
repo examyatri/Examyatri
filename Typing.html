@@ -18,6 +18,7 @@
             --disabled-color: #555555;
             --border-color: #333333;
             --font-family: 'Roboto Mono', monospace;
+            --current-word-bg: #D4AF37; /* A more vibrant gold/yellow */
         }
 
         *, *::before, *::after {
@@ -188,6 +189,8 @@
         #loading-status {
             min-height: 1.2em;
             margin-bottom: 1rem;
+            color: #aaa;
+            font-size: 0.9rem;
         }
         
         /* Practice View */
@@ -234,6 +237,7 @@
             flex-shrink: 0;
             user-select: none;
             cursor: text;
+            white-space: normal; /* Allow text to wrap */
         }
         
         #text-display {
@@ -245,21 +249,48 @@
             font-family: 'Noto Sans Devanagari', serif;
         }
 
-        .char {
-            display: inline;
+        /* NEW WORD-BASED STYLES */
+        .word {
+            display: inline-block;
+            margin-right: 0.6em; /* Simulates a space */
+            line-height: 1.5; /* Ensure consistent line height */
+            padding: 2px 0;
         }
-        .char.correct { color: var(--primary-color); }
-        .char.incorrect { color: var(--error-color); text-decoration: underline; }
+        .word.current { 
+            background-color: var(--current-word-bg);
+            color: #000;
+            border-radius: 3px;
+        }
+        .word.correct { color: var(--primary-color); }
+        .word.wrong { 
+            color: var(--error-color); 
+            text-decoration: line-through; 
+            background-color: rgba(244, 67, 54, 0.15);
+        }
+        .word.half { 
+            color: #FFA500; /* Orange */
+            text-decoration: underline wavy #FFA500;
+            background-color: rgba(255, 165, 0, 0.1);
+        }
+        .word.omitted {
+            color: #888;
+            background-color: rgba(136, 136, 136, 0.2);
+            border-radius: 3px;
+        }
+        /* Style for individual characters inside a word */
+        .char { 
+            display: inline-block; 
+            position: relative;
+        }
         
         .caret {
             position: absolute;
             width: 2px;
             background-color: var(--caret-color);
             animation: blink 1s infinite;
-            transition: left 0.1s linear, top 0.1s linear;
+            transition: left 0.05s linear, top 0.05s linear;
             border-radius: 1px;
-            height: calc(1.5rem * 1.2);
-            margin-top: calc(1.5rem * 0.2);
+            height: calc(1.5rem * 1.4); /* Make caret slightly taller than text */
         }
         @keyframes blink { 50% { opacity: 0; } }
 
@@ -281,9 +312,11 @@
         #free-hand-area {
             width: 100%;
             height: 100%;
+            flex-grow: 1; /* Make it fill available space */
             background: #111;
             color: var(--text-color);
-            border: none;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             font-size: 1.2rem;
             font-family: inherit;
             resize: none;
@@ -387,10 +420,14 @@
             text-align: left;
             color: #c0c0c0;
             white-space: pre-wrap;
+            line-height: 1.6;
         }
         .results-formula-note code {
             color: #fff;
             font-weight: bold;
+            background-color: #1e1e1e;
+            padding: 0.1em 0.3em;
+            border-radius: 3px;
         }
         .results-comparison {
             text-align: left;
@@ -484,6 +521,10 @@
         }
         #mistakes-analysis li, #improvement-tips li {
             margin-bottom: 0.5rem;
+        }
+        #mistakes-analysis ul {
+            padding-left: 1rem;
+            list-style: '→ ';
         }
         #improvement-tips li {
             padding-left: 1.5rem;
@@ -585,14 +626,14 @@
         <section id="setup-view" class="view active">
             <div class="setup-grid">
                 <div class="setup-card">
-                    <label for="level-select">Difficulty Level</label>
+                    <label for="level-select">Select Practice Type</label>
                     <select id="level-select" class="custom-select"></select>
                 </div>
-                <div class="setup-card">
+                <div class="setup-card" id="method-card">
                     <label for="method-select">Practice Method</label>
                     <select id="method-select" class="custom-select"></select>
                 </div>
-                <div class="setup-card">
+                <div class="setup-card" id="duration-card">
                     <label for="duration-select">Duration</label>
                     <select id="duration-select" class="custom-select">
                         <option value="1">1 Minute</option>
@@ -614,18 +655,18 @@
 
         <!-- Practice View -->
         <section id="practice-view" class="view">
-            <div class="stats-dashboard">
+            <div class="stats-dashboard" style="display: flex;">
                 <div class="stat-item"><span class="label">Time:</span><span id="stat-time" class="value">00:00</span></div>
                 <div class="stat-item"><span class="label">Gross WPM:</span><span id="stat-gross-wpm" class="value">0</span></div>
                 <div class="stat-item"><span class="label">Net WPM:</span><span id="stat-net-wpm" class="value">0</span></div>
                 <div class="stat-item"><span class="label">Errors:</span><span id="stat-errors" class="value">0</span></div>
                 <div class="stat-item"><span class="label">Accuracy:</span><span id="stat-accuracy" class="value">100%</span></div>
             </div>
-            <div id="text-display-wrapper">
+            <div id="text-display-wrapper" style="display: block;">
                 <div id="text-display"></div>
                 <div id="caret" class="caret" style="display: none;"></div>
-                <textarea id="free-hand-area" style="display: none;" placeholder="Start typing..."></textarea>
             </div>
+            <textarea id="free-hand-area" style="display: none;" placeholder="Start typing..."></textarea>
             <button id="submit-test-btn">Submit Now</button>
         </section>
     </main>
@@ -677,7 +718,7 @@
                 </div>
             </div>
             <div class="results-formula-note">
-                <span id="res-formula-note">Calculation of Net Speed = (Total Keystrokes / 5) / Time in Minutes.</span>
+                <span id="res-formula-note"></span>
             </div>
              <div id="res-keystroke-warning" style="color: var(--error-color); text-align: center; font-size: 0.9rem; margin-top: 1rem;"></div>
             
@@ -690,11 +731,6 @@
             </div>
             
             <!-- New Analytics Sections -->
-            <div id="performance-review-section" class="result-card" style="text-align: left; display: none; background-color: #333338;">
-                <div class="title">Performance Review</div>
-                <div id="performance-feedback" class="value" style="font-size: 1rem; white-space: pre-wrap; color: #e0e0e0; line-height: 1.5;"></div>
-            </div>
-
             <div id="weakness-analysis-section" class="result-card" style="text-align: left; display: none; background-color: #333338;">
                 <div class="title">Common Mistakes & Weak Areas</div>
                 <div id="mistakes-analysis" style="font-size: 0.9rem; color: #e0e0e0;">
@@ -709,13 +745,8 @@
                 </div>
             </div>
             
-            <div id="improvement-tips-section" class="result-card" style="text-align: left; display: none; background-color: #333338;">
-                <div class="title">Tips for Improvement</div>
-                <div id="improvement-tips" style="font-size: 0.9rem; color: #e0e0e0;"></div>
-            </div>
-
             <div id="progress-graphs-section" style="display: none;">
-                <h3 style="text-align: left; margin: 1rem 0 0.5rem; color: #e0e0e0;">Your Progress</h3>
+                <h3 style="text-align: left; margin: 1rem 0 0.5rem; color: #e0e0e0;">Your Progress (Last 10 Tests)</h3>
                 <div class="charts-container">
                     <canvas id="speed-chart"></canvas>
                     <canvas id="accuracy-chart"></canvas>
@@ -749,18 +780,51 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const autoShiftEnabled = false;
+            const lookahead = 4;
+            const maxCharsForSmoothPerformance = 8000;
+            const INITIAL_RENDER_WORDS = 100;
+            const APPEND_WORDS_THRESHOLD = 25;
+            const APPEND_WORDS_COUNT = 50;
+            
+            const RSS_PROXY_URL = 'https://api.rss2json.com/v1/api.json?rss_url=';
+            const RSS_FEEDS = {
+                en: {
+                    primary: 'https://pib.gov.in/RssFeedEnglish.aspx',
+                    fallbacks: [
+                        'https://indianexpress.com/section/education/feed/',
+                        'https://timesofindia.indiatimes.com/rssfeeds/913168846.cms',
+                        'https://www.hindustantimes.com/rss/education/rssfeed.xml',
+                        'https://www.indiatoday.in/rss/1206578',
+                        'https://www.thehindu.com/education/feeder/default.rss'
+                    ]
+                },
+                hi: {
+                    primary: 'https://pib.gov.in/RssFeedHindi.aspx',
+                    fallbacks: [
+                        'https://jansatta.com/education/feed/',
+                        'https://navbharattimes.indiatimes.com/education/rssfeed.cms',
+                        'https://www.livehindustan.com/rss/career/news.xml',
+                        'https://www.aajtak.in/rss/education'
+                    ]
+                }
+            };
+
             const dom = {
                 setupView: document.getElementById('setup-view'),
                 practiceView: document.getElementById('practice-view'),
                 levelSelect: document.getElementById('level-select'),
                 methodSelect: document.getElementById('method-select'),
                 durationSelect: document.getElementById('duration-select'),
+                methodCard: document.getElementById('method-card'),
+                durationCard: document.getElementById('duration-card'),
                 loadingStatus: document.getElementById('loading-status'),
                 startBtn: document.getElementById('start-practice-btn'),
                 pasteTextContainer: document.getElementById('paste-text-container'),
                 pasteTextArea: document.getElementById('paste-text-area'),
 
                 stats: {
+                    dashboard: document.querySelector('.stats-dashboard'),
                     time: document.getElementById('stat-time'),
                     grossWpm: document.getElementById('stat-gross-wpm'),
                     netWpm: document.getElementById('stat-net-wpm'),
@@ -790,10 +854,9 @@
                     backspaceCount: document.getElementById('res-backspace-count'),
                     resultCard: document.getElementById('res-result-card'),
                     resultText: document.getElementById('res-result-text'),
-                    formulaNote: document.getElementById('res-formula-note'),
-                    keystrokeWarning: document.getElementById('res-keystroke-warning'),
                     originalPassage: document.getElementById('res-original-passage'),
                     typedPassage: document.getElementById('res-typed-passage'),
+                    formulaNote: document.getElementById('res-formula-note'),
                 },
                 resultActions: {
                     retry: document.getElementById('retry-test-btn'),
@@ -802,275 +865,368 @@
                 },
                 langEnglishBtn: document.getElementById('lang-english-btn'),
                 langHindiBtn: document.getElementById('lang-hindi-btn'),
-                // New analytics elements
-                practiceDurationSummary: document.getElementById('practice-duration-summary'),
-                resTodayPracticeTime: document.getElementById('res-today-practice-time'),
-                resTotalPracticeTime: document.getElementById('res-total-practice-time'),
-                performanceReviewSection: document.getElementById('performance-review-section'),
-                performanceFeedback: document.getElementById('performance-feedback'),
-                weaknessAnalysisSection: document.getElementById('weakness-analysis-section'),
-                mistakesAnalysis: document.getElementById('mistakes-analysis'),
-                englishMistakesContainer: document.getElementById('english-mistakes-container'),
-                englishMistakesList: document.getElementById('english-mistakes-list'),
-                hindiMistakesContainer: document.getElementById('hindi-mistakes-container'),
-                hindiMistakesList: document.getElementById('hindi-mistakes-list'),
-                improvementTipsSection: document.getElementById('improvement-tips-section'),
-                improvementTips: document.getElementById('improvement-tips'),
-                progressGraphsSection: document.getElementById('progress-graphs-section'),
-                speedChartCanvas: document.getElementById('speed-chart'),
-                accuracyChartCanvas: document.getElementById('accuracy-chart'),
             };
             
-            // FIX 1 (IMPLEMENTED): Use Intl.Segmenter for correct Unicode grapheme splitting.
-            // This is the new section to handle Hindi (and other complex scripts) correctly.
-            // The previous method `Array.from(text)` was insufficient for Hindi conjuncts and matras.
-            const splitTextToChars = (text) => {
-                // Intl.Segmenter is the modern, correct way to split strings into what users
-                // perceive as characters (grapheme clusters).
+            const TEXT_RESOURCES = {
+                en: {
+                    simple: "the quick brown fox jumps over the lazy dog a cat sat on the mat i can see a big red car we like to play at the park my dog has a long tail birds can fly high in the sky the green frog jumps fish swim in the water",
+                    complex: "Bureaucracy, often criticized for its inefficiency, serves as a fundamental framework for implementing governmental policies. The intricate labyrinth of regulations requires meticulous navigation. Simultaneously, the proliferation of quantum computing threatens contemporary cryptographic standards, necessitating the development of post-quantum algorithms to safeguard digital infrastructure.",
+                    wordSets: {
+                        home: ["a", "add", "all", "ask", "ash", "dad", "fall", "fad", "flag", "flash", "flask", "gad", "gas", "glad", "glass", "had", "has", "jag", "lad", "lass", "sad", "sagas", "salsa", "shall"],
+                        top: ["we", "were", "to", "try", "true", "pout", "power", "priority", "query", "quote", "ripe", "tier", "trip", "type", "your", "yet", "wet", "erupt"],
+                        bottom: ["zoo", "box", "ban", "cab", "man", "van", "max", "vex", "mix", "calm", "zoom", "zebra", "mob", "nab"],
+                    }
+                },
+                hi: {
+                    simple: "राम घर गया सीता खाना खाती है मोहन स्कूल जाता है यह एक किताब है सूरज पूरब में उगता है बच्चे मैदान में खेलते हैं",
+                    complex: "आधुनिक प्रौद्योगिकी ने हमारे जीवन को अभूतपूर्व रूप से बदल दिया है। वैश्वीकरण के इस युग में, विभिन्न संस्कृतियों का आदान-प्रदान और समन्वय अत्यंत महत्वपूर्ण हो गया है। भारतीय संविधान नागरिकों को मौलिक अधिकार प्रदान करता है, जिनकी सुरक्षा न्यायपालिका का दायित्व है।",
+                    wordSets: {
+                         home: ["कल", "आज", "तक", "पर", "सहज", "सरल", "एक", "लहर", "सरस", "यह", "जल", "घर", "फल"],
+                         top: ["मत", "चल", "जग", "जब", "टब", "टमटम", "पर", "चढ़", "तब", "भर", "ऋण", "तट"],
+                         bottom: ["वन", "मन", "धन", "बम", "कम", "नम", "अब", "कब", "एक", "दम"],
+                    }
+                }
+            };
+            
+            let appState = {};
+            let speedChartInstance, accuracyChartInstance;
+            const textCache = {
+                en: { status: 'idle', promise: null, text: null },
+                hi: { status: 'idle', promise: null, text: null }
+            };
+
+            // --- LOCAL STORAGE & ANALYTICS ---
+            const storage = {
+                get: (key, defaultValue = null) => {
+                    try {
+                        const item = localStorage.getItem(key);
+                        return item ? JSON.parse(item) : defaultValue;
+                    } catch (e) {
+                        console.error(`Error reading from localStorage for key "${key}":`, e);
+                        return defaultValue;
+                    }
+                },
+                set: (key, value) => {
+                    try {
+                        localStorage.setItem(key, JSON.stringify(value));
+                    } catch (e) {
+                        console.error(`Error writing to localStorage for key "${key}":`, e);
+                    }
+                }
+            };
+
+            const MISTAKES_KEY = 'typingMistakes';
+            const HISTORY_KEY = 'typingHistory';
+            const MAX_HISTORY_ITEMS = 10;
+
+            const updateMistakeHistory = () => {
+                const mistakesData = storage.get(MISTAKES_KEY, { en: {}, hi: {} });
+                const langMistakes = mistakesData[appState.lang] || {};
+
+                appState.session.wordStates.forEach(state => {
+                    if ((state.status === 'wrong' || state.status === 'half') && state.ref && state.typed) {
+                        const ref = state.ref.toLowerCase();
+                        if (!langMistakes[ref]) {
+                            langMistakes[ref] = { count: 0, typedAs: {} };
+                        }
+                        langMistakes[ref].count++;
+                        const typed = state.typed.toLowerCase();
+                        langMistakes[ref].typedAs[typed] = (langMistakes[ref].typedAs[typed] || 0) + 1;
+                    }
+                });
+                mistakesData[appState.lang] = langMistakes;
+                storage.set(MISTAKES_KEY, mistakesData);
+            };
+            
+            const renderMistakeAnalysis = () => {
+                const mistakesData = storage.get(MISTAKES_KEY, { en: {}, hi: {} });
+                
+                ['en', 'hi'].forEach(lang => {
+                    const langMistakes = mistakesData[lang];
+                    const containerId = lang === 'en' ? 'english-mistakes-container' : 'hindi-mistakes-container';
+                    const listId = lang === 'en' ? 'english-mistakes-list' : 'hindi-mistakes-list';
+                    const container = document.getElementById(containerId);
+                    const listEl = document.getElementById(listId);
+
+                    const sortedMistakes = Object.entries(langMistakes || {})
+                        .sort(([, a], [, b]) => b.count - a.count)
+                        .slice(0, 5); // Show top 5
+
+                    if (sortedMistakes.length > 0) {
+                        listEl.innerHTML = `<ul>${sortedMistakes.map(([word, data]) => {
+                            const mostCommonTyped = Object.entries(data.typedAs).sort(([, a], [, b]) => b - a)[0][0];
+                            return `<li>You mistyped <span class="mistake-word">'${word}'</span> as <span class="suggestion-word">'${mostCommonTyped}'</span> (${data.count} times total)</li>`;
+                        }).join('')}</ul>`;
+                        container.style.display = 'block';
+                    } else {
+                         listEl.innerHTML = `<p>No common mistakes recorded yet for this language.</p>`;
+                         container.style.display = 'block';
+                    }
+                });
+                
+                document.getElementById('weakness-analysis-section').style.display = 'block';
+            };
+
+            const updatePracticeHistory = (finalMetrics) => {
+                const history = storage.get(HISTORY_KEY, []);
+                history.push({
+                    lang: appState.lang,
+                    netWPM: finalMetrics.netWPM,
+                    accuracy: finalMetrics.accuracyPercent,
+                    timestamp: new Date().toISOString()
+                });
+                if (history.length > MAX_HISTORY_ITEMS) {
+                    history.shift();
+                }
+                storage.set(HISTORY_KEY, history);
+            };
+            
+            const renderProgressGraphs = () => {
+                const history = storage.get(HISTORY_KEY, []);
+                const graphSection = document.getElementById('progress-graphs-section');
+                if (history.length < 2) {
+                    graphSection.style.display = 'none';
+                    return;
+                }
+
+                graphSection.style.display = 'block';
+
+                const labels = history.map((_, i) => `Test ${i + 1}`);
+                const speedData = history.map(item => Math.round(item.netWPM));
+                const accuracyData = history.map(item => parseFloat(item.accuracy.toFixed(2)));
+
+                const speedCtx = document.getElementById('speed-chart').getContext('2d');
+                if (speedChartInstance) speedChartInstance.destroy();
+                speedChartInstance = new Chart(speedCtx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Net WPM',
+                            data: speedData,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: { display: true, text: 'Net Speed (WPM) Trend', color: '#fff' },
+                            tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${context.raw} (Lang: ${history[context.dataIndex].lang.toUpperCase()})` } }
+                        },
+                        scales: { y: { beginAtZero: true, ticks: { color: '#ccc' }, grid: { color: '#444' } }, x: { ticks: { color: '#ccc' }, grid: { color: '#444' } } }
+                    }
+                });
+
+                const accuracyCtx = document.getElementById('accuracy-chart').getContext('2d');
+                if (accuracyChartInstance) accuracyChartInstance.destroy();
+                accuracyChartInstance = new Chart(accuracyCtx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Accuracy %',
+                            data: accuracyData,
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: { display: true, text: 'Accuracy (%) Trend', color: '#fff' },
+                            tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${context.raw}% (Lang: ${history[context.dataIndex].lang.toUpperCase()})` } }
+                        },
+                        scales: { y: { min: 0, max: 100, ticks: { color: '#ccc' }, grid: { color: '#444' } }, x: { ticks: { color: '#ccc' }, grid: { color: '#444' } } }
+                    }
+                });
+            };
+
+            const triggerCelebration = () => {
+                const modal = dom.resultsModal;
+                if (!modal) return;
+                let container = document.getElementById('celebration-container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'celebration-container';
+                    container.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 1001;';
+                    modal.appendChild(container);
+                }
+                container.innerHTML = '';
+                const emojis = ['🎉', '🎊', '🥳', '👏', '🏆', '✨'];
+                for (let i = 0; i < 50; i++) {
+                    const emoji = document.createElement('span');
+                    emoji.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                    emoji.style.cssText = `position: absolute; font-size: ${Math.random() * 2 + 1}rem; left: ${Math.random() * 100}%; top: ${Math.random() * 100}%; opacity: 1; transition: transform 3s ease-out, opacity 3s ease-out;`;
+                    container.appendChild(emoji);
+                    setTimeout(() => {
+                        const x = (Math.random() - 0.5) * 600;
+                        const y = (Math.random() - 0.5) * 600;
+                        emoji.style.transform = `translate(${x}px, ${y}px) rotate(${Math.random() * 720}deg)`;
+                        emoji.style.opacity = '0';
+                    }, 10);
+                    setTimeout(() => { if (container && emoji.parentNode === container) container.removeChild(emoji) }, 3010);
+                }
+            };
+            
+            // --- TEXT GENERATORS & FETCHING ---
+            const fetchPracticeText = async (language = 'en') => {
+                const feeds = RSS_FEEDS[language];
+                const urlsToTry = [feeds.primary, ...feeds.fallbacks.sort(() => 0.5 - Math.random())];
+
+                for (const url of urlsToTry) {
+                    try {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+                        
+                        const fetchUrl = `${RSS_PROXY_URL}${encodeURIComponent(url)}&_=${new Date().getTime()}`;
+                        const response = await fetch(fetchUrl, { cache: "no-cache", signal: controller.signal });
+                        clearTimeout(timeoutId);
+
+                        if (!response.ok) {
+                            console.warn(`Network error fetching from ${url}. Status: ${response.status}`);
+                            continue;
+                        }
+                        const data = await response.json();
+                        if (data.status !== 'ok' || !data.items || data.items.length === 0) {
+                            console.warn(`API error or no items from ${url}. Status: ${data.status}`);
+                            continue;
+                        }
+                        const randomArticle = data.items[Math.floor(Math.random() * data.items.length)];
+                        const description = randomArticle.description || randomArticle.content || '';
+                        let text = `${randomArticle.title}. ${description}`;
+
+                        const tempEl = document.createElement('textarea');
+                        tempEl.innerHTML = text;
+                        text = tempEl.value;
+                        
+                        text = text.replace(/<[^>]+>/g, '').replace(/\s\s+/g, ' ').replace(/\[read more\]/gi, '').replace(/Read More »/gi, '').trim();
+                        
+                        if (text.length > 200) {
+                            console.log(`Successfully fetched text from ${url}`);
+                            return text;
+                        }
+                    } catch (err) {
+                         if (err.name === 'AbortError') {
+                            console.warn(`Fetch from ${url} timed out.`);
+                        } else {
+                            console.error(`Error fetching or parsing from ${url}:`, err);
+                        }
+                    }
+                }
+                console.warn("All RSS sources failed, using offline complex text as fallback.");
+                return TEXT_RESOURCES[language].complex.repeat(5);
+            };
+
+            const prefetchArticle = async (language) => {
+                if (textCache[language].status === 'fetching' || textCache[language].status === 'ready') return;
+
+                textCache[language].status = 'fetching';
+                textCache[language].promise = fetchPracticeText(language);
+                
+                try {
+                    const text = await textCache[language].promise;
+                    textCache[language].text = text;
+                    textCache[language].status = 'ready';
+                    const currentLang = dom.langEnglishBtn.classList.contains('active') ? 'en' : 'hi';
+                    if (language === currentLang && dom.loadingStatus.textContent.includes('Fetching')) {
+                         dom.loadingStatus.textContent = 'Ready to start!';
+                         setTimeout(() => { if (dom.loadingStatus.textContent === 'Ready to start!') dom.loadingStatus.textContent = ''; }, 2000);
+                    }
+                } catch (error) {
+                    console.error(`Pre-fetching failed for ${language}:`, error);
+                    textCache[language].status = 'failed';
+                    textCache[language].text = null;
+                } finally {
+                    textCache[language].promise = null;
+                }
+            };
+            
+            const getArticleForPractice = async (language) => {
+                const cache = textCache[language];
+
+                // If an article was successfully pre-fetched, use it and then start fetching the next one.
+                if (cache.status === 'ready' && cache.text) {
+                    const text = cache.text;
+                    cache.text = null; // Invalidate the used text
+                    cache.status = 'idle'; // Reset status to allow a new prefetch
+                    prefetchArticle(language); // Start fetching the *next* article immediately
+                    return text;
+                }
+
+                // If a pre-fetch is already in progress, wait for it to finish.
+                if (cache.status === 'fetching' && cache.promise) {
+                    dom.loadingStatus.textContent = 'Finalizing your practice text...';
+                    const text = await cache.promise;
+                    cache.text = null; // Invalidate after use
+                    cache.status = 'idle';
+                    prefetchArticle(language); // Start fetching the *next* article
+                    return text;
+                }
+                
+                // If no article is ready (e.g., first load or failed prefetch), fetch one on demand.
+                dom.loadingStatus.textContent = 'Fetching a new article...';
+                const text = await fetchPracticeText(language);
+                prefetchArticle(language); // Also trigger a pre-fetch for the session after this one
+                return text;
+            };
+
+            const generateTextFromWords = (wordList, count = 200) => {
+                let text = [];
+                for (let i = 0; i < count; i++) {
+                    text.push(wordList[Math.floor(Math.random() * wordList.length)]);
+                }
+                return text.join(' ');
+            };
+
+            const practiceLevels = {
+                "Beginner": {
+                    "Home Row": () => Promise.resolve(generateTextFromWords(TEXT_RESOURCES[appState.lang].wordSets.home)),
+                    "Top Row": () => Promise.resolve(generateTextFromWords(TEXT_RESOURCES[appState.lang].wordSets.top)),
+                    "Bottom Row": () => Promise.resolve(generateTextFromWords(TEXT_RESOURCES[appState.lang].wordSets.bottom)),
+                    "Home + Top": () => Promise.resolve(generateTextFromWords([...TEXT_RESOURCES[appState.lang].wordSets.home, ...TEXT_RESOURCES[appState.lang].wordSets.top])),
+                    "Home + Bottom": () => Promise.resolve(generateTextFromWords([...TEXT_RESOURCES[appState.lang].wordSets.home, ...TEXT_RESOURCES[appState.lang].wordSets.bottom])),
+                    "Top + Bottom": () => Promise.resolve(generateTextFromWords([...TEXT_RESOURCES[appState.lang].wordSets.top, ...TEXT_RESOURCES[appState.lang].wordSets.bottom])),
+                    "Small Sentences": () => getArticleForPractice(appState.lang).then(text => {
+                        const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+                        const shortSentences = sentences.filter(s => tokenize(s).length < 15 && tokenize(s).length > 3);
+                        return (shortSentences.length < 5) ? TEXT_RESOURCES[appState.lang].simple.repeat(10) : shortSentences.sort(() => 0.5 - Math.random()).slice(0, 10).join(' ');
+                    }),
+                },
+                "Skill Building": {
+                    "Random Words": () => getArticleForPractice(appState.lang).then(text => tokenize(text).sort(() => 0.5 - Math.random()).join(' ')),
+                    "Sentence Practice": () => getArticleForPractice(appState.lang),
+                    "Paragraph Practice": () => getArticleForPractice(appState.lang),
+                    "Punctuation Practice": () => getArticleForPractice(appState.lang),
+                },
+                "Exam": { 
+                    "All Exam": () => getArticleForPractice(appState.lang), 
+                },
+                "Free Hand": { "Start Typing": () => Promise.resolve("This is a free hand session.") },
+                "Paste Your Text": { "Start Practice": () => Promise.resolve(dom.pasteTextArea.value) }
+            };
+
+            // --- UTILITY FUNCTIONS ---
+            const graphemeSplitter = (text) => {
                 if (typeof Intl.Segmenter === 'function') {
-                    // We use the appState.lang to create a locale-specific segmenter.
-                    // This is crucial for scripts like Devanagari (Hindi).
                     try {
                         const segmenter = new Intl.Segmenter(appState.lang, { granularity: 'grapheme' });
                         return Array.from(segmenter.segment(text)).map(g => g.segment);
-                    } catch (e) {
-                        // Fallback in case of an invalid language tag, though 'en' and 'hi' are safe.
-                        console.warn("Intl.Segmenter failed, falling back.", e);
-                        return Array.from(text);
-                    }
+                    } catch (e) { return Array.from(text); }
                 }
-                // Fallback for older browsers that don't support Intl.Segmenter.
                 return Array.from(text);
             };
-            
-            const KEYS = {
-                en: { home: "asdfjkl;", top: "qwertyuiop", bottom: "zxcvbnm,.", numbers: "1234567890", symbols: "!@#$%^&*()_+-=[]{}|;':\",./<>?" },
-                hi: { home: "ोेि्कसहमतरल", top: "ौैाीपृछठटझफ", bottom: "़ऋदजगबअड़ध", numbers: "१२३४५६७८९०", symbols: "।(),'\"-:", }
-            };
-             const OFFLINE_FALLBACK = {
-                en: [ "The quick brown fox jumps over the lazy dog.", "Technology has changed the way we live and work.", "The internet connects people from all over the world.", "Reading books is a great way to expand your knowledge.", "Success is not final, failure is not fatal: it is the courage to continue that counts.", "The only way to do great work is to love what you do.", "Believe you can and you're halfway there.", "The future belongs to those who believe in the beauty of their dreams.", "Strive not to be a success, but rather to be of value.", "In the middle of every difficulty lies opportunity.", ],
-                hi: [ "सूरज की पहली किरण आशा लेकर आती है।", "सच्चा मित्र वही है जो कठिन समय में साथ दे।", "परिश्रम ही सफलता की कुंजी है।", "ज्ञान सबसे बड़ी शक्ति है।", "एक हजार मील की यात्रा एक कदम से शुरू होती है।", "समय किसी का इंतजार नहीं करता।", "स्वस्थ शरीर में ही स्वस्थ मन का वास होता है।", "किताबें हमारी सबसे अच्छी दोस्त होती हैं।", "जीवन एक अनमोल उपहार है, इसे व्यर्थ न करें।", "धैर्य और लगन से हर मुश्किल आसान हो जाती है।", ]
-            };
-             const STATIC_TEXTS = {
-                en: { application: "To,\nThe Hiring Manager,\n[Company Name],\n[Company Address]\n\nSubject: Application for the post of [Job Title]\n\nDear Sir/Madam,\nI am writing to express my keen interest in the [Job Title] position advertised on [Platform]. With my skills and experience, I am confident that I would be a valuable asset to your team. My resume is attached for your review. I look forward to hearing from you soon.\n\nSincerely,\n[Your Name]", legal: "Notwithstanding any other provision of this agreement, the parties agree that neither party shall be liable to the other for any indirect, special, or consequential damages. The validity, interpretation, and performance of this agreement shall be governed by and construed in accordance with the laws of the specified jurisdiction, without regard to its conflict of law principles.", letter: "Dear [Recipient Name],\nI hope this letter finds you well. I am writing to you today to discuss the upcoming project deadline. We need to ensure all deliverables are submitted by the end of the week. Please coordinate with your respective teams to finalize the reports. Your prompt attention to this matter is highly appreciated.\n\nBest regards,\n[Your Name]", punctuation: "Wait, what? He asked, \"Are you sure?\" I'm not sure... let's check the guide (page 5). The options are: red, green, or blue; however, I prefer the first one. It's a 'win-win' situation, isn't it?", capitalization: "The United Nations (UN) headquarters is in New York City. Dr. Smith and his colleague, Professor Jones, attended a conference in Paris, France, last Monday. They discussed the impact of climate change on the Arctic Circle.", symbols: "The formula E=mc^2 is famous. Contact me at user@example.com or call +1 (555) 123-4567. The stock price rose by 15% to $1,234.56. We need to check the file at C:\\Users\\Default\\.", },
-                hi: { application: "सेवा में,\nश्रीमान प्रबंधक,\n[कंपनी का नाम],\n[कंपनी का पता]\n\nविषय: [पद का नाम] पद हेतु आवेदन पत्र\n\nमहोदय,\nसविनय निवेदन है कि मुझे [प्लेटफॉर्म] पर विज्ञापित [पद का नाम] पद के लिए आपकी कंपनी में रुचि है। मेरे कौशल और अनुभव के साथ, मुझे विश्वास है कि मैं आपकी टीम के लिए एक मूल्यवान संपत्ति होऊंगा। मेरा बायोडाटा आपके अवलोकन के लिए संलग्न है। मुझे आपसे शीघ्र उत्तर की आशा है।\n\nभवदीय,\n[आपका नाम]", legal: "इस समझौते के किसी अन्य प्रावधान के होते हुए भी, पक्ष इस बात से सहमत हैं कि कोई भी पक्ष दूसरे पक्ष के प्रति किसी भी अप्रत्यक्ष, विशेष, या परिणामी क्षति के लिए उत्तरदायी नहीं होगा। इस समझौते की वैधता, व्याख्या, और प्रदर्शन निर्दिष्ट अधिकार क्षेत्र के कानूनों के अनुसार शासित और समझे जाएंगे, इसके कानून सिद्धांतों के टकराव की परवाह किए बिना।", letter: "प्रिय [प्राप्तकर्ता का नाम],\nआशा है कि आप स्वस्थ होंगे। मैं आज आपसे आगामी परियोजना की समय सीमा पर चर्चा करने के लिए लिख रहा हूं। हमें यह सुनिश्चित करने की आवश्यकता है कि सभी डिलिवरेबल्स सप्ताह के अंत तक जमा कर दिए जाएं। कृपया रिपोर्ट को अंतिम रूप देने के लिए अपनी संबंधित टीमों के साथ समन्वय करें। इस मामले पर आपके त्वरित ध्यान की अत्यधिक सराहना की जाती है।\n\nसाभार,\n[आपका नाम]", punctuation: "रुको, क्या? उसने पूछा, \"क्या तुम निश्चित हो?\" मुझे यकीन नहीं है... चलो गाइड (पेज 5) देखते हैं। विकल्प हैं: लाल, हरा, या नीला; हालाँकि, मुझे पहला वाला पसंद है। यह एक 'जीत-जीत' की स्थिति है, है ना?", capitalization: "संयुक्त राष्ट्र (UN) का मुख्यालय न्यूयॉर्क शहर में है। डॉ. शर्मा और उनके सहयोगी, प्रोफेसर वर्मा, पिछले सोमवार को पेरिस, फ्रांस में एक सम्मेलन में शामिल हुए। उन्होंने आर्कटिक सर्कल पर जलवायु परिवर्तन के प्रभाव पर चर्चा की।", }
-            };
 
-            const getRandomFallback = (lang) => OFFLINE_FALLBACK[lang][Math.floor(Math.random() * OFFLINE_FALLBACK[lang].length)];
-            const generateRandomText = (chars, wordLength, numWords) => { let text = ''; for (let i = 0; i < numWords; i++) { let word = ''; const currentWordLength = Math.floor(Math.random() * (wordLength - 2)) + 2; for (let j = 0; j < currentWordLength; j++) { word += chars[Math.floor(Math.random() * chars.length)]; } text += word + ' '; } return text.trim(); };
-            const getTypingText = async (language = 'en') => {
-                 const sources = [
-                    async () => { const url = language === 'hi' ? 'https://api.rss2json.com/v1/api.json?rss_url=https://www.jagran.com/education/rssfeed.xml' : 'https://api.rss2json.com/v1/api.json?rss_url=https://www.thehindu.com/education/feeder/default.rss'; const res = await fetch(url, { cache: "no-cache" }); if (!res.ok) throw new Error("RSS Network error"); const data = await res.json(); if (data.status !== 'ok' || !data.items || data.items.length === 0) throw new Error("News source failed"); return data.items[Math.floor(Math.random() * data.items.length)].description.replace(/<[^>]+>/g, '').trim(); },
-                    async () => { const url = language === 'hi' ? 'https://hi.wikipedia.org/api/rest_v1/page/random/summary' : 'https://en.wikipedia.org/api/rest_v1/page/random/summary'; const res = await fetch(url); if (!res.ok) throw new Error("Wikipedia Network error"); const data = await res.json(); if (!data.extract) throw new Error("Wikipedia extract failed"); return data.extract; }
-                ];
-                for (const source of sources) { try { const text = await Promise.race([ source(), new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 4000)) ]); if (text && text.length > 50) return text; } catch (err) { console.warn("A text source failed or timed out, trying next..."); } }
-                console.warn("All online sources failed. Using offline fallback."); return getRandomFallback(language);
-            };
-            const appendMoreText = async () => {
-                if (appState.session.isFetchingMoreText || !appState.isPracticeActive) return;
-                appState.session.isFetchingMoreText = true; dom.loadingStatus.textContent = 'Generating more text...';
-                try {
-                    // FIX 1: Normalize new text
-                    const newText = (await appState.config.textGenerator() || '').normalize("NFC");
-                    if (newText && appState.isPracticeActive) {
-                        const separator = ' '; appState.config.sourceText += separator + newText; const newChars = splitTextToChars(separator + newText); appState.config.sourceChars.push(...newChars); appState.config.sourceWords = appState.config.sourceText.split(/\s+/).filter(Boolean);
-                        const newHtml = newChars.map(char => `<span class="char">${char}</span>`).join(''); dom.textDisplay.insertAdjacentHTML('beforeend', newHtml);
-                    }
-                } catch (error) { console.error("Failed to generate/fetch more text:", error); } finally { dom.loadingStatus.textContent = ''; appState.session.isFetchingMoreText = false; }
-            };
-            
-            const HINDI_BEGINNER_PRACTICE = { "1. Home Row": "कर हम तरस; महक कसक; कमल महल; सिर किस; केसर कोमल; हमेशा समर;", "2. Top Row": "पठ छठ; पीठ मीठी; पाठ पीठ; कैसा बैठा; फौजी चौकी; मीठा पाठ;", "3. Bottom Row": "जग मग गज; अब जब; धन बढ़; गड़बड़ अजय; अगर डगर; भजन गगन;", "4. Home + Top": "टिकट मिठाई; कठोर कठिन; ठीक ठाक; पहला पहर; महफिल शामिल;", "5. Home + Bottom": "जगह महल; गरम खबर; सहज समझ; बाहर भजन; मदद मकसद;", "6. Top + Bottom": "अटक भटक; पढ़ना चढ़ना; गठन बचपन; अजय अचल;", "7. Word Formation": "किसान किताब; बारिश शामिल; टोकरी कटोरी; पहचान मेहमान;", "9. Random Row Mix": "भारत महान; बचपन की याद; समय का महत्व; सड़क पर गजराज; कलम दवात;" };
-            const practiceLevels = {
-                "Beginner": { "1. Home Row": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["1. Home Row"]) : generateRandomText(KEYS.en.home, 5, 20), "2. Top Row": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["2. Top Row"]) : generateRandomText(KEYS.en.top, 5, 20), "3. Bottom Row": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["3. Bottom Row"]) : generateRandomText(KEYS.en.bottom, 5, 20), "4. Home + Top": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["4. Home + Top"]) : generateRandomText(KEYS.en.home + KEYS.en.top, 6, 25), "5. Home + Bottom": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["5. Home + Bottom"]) : generateRandomText(KEYS.en.home + KEYS.en.bottom, 6, 25), "6. Top + Bottom": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["6. Top + Bottom"]) : generateRandomText(KEYS.en.top + KEYS.en.bottom, 6, 25), "7. Word Formation": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["7. Word Formation"]) : generateRandomText(KEYS.en.home + KEYS.en.top, 4, 30), "8. Small Sentences": () => Promise.resolve(getRandomFallback(appState.lang)), "9. Random Row Mix": () => appState.lang === 'hi' ? Promise.resolve(HINDI_BEGINNER_PRACTICE["9. Random Row Mix"]) : generateRandomText(KEYS.en.home + KEYS.en.top + KEYS.en.bottom, 6, 25), "10. Numeric Practice": () => generateRandomText(KEYS.en.numbers + ' ', 5, 20), },
-                "Skill Building": { "1. Random Words": () => getTypingText(appState.lang), "2. Sentence Practice": () => getTypingText(appState.lang), "3. Paragraph Practice": () => getTypingText(appState.lang), "4. Punctuation Practice": () => Promise.resolve(STATIC_TEXTS[appState.lang].punctuation), "5. Capitalization": () => Promise.resolve(STATIC_TEXTS[appState.lang].capitalization), "6. Numeric Row Practice": () => generateRandomText(KEYS.en.numbers + ' 123 456 7890 ', 7, 20), "7. Symbol Typing": () => Promise.resolve(STATIC_TEXTS.en.symbols), "8. Dictation Mode": () => getTypingText(appState.lang), "9. Mixed Practice": () => getTypingText(appState.lang), "10. Repetition Drill": async () => { const s = await getTypingText(appState.lang); return (s + " ").repeat(2).trim(); }, },
-                "Advanced": { "1. Editorial Articles": () => getTypingText(appState.lang), "2. Technical Text": () => getTypingText(appState.lang), "3. Application Format": () => Promise.resolve(STATIC_TEXTS[appState.lang].application), "4. Government Notice": () => getTypingText(appState.lang), "5. Table Data Typing": () => Promise.resolve("Name|Age|City|Country\nJohn|30|New York|USA\nAnna|25|Paris|France\nMike|42|Tokyo|Japan"), "6. Speech Text": () => getTypingText(appState.lang), "7. Legal Paragraphs": () => Promise.resolve(STATIC_TEXTS[appState.lang].legal), "8. Complex Sentences": () => getTypingText(appState.lang), "9. News Report Practice": () => getTypingText(appState.lang), "10. Error Correction": () => getTypingText(appState.lang), },
-                "Expert": { "1. Long Paragraph": () => getTypingText(appState.lang), "2. Letter Writing": () => Promise.resolve(STATIC_TEXTS[appState.lang].letter), "3. Report Typing": () => getTypingText(appState.lang), "4. Press Release": () => getTypingText(appState.lang), "5. Data Table Typing": () => Promise.resolve("ID,Product,Price,Stock\n101,Laptop,1200,50\n102,Mouse,25,200\n103,Keyboard,75,150\n104,Monitor,300,80"), "6. Essay Typing": () => getTypingText(appState.lang), "7. Mixed Format": () => Promise.resolve(`${STATIC_TEXTS[appState.lang].letter} \n\n ${STATIC_TEXTS[appState.lang].legal}`), "8. Official Document": () => getTypingText(appState.lang), "9. English-Hindi Mix": () => Promise.resolve("This is an English sentence. यह एक हिंदी वाक्य है। We need to type both. हमें दोनों टाइप करने होंगे।"), "10. Multiple Passages": () => getTypingText(appState.lang), },
-                "Exam Type": { "1. SSC Exam Mode": () => getTypingText(appState.lang), "2. CPCT Mode": () => getTypingText(appState.lang), "3. RSMSSB Mode": () => getTypingText(appState.lang), "4. UP Police Clerk": () => getTypingText(appState.lang), "5. Bank Clerk Mode": () => getTypingText(appState.lang), "6. Railway Typing": () => getTypingText(appState.lang), "7. High Court Clerk": () => getTypingText(appState.lang), "8. Insurance Typing": () => getTypingText(appState.lang), "9. MP DEO Typing": () => getTypingText(appState.lang), "10. Custom Exam Sim": () => getTypingText(appState.lang), },
-                "Free Hand": { "Free Practice": () => Promise.resolve(""), },
-                "Uplode Your Text": { "Paste Your Text And Start Practice": () => Promise.resolve(dom.pasteTextArea.value) }
-            };
-            let appState = {};
-            let speedChart, accuracyChart; // Chart instances
-            const BACKUP_KEY = 'ExamYatriTypingPermanentBackup';
-            const DURATION_KEYS = {
-                TODAY: 'ExamYatriTodayPracticeTime',
-                TOTAL: 'ExamYatriTotalPracticeTime',
-                DATE: 'ExamYatriLastPracticeDate'
-            };
-
-            const getStoredResults = () => { try { return JSON.parse(localStorage.getItem(BACKUP_KEY)) || []; } catch (e) { return []; } };
-            const saveResults = (results) => { localStorage.setItem(BACKUP_KEY, JSON.stringify(results)); };
-            
-            const formatDuration = (totalSeconds) => {
-                if (totalSeconds < 60) return `${totalSeconds}s`;
-                if (totalSeconds < 3600) {
-                    const minutes = Math.floor(totalSeconds / 60);
-                    const seconds = totalSeconds % 60;
-                    return `${minutes}m ${seconds}s`;
-                }
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                return `${hours}h ${minutes}m`;
-            };
-
-            const updatePracticeTime = (sessionSeconds) => {
-                const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-                const lastPracticeDate = localStorage.getItem(DURATION_KEYS.DATE);
-                
-                let todaySeconds = parseInt(localStorage.getItem(DURATION_KEYS.TODAY) || '0', 10);
-                let totalSeconds = parseInt(localStorage.getItem(DURATION_KEYS.TOTAL) || '0', 10);
-                
-                if (today !== lastPracticeDate) {
-                    todaySeconds = 0; // Reset for new day
-                }
-                
-                todaySeconds += sessionSeconds;
-                totalSeconds += sessionSeconds;
-                
-                localStorage.setItem(DURATION_KEYS.TODAY, todaySeconds);
-                localStorage.setItem(DURATION_KEYS.TOTAL, totalSeconds);
-                localStorage.setItem(DURATION_KEYS.DATE, today);
-
-                return { todaySeconds, totalSeconds };
-            };
-
-
-            const resetState = () => {
-                appState = { lang: 'en', timerId: null, isPracticeActive: false, config: { level: '', method: '', duration: 0, sourceText: '', sourceWords: [], sourceChars: [], isDynamicText: false, textGenerator: null }, session: { startTime: 0, timeLeft: 0, typedText: '', charIndex: 0, correctChars: 0, errorCount: 0, keystrokes: 0, backspaceCount: 0, isFetchingMoreText: false }, };
-            };
-            const populateLevels = () => { dom.levelSelect.innerHTML = Object.keys(practiceLevels).map(level => `<option value="${level}">${level}</option>`).join(''); };
-            const populateMethods = () => { const selectedLevel = dom.levelSelect.value; const methods = Object.keys(practiceLevels[selectedLevel]); dom.methodSelect.innerHTML = methods.map(method => `<option value="${method}">${method}</option>`).join(''); handleMethodChange(); };
-            const handleMethodChange = () => {
-                 const isFreeHand = dom.levelSelect.value === 'Free Hand'; const isPasteText = dom.levelSelect.value === 'Uplode Your Text'; dom.durationSelect.disabled = isFreeHand; dom.pasteTextContainer.style.display = isPasteText ? 'block' : 'none';
-            };
-            const switchView = (view) => { dom.setupView.classList.toggle('active', view === 'setup'); dom.practiceView.classList.toggle('active', view === 'practice'); };
-            const startPractice = async () => {
-                if (dom.levelSelect.value === 'Uplode Your Text' && dom.pasteTextArea.value.trim() === '') { alert("Please paste your text before starting."); return; }
-                dom.startBtn.disabled = true; dom.loadingStatus.textContent = 'Fetching text...';
-                try {
-                    const level = dom.levelSelect.value; const method = dom.methodSelect.value; const textGenerator = practiceLevels[level][method];
-                    // FIX 1: Normalize source text
-                    const sourceText = (await textGenerator() || '').normalize("NFC");
-                    appState.config = { level: level, method: method, duration: parseInt(dom.durationSelect.value, 10) * 60, isDynamicText: level !== 'Free Hand' && level !== 'Uplode Your Text', textGenerator: textGenerator, sourceText: sourceText, };
-                    if (!appState.config.sourceText && appState.config.level !== 'Free Hand') { appState.config.sourceText = getRandomFallback(appState.lang).normalize("NFC"); }
-                    if (appState.config.level === 'Free Hand') {
-                        dom.textDisplay.style.display = 'none'; dom.caret.style.display = 'none'; dom.freeHandArea.style.display = 'block'; dom.freeHandArea.value = '';
-                    } else {
-                        dom.textDisplay.style.display = 'block'; dom.freeHandArea.style.display = 'none'; appState.config.sourceWords = appState.config.sourceText.split(/\s+/).filter(Boolean); appState.config.sourceChars = splitTextToChars(appState.config.sourceText); dom.textDisplay.innerHTML = appState.config.sourceChars.map(char => `<span class="char">${char}</span>`).join(''); dom.textDisplay.className = appState.lang === 'hi' ? 'hindi' : '';
-                    }
-                    resetSession(); switchView('practice'); appState.config.level === 'Free Hand' ? dom.freeHandArea.focus() : dom.hiddenInput.focus();
-                } catch (error) { console.error("Failed to start practice:", error); dom.loadingStatus.textContent = 'Error fetching text. Please try again.'; } finally { dom.loadingStatus.textContent = ''; dom.startBtn.disabled = false; }
-            };
-            const resetSession = () => { if (appState.timerId) clearInterval(appState.timerId); appState.isPracticeActive = false; appState.timerId = null; appState.session = { startTime: 0, timeLeft: appState.config.duration, typedText: '', charIndex: 0, correctChars: 0, errorCount: 0, keystrokes: 0, backspaceCount: 0, isFetchingMoreText: false }; dom.hiddenInput.value = ''; dom.textDisplayWrapper.scrollTop = 0; updateStatsDisplay(); updateTextDisplay(); };
-            const handleTyping = () => {
-                if (appState.session.timeLeft <= 0 && appState.config.level !== 'Free Hand' && appState.config.duration > 0) return;
-                if (!appState.isPracticeActive && appState.config.duration > 0) { appState.isPracticeActive = true; appState.session.startTime = Date.now(); startTimer(); }
-                appState.session.typedText = appState.config.level === 'Free Hand' ? dom.freeHandArea.value : dom.hiddenInput.value; updateTextDisplay();
-                const remainingChars = appState.config.sourceChars.length - appState.session.charIndex; if (appState.config.isDynamicText && remainingChars < 100) { appendMoreText(); }
-                if (appState.config.level !== 'Free Hand' && appState.session.charIndex === appState.config.sourceChars.length && !appState.config.isDynamicText) { endPractice(); }
-            };
-            const startTimer = () => { if (appState.timerId || appState.config.duration <= 0) return; appState.timerId = setInterval(() => { if (appState.isPracticeActive) { const elapsed = Math.floor((Date.now() - appState.session.startTime) / 1000); appState.session.timeLeft = appState.config.duration - elapsed; updateStatsDisplay(); } if (appState.session.timeLeft <= 0) { endPractice(); } }, 250); };
-            const updateTextDisplay = () => {
-                if (appState.config.level === 'Free Hand') return;
-                // FIX 1: Normalize user input before comparison
-                const typedChars = splitTextToChars(appState.session.typedText.normalize("NFC"));
-                const charElements = dom.textDisplay.querySelectorAll('.char'); 
-                appState.session.charIndex = typedChars.length; 
-                let correctCount = 0; 
-                let errorCount = 0;
-                charElements.forEach((charEl, index) => { if (index < appState.session.charIndex) { if (typedChars[index] === appState.config.sourceChars[index]) { charEl.className = 'char correct'; correctCount++; } else { charEl.className = 'char incorrect'; errorCount++; } } else { charEl.className = 'char'; } });
-                appState.session.correctChars = correctCount; 
-                appState.session.errorCount = errorCount; 
-                updateCaretPosition();
-            };
-             const updateCaretPosition = () => {
-                const charElements = dom.textDisplay.querySelectorAll('.char');
-                const charIndex = appState.session.charIndex;
-
-                // Hide caret if no text is displayed
-                if (charElements.length === 0) {
-                    dom.caret.style.display = 'none';
-                    return;
-                }
-
-                dom.caret.style.display = 'block';
-
-                const wrapper = dom.textDisplayWrapper;
-                const wrapperRect = wrapper.getBoundingClientRect();
-
-                let targetEl;
-                if (charIndex >= charElements.length) {
-                    // At the end of the text, use the last character.
-                    targetEl = charElements[charElements.length - 1];
-                } else {
-                    // Use the current character.
-                    targetEl = charElements[charIndex];
-                }
-                
-                // If no target character (e.g., text is empty), hide caret.
-                if (!targetEl) {
-                    dom.caret.style.display = 'none';
-                    return;
-                }
-
-                const targetRect = targetEl.getBoundingClientRect();
-                
-                // Calculate caret's left position relative to the wrapper.
-                let left;
-                if (charIndex >= charElements.length) {
-                    // Position after the last character.
-                    left = targetRect.right - wrapperRect.left;
-                } else {
-                    // Position at the beginning of the current character.
-                    left = targetRect.left - wrapperRect.left;
-                }
-                
-                // **FIX 3**: Correctly calculate top position by accounting for the wrapper's scroll.
-                const top = targetRect.top - wrapperRect.top + wrapper.scrollTop;
-
-                dom.caret.style.left = `${left}px`;
-                dom.caret.style.top = `${top}px`;
-
-                // **FIX 2**: Improved auto-scroll logic to keep the current line comfortably in view.
-                const caretLineTop = targetEl.offsetTop; // Position relative to parent (#text-display)
-                const caretLineHeight = targetEl.offsetHeight;
-                const wrapperHeight = wrapper.clientHeight;
-                const currentScrollTop = wrapper.scrollTop;
-
-                // Define a vertical "comfort zone" where no scrolling is needed.
-                // e.g., from 30% down to 70% down the visible area.
-                const comfortZoneTop = currentScrollTop + wrapperHeight * 0.3;
-                const comfortZoneBottom = currentScrollTop + wrapperHeight * 0.7;
-
-                if (caretLineTop < comfortZoneTop) {
-                    // If the current line is above the comfort zone, scroll up to re-center it.
-                    const newScrollTop = Math.max(0, caretLineTop - wrapperHeight * 0.4); // Aim for 40% from top
-                    wrapper.scrollTop = newScrollTop;
-                } else if (caretLineTop + caretLineHeight > comfortZoneBottom) {
-                    // If the current line is below the comfort zone, scroll down to re-center it.
-                    const newScrollTop = caretLineTop + caretLineHeight - wrapperHeight * 0.5; // Aim for 50% from top
-                    wrapper.scrollTop = newScrollTop;
-                }
-                // If within the comfort zone, do nothing to prevent distracting, jittery scrolling.
-            };
-            const updateStatsDisplay = () => {
-                const duration = appState.config.duration > 0 ? Math.max(0, appState.session.timeLeft) : (appState.isPracticeActive ? Math.floor((Date.now() - appState.session.startTime) / 1000) : 0);
-                const minutes = Math.floor(duration / 60); const seconds = duration % 60; dom.stats.time.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                if (!appState.isPracticeActive && appState.session.startTime === 0) return;
-                const elapsedMinutes = (Date.now() - appState.session.startTime) / 60000; if(elapsedMinutes <= 0) return;
-                const totalTypedChars = appState.session.typedText.length; const grossWpm = (totalTypedChars / 5) / elapsedMinutes; const errorCount = appState.session.errorCount; const correctChars = totalTypedChars - errorCount;
-                const netWpm = elapsedMinutes > 0 ? (correctChars / 5) / elapsedMinutes : 0; const accuracy = totalTypedChars > 0 ? (correctChars / totalTypedChars) * 100 : 100;
-                dom.stats.grossWpm.textContent = Math.round(grossWpm); dom.stats.netWpm.textContent = Math.round(Math.max(0, netWpm)); dom.stats.errors.textContent = errorCount; dom.stats.accuracy.textContent = `${Math.round(accuracy)}%`;
-            };
-            const endPractice = () => { if (!appState.isPracticeActive && appState.session.startTime > 0) return; if (appState.timerId) clearInterval(appState.timerId); appState.isPracticeActive = false; appState.session.timeLeft = 0; updateStatsDisplay(); dom.hiddenInput.blur(); dom.freeHandArea.blur(); showResults(); };
-            
             const levenshtein = (a, b) => {
               if (a === b) return 0;
               const n = a.length, m = b.length;
-              if (n === 0) return m;
-              if (m === 0) return n;
-              let prev = Array(m + 1).fill(0), cur = Array(m + 1).fill(0);
-              for (let j = 0; j <= m; j++) prev[j] = j;
+              if (n === 0) return m; if (m === 0) return n;
+              let prev = Array(m + 1).fill(0).map((_, j) => j);
+              let cur = Array(m + 1).fill(0);
               for (let i = 1; i <= n; i++) {
                 cur[0] = i;
                 for (let j = 1; j <= m; j++) {
@@ -1080,381 +1236,434 @@
                 [prev, cur] = [cur, prev];
               }
               return prev[m];
-            }
+            };
 
-            const computeTypingMetrics = ({ referenceText = "", typedText = "", timeSeconds = 1 }) => {
-                const warnings = [];
-                if (timeSeconds <= 0) {
-                    warnings.push("Invalid timeSeconds; must be > 0. Using 1 second as fallback.");
-                    timeSeconds = 1;
-                }
-                const ref = referenceText.trim().replace(/\s+/g, " ");
-                const typed = typedText.trim().replace(/\s+/g, " ");
-                const refWords = ref.length ? ref.split(" ") : [];
-                const typedWords = typed.length ? typed.split(" ") : [];
-                const totalKeystrokes = typed.length;
-                const wordsTypedCount = typedWords.length;
+            const tokenize = (text) => text.normalize("NFC").trim().split(/\s+/).filter(Boolean);
 
-                let fullMistakes = 0;
-                let halfMistakes = 0;
-                const perWord = [];
-                let refIndex = 0;
-
-                for (let i = 0; i < typedWords.length; i++) {
-                    const typedWord = typedWords[i];
-
-                    if (refIndex >= refWords.length) {
-                        // User typed more words than available in the reference text.
-                        fullMistakes++;
-                        perWord.push({ source: null, typed: typedWord, status: "extra" });
-                        continue;
-                    }
-
-                    // Try to find a match for the typed word at or after the current reference index.
-                    let matchIndex = -1;
-                    // Look for an exact match in a small forward window to allow for skipped words.
-                    for (let j = 0; j < 5 && (refIndex + j) < refWords.length; j++) {
-                        if (refWords[refIndex + j] === typedWord) {
-                            matchIndex = refIndex + j;
-                            break;
-                        }
-                    }
-
-                    if (matchIndex !== -1) {
-                        // Found a match. Any words between refIndex and matchIndex are considered skipped.
-                        for (let k = refIndex; k < matchIndex; k++) {
-                            perWord.push({ source: refWords[k], typed: null, status: "full" });
-                            fullMistakes++;
-                        }
-                        // The matched word is correct.
-                        perWord.push({ source: refWords[matchIndex], typed: typedWord, status: "correct" });
-                        refIndex = matchIndex + 1;
-                    } else {
-                        // No exact match found nearby. This is a mistyped word (substitution or insertion).
-                        // We'll treat it as a substitution for the current reference word.
-                        const currentRefWord = refWords[refIndex];
-                        const distance = levenshtein(currentRefWord, typedWord);
-                        const threshold = Math.ceil(currentRefWord.length / 2);
-
-                        if (distance > 0 && distance < threshold) {
-                            halfMistakes++;
-                            perWord.push({ source: currentRefWord, typed: typedWord, status: "half" });
-                        } else {
-                            fullMistakes++;
-                            perWord.push({ source: currentRefWord, typed: typedWord, status: "full" });
-                        }
-                        refIndex++;
-                    }
-                }
-
-                // Any remaining words in the reference text are considered omitted but not counted as mistakes for score calculation.
-                if (refIndex < refWords.length) {
-                    for (let i = refIndex; i < refWords.length; i++) {
-                        perWord.push({ source: refWords[i], typed: null, status: "omitted" });
-                    }
-                }
-                
-                const totalWrongWords = fullMistakes + halfMistakes;
-                const errorPenaltyWords = fullMistakes + (halfMistakes / 2);
-                const minutes = timeSeconds / 60;
-                
-                const grossWPM = minutes > 0 ? (totalKeystrokes / 5) / minutes : 0;
-                const errorPenaltyRate = minutes > 0 ? errorPenaltyWords / minutes : 0;
-                const netWPM = Math.max(0, grossWPM - errorPenaltyRate);
-                const accuracy = grossWPM > 0 ? (netWPM / grossWPM) * 100 : 0;
-
-                return {
-                    totalKeystrokes,
-                    wordsTypedCount,
-                    fullMistakes,
-                    halfMistakes,
-                    totalWrongWords,
-                    grossWPM: +grossWPM.toFixed(2),
-                    netWPM: +netWPM.toFixed(2),
-                    accuracyPercent: +accuracy.toFixed(2),
-                    wordAnalysis: perWord,
-                    warnings
+            // --- STATE MANAGEMENT ---
+            const resetState = () => {
+                appState = {
+                    lang: 'en',
+                    timerId: null,
+                    isPracticeActive: false,
+                    isFetchingMore: false,
+                    config: {
+                        level: '',
+                        method: '',
+                        duration: 0,
+                        sourceText: '',
+                    },
+                    session: {
+                        startTime: 0,
+                        timeLeft: 0,
+                        allRefWords: [], 
+                        refWords: [], 
+                        wordStates: [], 
+                        currentWordIndex: 0,
+                        backspaceCount: 0,
+                        totalKeystrokes: 0,
+                        fullMistakes: 0,
+                        halfMistakes: 0,
+                    },
                 };
-            }
+            };
+            
+            // --- UI AND RENDERING ---
+            const populateLevels = () => { dom.levelSelect.innerHTML = Object.keys(practiceLevels).map(level => `<option value="${level}">${level}</option>`).join(''); };
+            const populateMethods = () => { const selectedLevel = dom.levelSelect.value; const methods = Object.keys(practiceLevels[selectedLevel]); dom.methodSelect.innerHTML = methods.map(method => `<option value="${method}">${method}</option>`).join(''); handleLevelChange(); };
+            const handleLevelChange = () => {
+                const level = dom.levelSelect.value;
+                dom.pasteTextContainer.style.display = (level === 'Paste Your Text') ? 'block' : 'none';
+                dom.methodCard.style.display = (level === 'Paste Your Text' || level === 'Free Hand') ? 'none' : 'flex';
+                dom.durationCard.style.display = (level === 'Free Hand') ? 'none' : 'flex';
+            };
+            const switchView = (view) => { dom.setupView.classList.toggle('active', view === 'setup'); dom.practiceView.classList.toggle('active', view === 'practice'); };
+            
+            const createWordHtml = (word, index) => {
+                 const charsHtml = graphemeSplitter(word).map((char, charIndex) => 
+                    `<span class="char" id="word-${index}-char-${charIndex}">${char}</span>`
+                ).join('');
+                return `<span class="word" id="word-${index}">${charsHtml}</span>`;
+            };
+
+            const renderWords = () => {
+                dom.textDisplay.innerHTML = appState.session.refWords.map(createWordHtml).join('');
+                dom.textDisplay.className = appState.lang === 'hi' ? 'hindi' : '';
+                updateUI();
+            };
+
+            const positionCaretAndScroll = () => {
+                const { session } = appState;
+                const currentWordEl = document.getElementById(`word-${session.currentWordIndex}`);
+                if (currentWordEl) {
+                    dom.caret.style.display = 'block';
+                    const typedValue = dom.hiddenInput.value;
+                    const typedLength = graphemeSplitter(typedValue).length;
+                    
+                    let targetChar;
+                    const chars = currentWordEl.querySelectorAll('.char');
+                    
+                    if (typedLength < chars.length) {
+                       targetChar = chars[typedLength];
+                    } else {
+                       targetChar = chars.length > 0 ? chars[chars.length - 1] : currentWordEl;
+                    }
+                    
+                    const wrapperRect = dom.textDisplayWrapper.getBoundingClientRect();
+                    const targetRect = targetChar.getBoundingClientRect();
+                    
+                    let left;
+                    if (typedLength >= chars.length && chars.length > 0) {
+                        left = targetRect.right - wrapperRect.left;
+                    } else {
+                        left = targetRect.left - wrapperRect.left;
+                    }
+                    
+                    const top = targetRect.top - wrapperRect.top + dom.textDisplayWrapper.scrollTop;
+                    
+                    dom.caret.style.left = `${left}px`;
+                    dom.caret.style.top = `${top}px`;
+
+                    const targetScrollTop = currentWordEl.offsetTop - (dom.textDisplayWrapper.clientHeight * 0.4);
+                    if (Math.abs(dom.textDisplayWrapper.scrollTop - targetScrollTop) > 5) {
+                        dom.textDisplayWrapper.scrollTop = Math.max(0, targetScrollTop);
+                    }
+                } else {
+                    dom.caret.style.display = 'none';
+                }
+            };
+            
+            const updateLiveStats = () => {
+                const elapsedSeconds = appState.session.startTime > 0 ? (Date.now() - appState.session.startTime) / 1000 : 0;
+                if (elapsedSeconds <= 0 && appState.isPracticeActive) return;
+
+                const minutes = Math.floor(appState.session.timeLeft / 60);
+                const seconds = appState.session.timeLeft % 60;
+                dom.stats.time.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                
+                let currentKeystrokes = appState.session.totalKeystrokes;
+                if (dom.hiddenInput.value) {
+                    const typedWord = dom.hiddenInput.value;
+                    const baseKeystrokes = appState.session.wordStates
+                        .slice(0, appState.session.currentWordIndex)
+                        .reduce((sum, s) => sum + (s.typed?.length || 0) + 1, 0);
+                    currentKeystrokes = baseKeystrokes + typedWord.length;
+                }
+
+                const metrics = window.computeTypingMetrics({
+                    timeSeconds: elapsedSeconds > 1 ? elapsedSeconds : 1,
+                    keystrokesOverride: currentKeystrokes,
+                    fullMistakes: appState.session.fullMistakes,
+                    halfMistakes: appState.session.halfMistakes
+                });
+                
+                dom.stats.grossWpm.textContent = metrics.grossWPMDisplay;
+                dom.stats.netWpm.textContent = metrics.netWPMDisplay;
+                dom.stats.errors.textContent = metrics.errorChars.toFixed(1);
+                dom.stats.accuracy.textContent = `${metrics.accuracyDisplay}%`;
+            };
+
+            const updateUI = () => {
+                requestAnimationFrame(() => {
+                    if (!appState.isPracticeActive && appState.session.startTime === 0) return;
+
+                    const { session } = appState;
+                    session.wordStates.forEach((state, index) => {
+                        const el = document.getElementById(`word-${index}`);
+                        if(el) {
+                            let newClass = 'word';
+                            if (index === session.currentWordIndex) newClass += ' current';
+                            else if (state.status !== 'untyped') newClass += ` ${state.status}`;
+                            if (el.className !== newClass) el.className = newClass;
+                        }
+                    });
+                    
+                    positionCaretAndScroll();
+                    updateLiveStats();
+                });
+            };
+
+            // --- CORE TYPING LOGIC ---
+             const appendMoreWords = () => {
+                if (appState.isFetchingMore) return;
+                appState.isFetchingMore = true;
+                
+                const { session } = appState;
+                const currentLength = session.refWords.length;
+                const nextChunk = session.allRefWords.slice(currentLength, currentLength + APPEND_WORDS_COUNT);
+
+                if (nextChunk.length > 0) {
+                    session.refWords.push(...nextChunk);
+                    session.wordStates.push(...nextChunk.map(ref => ({ ref, typed: '', status: 'untyped' })));
+
+                    const fragment = document.createDocumentFragment();
+                    nextChunk.forEach((word, index) => {
+                        const wordEl = document.createElement('span');
+                        wordEl.innerHTML = createWordHtml(word, currentLength + index);
+                        fragment.appendChild(wordEl.firstChild);
+                        fragment.appendChild(document.createTextNode(' '));
+                    });
+                    dom.textDisplay.appendChild(fragment);
+                }
+                appState.isFetchingMore = false;
+            };
+
+            const startPractice = async () => {
+                const level = dom.levelSelect.value;
+
+                if (level === 'Paste Your Text' && dom.pasteTextArea.value.trim() === '') {
+                    alert("Please paste your text before starting.");
+                    return;
+                }
+                dom.startBtn.disabled = true;
+                
+                try {
+                    resetState();
+                    appState.lang = dom.langEnglishBtn.classList.contains('active') ? 'en' : 'hi';
+                    
+                    const method = (level === 'Paste Your Text' || level === 'Free Hand') ? 'Start Practice' : dom.methodSelect.value;
+                    const textGenerator = practiceLevels[level][method];
+                    let sourceText;
+
+                    if (level === 'Free Hand') {
+                        appState.config = { level, method, duration: 0, sourceText: '' };
+                        switchView('practice');
+                        dom.stats.dashboard.style.display = 'none';
+                        dom.textDisplayWrapper.style.display = 'none';
+                        dom.freeHandArea.style.display = 'block';
+                        dom.freeHandArea.value = '';
+                        dom.freeHandArea.focus();
+                        dom.submitBtn.textContent = 'Back to Setup';
+                        return;
+                    }
+
+                    dom.loadingStatus.textContent = 'Preparing your text...';
+                    sourceText = await textGenerator();
+                    
+                    if (!sourceText) throw new Error("Failed to get any practice text.");
+
+                    if (sourceText.length > maxCharsForSmoothPerformance) {
+                        sourceText = sourceText.substring(0, maxCharsForSmoothPerformance);
+                    }
+                    
+                    appState.config = { level, method, duration: parseInt(dom.durationSelect.value, 10) * 60, sourceText };
+                    
+                    const allRefWords = tokenize(sourceText);
+                    appState.session.allRefWords = allRefWords;
+                    appState.session.refWords = allRefWords.slice(0, INITIAL_RENDER_WORDS);
+                    appState.session.wordStates = appState.session.refWords.map(ref => ({ ref, typed: '', status: 'untyped' }));
+                    appState.session.timeLeft = appState.config.duration;
+                    
+                    dom.stats.dashboard.style.display = 'flex';
+                    dom.textDisplayWrapper.style.display = 'block';
+                    dom.freeHandArea.style.display = 'none';
+                    dom.submitBtn.textContent = 'Submit Now';
+
+                    switchView('practice');
+                    renderWords();
+                    dom.hiddenInput.focus();
+                } catch (error) {
+                    console.error("Failed to start practice:", error);
+                    dom.loadingStatus.textContent = 'Error preparing text. Please try again.';
+                } finally {
+                    if (dom.loadingStatus.textContent.includes('Preparing')) dom.loadingStatus.textContent = '';
+                    dom.startBtn.disabled = false;
+                }
+            };
+            
+            const startTimer = () => {
+                if (appState.timerId || appState.config.duration <= 0) return;
+                appState.timerId = setInterval(() => {
+                    if (appState.isPracticeActive) {
+                        const elapsed = Math.floor((Date.now() - appState.session.startTime) / 1000);
+                        appState.session.timeLeft = appState.config.duration - elapsed;
+                        if (appState.session.timeLeft <= 0) {
+                            appState.session.timeLeft = 0;
+                            endPractice();
+                        }
+                        if (appState.session.currentWordIndex >= appState.session.refWords.length - APPEND_WORDS_THRESHOLD && appState.session.refWords.length < appState.session.allRefWords.length) {
+                             appendMoreWords();
+                        }
+                        updateLiveStats();
+                    }
+                }, 250);
+            };
+
+            const commitCurrentWord = () => {
+                const { session } = appState;
+                if (session.currentWordIndex >= session.refWords.length) return;
+
+                const typedWord = dom.hiddenInput.value.trim();
+                const refWord = session.refWords[session.currentWordIndex];
+                const currentState = session.wordStates[session.currentWordIndex];
+                currentState.typed = typedWord;
+                
+                session.totalKeystrokes += graphemeSplitter(typedWord).length + (typedWord ? 1 : 0);
+
+                if (typedWord === "") {
+                    currentState.status = 'omitted';
+                    session.fullMistakes++;
+                } else {
+                    const distance = levenshtein(refWord, typedWord);
+                    if (distance === 0) currentState.status = 'correct';
+                    else if (distance <= Math.ceil(graphemeSplitter(refWord).length / 2)) {
+                        currentState.status = 'half';
+                        session.halfMistakes++;
+                    } else {
+                        currentState.status = 'wrong';
+                        session.fullMistakes++;
+                    }
+                }
+                
+                session.currentWordIndex++;
+                dom.hiddenInput.value = '';
+
+                if (session.currentWordIndex >= session.allRefWords.length) {
+                    endPractice();
+                } else {
+                    if (session.currentWordIndex >= session.refWords.length - APPEND_WORDS_THRESHOLD) {
+                        appendMoreWords();
+                    }
+                    updateUI(); 
+                    positionCaretAndScroll();
+                }
+            };
+
+            const handleKeyDown = (e) => {
+                if (!appState.isPracticeActive && e.key !== 'Tab' && e.key !== 'Shift') {
+                    appState.isPracticeActive = true;
+                    appState.session.startTime = Date.now();
+                    startTimer();
+                }
+
+                if (e.key === 'Backspace') {
+                    appState.session.backspaceCount++;
+                    if (dom.hiddenInput.value === '' && appState.session.currentWordIndex > 0) {
+                        e.preventDefault();
+                        const { session } = appState;
+                        session.currentWordIndex--;
+                        const prevState = session.wordStates[session.currentWordIndex];
+                        if (prevState.status === 'wrong' || (prevState.status === 'omitted' && prevState.typed === '')) session.fullMistakes--;
+                        if (prevState.status === 'half') session.halfMistakes--;
+                        session.totalKeystrokes -= (graphemeSplitter(prevState.typed || '').length + (prevState.typed ? 1 : 0));
+                        prevState.status = 'untyped';
+                        dom.hiddenInput.value = prevState.typed || '';
+                        updateUI();
+                        positionCaretAndScroll();
+                        return;
+                    }
+                }
+            };
+
+            const handleInput = () => {
+                if (!appState.isPracticeActive) {
+                     if (dom.hiddenInput.value) { // Auto-start timer on first input
+                        appState.isPracticeActive = true;
+                        appState.session.startTime = Date.now();
+                        startTimer();
+                    } else {
+                        return;
+                    }
+                }
+                if (appState.session.timeLeft <= 0 && appState.config.duration > 0) return;
+
+                const typedValue = dom.hiddenInput.value;
+                if (typedValue.endsWith(' ')) {
+                    if(typedValue.trim() !== '' || appState.session.currentWordIndex < appState.session.refWords.length) {
+                        commitCurrentWord();
+                    }
+                    return;
+                }
+                
+                const { session } = appState;
+                const refWord = session.refWords[session.currentWordIndex];
+                if (autoShiftEnabled && refWord && graphemeSplitter(typedValue).length === graphemeSplitter(refWord).length) {
+                    commitCurrentWord();
+                } else {
+                    updateUI();
+                }
+            };
+            
+            const endPractice = () => {
+                if (appState.config.level === 'Free Hand') {
+                    switchView('setup');
+                    return;
+                }
+                if (appState.timerId) clearInterval(appState.timerId);
+                if (!appState.isPracticeActive && appState.session.startTime > 0) return;
+                if(dom.hiddenInput.value && appState.session.currentWordIndex < appState.session.refWords.length){
+                    commitCurrentWord();
+                }
+                appState.isPracticeActive = false;
+                dom.hiddenInput.blur();
+                showResults();
+            };
 
             const showResults = () => {
-                const timeTakenSec = appState.isPracticeActive ? 0 : (appState.session.startTime > 0 ? Math.round((Date.now() - appState.session.startTime) / 1000) : appState.config.duration);
-                const durationMinutes = appState.config.duration / 60;
-                
-                const metrics = computeTypingMetrics({
-                    referenceText: appState.config.sourceText,
-                    typedText: appState.session.typedText,
-                    timeSeconds: timeTakenSec > 0 ? timeTakenSec : appState.config.duration
+                const timeTakenSec = appState.session.startTime > 0 ? Math.min(appState.config.duration, Math.round((Date.now() - appState.session.startTime) / 1000)) : appState.config.duration;
+                const effectiveTime = timeTakenSec > 0 ? timeTakenSec : 1;
+                const finalKeystrokes = appState.session.wordStates.slice(0, appState.session.currentWordIndex).reduce((sum, s) => sum + graphemeSplitter(s.typed || '').length + (s.typed ? 1 : 0) , 0) -1;
+
+                const finalMetrics = window.computeTypingMetrics({
+                    timeSeconds: effectiveTime,
+                    keystrokesOverride: Math.max(0, finalKeystrokes),
+                    fullMistakes: appState.session.fullMistakes,
+                    halfMistakes: appState.session.halfMistakes,
                 });
                 
-                const timeTakenMin = (timeTakenSec > 0 ? timeTakenSec : appState.config.duration) / 60;
-
-                const isQualified = metrics.netWPM >= 30 && metrics.accuracyPercent >= 90;
-                
-                const keystrokeWarning = metrics.warnings.length > 0 ? metrics.warnings.join(' ') : '';
-
-
+                const isQualified = appState.lang === 'en' ? (finalMetrics.netWPM >= 30) : (finalMetrics.netWPM >= 25);
                 dom.newResults.passageTitle.textContent = `${appState.config.level}: ${appState.config.method}`;
-                dom.newResults.timeDuration.textContent = `${durationMinutes.toFixed(2)}`;
-                dom.newResults.timeTaken.textContent = `${timeTakenMin.toFixed(2)}`;
-                dom.newResults.keystrokes.textContent = metrics.totalKeystrokes;
-                dom.newResults.wordsTyped.textContent = metrics.wordsTypedCount;
-                dom.newResults.fullMistakes.textContent = metrics.fullMistakes;
-                dom.newResults.halfMistakes.textContent = metrics.halfMistakes;
-                dom.newResults.totalWrongWords.textContent = metrics.totalWrongWords;
-                dom.newResults.accuracy.textContent = metrics.accuracyPercent.toFixed(2);
-                dom.newResults.grossSpeed.textContent = metrics.grossWPM.toFixed(2);
-                dom.newResults.netSpeed.textContent = metrics.netWPM.toFixed(2);
+                dom.newResults.timeDuration.textContent = (appState.config.duration / 60).toFixed(2);
+                dom.newResults.timeTaken.textContent = (effectiveTime / 60).toFixed(2);
+                dom.newResults.keystrokes.textContent = finalMetrics.totalKeystrokes;
+                dom.newResults.wordsTyped.textContent = appState.session.wordStates.slice(0, appState.session.currentWordIndex).filter(s => s.typed).length;
+                dom.newResults.fullMistakes.textContent = appState.session.fullMistakes;
+                dom.newResults.halfMistakes.textContent = appState.session.halfMistakes;
+                dom.newResults.totalWrongWords.textContent = (appState.session.fullMistakes + appState.session.halfMistakes);
+                dom.newResults.accuracy.textContent = finalMetrics.accuracyDisplay;
+                dom.newResults.grossSpeed.textContent = finalMetrics.grossWPMDisplay;
+                dom.newResults.netSpeed.textContent = finalMetrics.netWPMDisplay;
                 dom.newResults.backspaceCount.textContent = appState.session.backspaceCount;
-                
                 dom.newResults.resultText.textContent = isQualified ? "Qualified" : "Not Qualified";
                 dom.newResults.resultCard.className = isQualified ? 'result-card qualified' : 'result-card not-qualified';
-                dom.newResults.keystrokeWarning.textContent = keystrokeWarning;
-                
-                const errorPenaltyWords = metrics.fullMistakes + (metrics.halfMistakes / 2);
-                const formulaParts = [
-                    `<code>Error Penalty = Full (${metrics.fullMistakes}) + Half (${metrics.halfMistakes} ÷ 2) = ${errorPenaltyWords.toFixed(2)} words</code>`,
-                    `<code>Gross WPM = (Total Chars Typed ÷ 5) ÷ Time = (${metrics.totalKeystrokes} ÷ 5) ÷ ${timeTakenMin.toFixed(2)} = ${metrics.grossWPM.toFixed(2)}</code>`,
-                    `<code>Net WPM = Gross WPM - (Error Penalty ÷ Time) = ${metrics.grossWPM.toFixed(2)} - (${errorPenaltyWords.toFixed(2)} ÷ ${timeTakenMin.toFixed(2)}) = ${metrics.netWPM.toFixed(2)}</code>`,
-                ];
-                dom.newResults.formulaNote.innerHTML = formulaParts.join('\n');
+                dom.newResults.formulaNote.innerHTML = `<code>Gross WPM</code> = (Total Keystrokes / 5) / Time (min)<br><code>Error Penalty</code> = Full Mistakes + (Half Mistakes / 2)<br><code>Net WPM</code> = Gross WPM - Error Penalty<br><code>Accuracy</code> = (Net WPM / Gross WPM) * 100`.trim().replace(/\s{2,}/g, ' ');
 
                 let originalHTML = '', typedHTML = '';
-                metrics.wordAnalysis.forEach(({ source, typed, status }) => {
-                    const s = source || '';
-                    const t = typed || '';
-                    switch(status) {
-                        case 'correct': originalHTML += `<span class="correct-word">${s}</span> `; typedHTML += `<span class="correct-word">${t}</span> `; break;
-                        case 'half': originalHTML += `<span class="half-mistake-word">${s}</span> `; typedHTML += `<span class="half-mistake-word">${t}</span> `; break;
-                        case 'full': originalHTML += `<span class="wrong-word">${s}</span> `; typedHTML += `<span class="wrong-word">${t}</span> `; break;
-                        case 'omitted': originalHTML += `<span class="omitted-word">${s}</span> `; typedHTML += ` `; break;
-                        case 'extra': originalHTML += ` `; typedHTML += `<span class="wrong-word">${t}</span> `; break;
+                appState.session.wordStates.slice(0, appState.session.currentWordIndex).forEach(state => {
+                    const s = state.ref || '', t = state.typed || '';
+                    const statusClass = { 'correct': 'correct-word', 'wrong': 'wrong-word', 'half': 'half-mistake-word', 'omitted': 'omitted-word' }[state.status] || '';
+                    if (state.status === 'omitted' || state.status === 'untyped') {
+                         originalHTML += `<span class="omitted-word">${s}</span> `;
+                         typedHTML += ` `;
+                    } else if(statusClass) {
+                        originalHTML += `<span class="${statusClass}">${s}</span> `;
+                        typedHTML += `<span class="${statusClass}">${t}</span> `;
+                    } else {
+                         originalHTML += `<span>${s}</span> `;
+                         typedHTML += `<span>${t}</span> `;
                     }
                 });
-
                 dom.newResults.originalPassage.innerHTML = originalHTML;
                 dom.newResults.typedPassage.innerHTML = typedHTML;
-
-                const currentResult = {
-                    timestamp: Date.now(),
-                    level: appState.config.level,
-                    method: appState.config.method,
-                    lang: appState.lang,
-                    duration: durationMinutes,
-                    grossWPM: metrics.grossWPM,
-                    netWPM: metrics.netWPM,
-                    accuracy: metrics.accuracyPercent,
-                    errors: metrics.totalWrongWords,
-                    keystrokes: metrics.totalKeystrokes,
-                    backspaceCount: appState.session.backspaceCount,
-                    qualified: isQualified,
-                    wordAnalysis: metrics.wordAnalysis,
-                };
-
-                const allResults = getStoredResults();
-                allResults.push(currentResult);
-                saveResults(allResults);
-
-                const { todaySeconds, totalSeconds } = updatePracticeTime(timeTakenSec);
-                dom.practiceDurationSummary.style.display = 'block';
-                dom.resTodayPracticeTime.textContent = formatDuration(todaySeconds);
-                dom.resTotalPracticeTime.textContent = formatDuration(totalSeconds);
-
-                renderAnalytics(allResults);
-
+                
+                updateMistakeHistory();
+                renderMistakeAnalysis();
+                updatePracticeHistory(finalMetrics);
+                renderProgressGraphs();
+                if (isQualified) triggerCelebration();
+                
                 dom.resultsModal.classList.add('active');
             };
 
-            const hideResults = () => {
-                dom.resultsModal.classList.remove('active');
-                if (speedChart) speedChart.destroy();
-                if (accuracyChart) accuracyChart.destroy();
-                dom.practiceDurationSummary.style.display = 'none';
-                dom.performanceReviewSection.style.display = 'none';
-                dom.weaknessAnalysisSection.style.display = 'none';
-                dom.improvementTipsSection.style.display = 'none';
-                dom.progressGraphsSection.style.display = 'none';
-            };
-
-            const renderAnalytics = (results) => {
-                const currentResult = results[results.length - 1];
-                renderPerformanceReview(results);
-                renderWeaknessAnalysis(results);
-                renderProgressGraphs(results);
-                renderImprovementTips(currentResult);
-            };
-
-            const renderPerformanceReview = (results) => {
-                if (results.length < 2) {
-                    dom.performanceReviewSection.style.display = 'none';
-                    return;
-                }
-                dom.performanceReviewSection.style.display = 'block';
-                const current = results[results.length - 1];
-                const previous = results[results.length - 2];
-                
-                let feedback = [];
-                const wpmDiff = current.netWPM - previous.netWPM;
-                const accDiff = current.accuracy - previous.accuracy;
-                const errDiff = current.errors - previous.errors;
-
-                if (wpmDiff > 0) feedback.push(`Speed improved by <span style="color:var(--primary-color)">+${wpmDiff.toFixed(2)} WPM</span>.`);
-                else if (wpmDiff < 0) feedback.push(`Speed decreased by <span style="color:var(--error-color)">${wpmDiff.toFixed(2)} WPM</span>.`);
-                
-                if (accDiff > 0) feedback.push(`Accuracy increased by <span style="color:var(--primary-color)">+${accDiff.toFixed(2)}%</span>.`);
-                else if (accDiff < 0) feedback.push(`Accuracy decreased by <span style="color:var(--error-color)">${accDiff.toFixed(2)}%</span>.`);
-
-                if (errDiff < 0) feedback.push(`Errors reduced by <span style="color:var(--primary-color)">${-errDiff}</span>.`);
-                else if (errDiff > 0) feedback.push(`Errors increased by <span style="color:var(--error-color)">${errDiff}</span>.`);
-
-                if (feedback.length === 0) feedback.push("Your performance is consistent. Keep practicing!");
-                else if (wpmDiff > 0 && accDiff > 0) feedback.push("Excellent improvement! Keep up the great work!");
-                else if (wpmDiff < 0 || accDiff < 0) feedback.push("Focus on consistency and accuracy in your next session.");
-                
-                dom.performanceFeedback.innerHTML = feedback.join('\n');
-            };
-
-            const renderWeaknessAnalysis = (results) => {
-                const generateMistakeList = (filteredResults) => {
-                    const mistakeMap = new Map();
-                    filteredResults.flatMap(r => r.wordAnalysis || [])
-                        .filter(w => w.status !== 'correct' && w.source)
-                        .forEach(w => {
-                            if (!mistakeMap.has(w.source)) {
-                                mistakeMap.set(w.source, { count: 0, typedAs: new Map() });
-                            }
-                            const entry = mistakeMap.get(w.source);
-                            entry.count++;
-                            if (w.typed) {
-                                entry.typedAs.set(w.typed, (entry.typedAs.get(w.typed) || 0) + 1);
-                            }
-                        });
-
-                    if (mistakeMap.size === 0) return null;
-
-                    const sortedMistakes = [...mistakeMap.entries()].sort((a, b) => b[1].count - a[1].count).slice(0, 5);
-                    
-                    let html = '<ul>';
-                    sortedMistakes.forEach(([source, data]) => {
-                        const commonTyped = [...data.typedAs.entries()].sort((a, b) => b[1] - a[1])[0];
-                        html += `<li>Mistyped '<span class="mistake-word">${source}</span>' (${data.count} times)`;
-                        if (commonTyped) {
-                             html += `, often as '<span class="suggestion-word">${commonTyped[0]}</span>'`;
-                        }
-                        html += `.</li>`;
-                    });
-                    html += '</ul>';
-                    return html;
-                };
-
-                const englishResults = results.filter(r => r.lang === 'en');
-                const hindiResults = results.filter(r => r.lang === 'hi');
-
-                const englishMistakesHTML = generateMistakeList(englishResults);
-                const hindiMistakesHTML = generateMistakeList(hindiResults);
-
-                let anyMistakesFound = false;
-
-                if (englishMistakesHTML) {
-                    dom.englishMistakesContainer.style.display = 'block';
-                    dom.englishMistakesList.innerHTML = englishMistakesHTML;
-                    anyMistakesFound = true;
-                } else {
-                    dom.englishMistakesContainer.style.display = 'none';
-                }
-
-                if (hindiMistakesHTML) {
-                    dom.hindiMistakesContainer.style.display = 'block';
-                    dom.hindiMistakesList.innerHTML = hindiMistakesHTML;
-                    anyMistakesFound = true;
-                } else {
-                    dom.hindiMistakesContainer.style.display = 'none';
-                }
-
-                dom.weaknessAnalysisSection.style.display = anyMistakesFound ? 'block' : 'none';
-            };
-
-            const renderImprovementTips = (currentResult) => {
-                const { accuracy, netWPM, grossWPM, backspaceCount, wordAnalysis } = currentResult;
-                let tips = [];
-
-                if (accuracy < 90) {
-                    tips.push("Your accuracy is low. Try to focus on typing correctly rather than speed. Precision is key!");
-                } else if (accuracy < 95) {
-                    tips.push("Good accuracy! Slow down just a bit to eliminate those few remaining errors.");
-                }
-
-                const wpmDifference = grossWPM - netWPM;
-                if (wpmDifference > 10) {
-                    tips.push("A high number of errors is reducing your Net Speed. Focus on accuracy to see a big improvement.");
-                }
-
-                if (backspaceCount > (currentResult.keystrokes / 20)) { // If backspace is more than 5% of keystrokes
-                    tips.push("You're using the backspace key frequently. Try to type more deliberately to build a better rhythm and flow.");
-                }
-                
-                const halfMistakes = (wordAnalysis || []).filter(w => w.status === 'half').length;
-                const fullMistakes = (wordAnalysis || []).filter(w => w.status === 'full').length;
-                if (halfMistakes > fullMistakes && halfMistakes > 3) {
-                     tips.push("You're making many minor typos (half mistakes). Double-check for small errors like an extra or missed letter before moving on.");
-                }
-
-                if (tips.length === 0) {
-                    tips.push("Great work! Your performance is solid. Keep practicing regularly to maintain and improve your skills.");
-                }
-                
-                dom.improvementTips.innerHTML = '<ul>' + tips.map(tip => `<li>${tip}</li>`).join('') + '</ul>';
-                dom.improvementTipsSection.style.display = 'block';
-            };
-
-
-            const renderProgressGraphs = (results) => {
-                const recentResults = results.slice(-10);
-
-                if (recentResults.length < 2) {
-                    dom.progressGraphsSection.style.display = 'none';
-                    return;
-                }
-                dom.progressGraphsSection.style.display = 'block';
-
-                if (speedChart) speedChart.destroy();
-                if (accuracyChart) accuracyChart.destroy();
-
-                const labels = recentResults.map((_, i) => `Test ${results.length - recentResults.length + i + 1}`);
-                const speedData = {
-                    labels,
-                    datasets: [
-                        { label: 'Gross WPM', data: recentResults.map(r => r.grossWPM), borderColor: '#2196F3', tension: 0.1, backgroundColor: 'rgba(33, 150, 243, 0.1)', fill: true },
-                        { label: 'Net WPM', data: recentResults.map(r => r.netWPM), borderColor: 'var(--primary-color)', tension: 0.1, backgroundColor: 'rgba(76, 175, 80, 0.1)', fill: true }
-                    ]
-                };
-                const accuracyData = {
-                    labels,
-                    datasets: [
-                        { label: 'Accuracy (%)', data: recentResults.map(r => r.accuracy), borderColor: '#FFC107', tension: 0.1, yAxisID: 'y', backgroundColor: 'rgba(255, 193, 7, 0.1)', fill: true },
-                        { label: 'Errors', data: recentResults.map(r => r.errors), borderColor: 'var(--error-color)', tension: 0.1, yAxisID: 'y1', backgroundColor: 'rgba(244, 67, 54, 0.1)', fill: true }
-                    ]
-                };
-                
-                const chartOptions = {
-                    responsive: true, maintainAspectRatio: true,
-                    plugins: { legend: { labels: { color: '#ccc' } } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#444' }, ticks: { color: '#ccc' } },
-                        x: { grid: { color: '#444' }, ticks: { color: '#ccc', maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }
-                    }
-                };
-
-                speedChart = new Chart(dom.speedChartCanvas, { type: 'line', data: speedData, options: { ...chartOptions, plugins: { ...chartOptions.plugins, title: { display: true, text: 'Typing Speed (WPM)', color: '#fff' } } } });
-                accuracyChart = new Chart(dom.accuracyChartCanvas, { type: 'line', data: accuracyData, options: { ...chartOptions, plugins: { ...chartOptions.plugins, title: { display: true, text: 'Accuracy & Errors', color: '#fff' } }, scales: { ...chartOptions.scales, y1: { type: 'linear', display: true, position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, ticks: { color: '#ccc' } } } } });
-            };
-
+            const hideResults = () => { dom.resultsModal.classList.remove('active'); };
+            
+            // --- INITIALIZATION ---
             const init = () => {
-                resetState(); populateLevels(); populateMethods();
-                Chart.defaults.color = '#ccc'; Chart.defaults.borderColor = '#444';
-                const visitCountEl = document.getElementById("visitCount"); if (visitCountEl) { let count = parseInt(localStorage.getItem("visitorCount") || "0"); count++; localStorage.setItem("visitorCount", String(count)); visitCountEl.textContent = count.toLocaleString(); }
+                resetState();
+                populateLevels();
+                populateMethods();
+
                 dom.levelSelect.addEventListener('change', populateMethods);
-                dom.methodSelect.addEventListener('change', handleMethodChange);
                 [dom.langEnglishBtn, dom.langHindiBtn].forEach(btn => {
                     btn.addEventListener('click', () => {
                         dom.langEnglishBtn.classList.remove('active');
@@ -1465,33 +1674,41 @@
                 });
                 dom.startBtn.addEventListener('click', startPractice);
                 dom.submitBtn.addEventListener('click', endPractice);
-                dom.hiddenInput.addEventListener('input', handleTyping);
-                dom.hiddenInput.addEventListener('keydown', (e) => { appState.session.keystrokes++; if (e.key === 'Backspace') { appState.session.backspaceCount++; } if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) e.preventDefault(); });
-                dom.freeHandArea.addEventListener('input', handleTyping);
-                dom.freeHandArea.addEventListener('keydown', (e) => { appState.session.keystrokes++; if (e.key === 'Backspace') { appState.session.backspaceCount++; } });
-                dom.textDisplayWrapper.addEventListener('click', () => { appState.config.level === 'Free Hand' ? dom.freeHandArea.focus() : dom.hiddenInput.focus(); });
+                dom.hiddenInput.addEventListener('keydown', handleKeyDown);
+                dom.hiddenInput.addEventListener('input', handleInput);
+                dom.textDisplayWrapper.addEventListener('click', () => dom.hiddenInput.focus());
                 
                 dom.resultActions.retry.addEventListener('click', () => {
                     hideResults();
-                    const oldConfig = { ...appState.config }; resetSession(); appState.config = oldConfig;
-                    if(appState.config.level !== 'Free Hand') {
-                        dom.textDisplay.innerHTML = appState.config.sourceChars.map(char => `<span class="char">${char}</span>`).join('');
-                        dom.textDisplay.className = appState.lang === 'hi' ? 'hindi' : '';
-                    }
-                     dom.freeHandArea.value = '';
+                    const oldConfig = { ...appState.config };
+                    resetState();
+                    appState.config = oldConfig;
+                    appState.lang = dom.langEnglishBtn.classList.contains('active') ? 'en' : 'hi';
+                    
+                    const allRefWords = tokenize(oldConfig.sourceText);
+                    appState.session.allRefWords = allRefWords;
+                    appState.session.refWords = allRefWords.slice(0, INITIAL_RENDER_WORDS);
+                    appState.session.wordStates = appState.session.refWords.map(ref => ({ ref, typed: '', status: 'untyped' }));
+                    appState.session.timeLeft = oldConfig.duration;
+                    
                     switchView('practice');
-                    appState.config.level === 'Free Hand' ? dom.freeHandArea.focus() : dom.hiddenInput.focus();
+                    renderWords();
+                    dom.hiddenInput.focus();
                 });
                 dom.resultActions.newTest.addEventListener('click', () => {
-                    if (appState.config.level === 'Uplode Your Text') dom.pasteTextArea.value = '';
-                    hideResults();
-                    startPractice();
-                });
-                dom.resultActions.backToHome.addEventListener('click', () => {
-                    if (appState.config.level === 'Uplode Your Text') dom.pasteTextArea.value = '';
+                    if (appState.config.level === 'Paste Your Text') dom.pasteTextArea.value = '';
                     hideResults();
                     switchView('setup');
                 });
+                dom.resultActions.backToHome.addEventListener('click', () => {
+                    if (appState.config.level === 'Paste Your Text') dom.pasteTextArea.value = '';
+                    hideResults();
+                    switchView('setup');
+                });
+                
+                dom.loadingStatus.textContent = 'Fetching fresh articles... This may take a moment on your first visit.';
+                prefetchArticle('en');
+                prefetchArticle('hi');
             };
 
             init();
@@ -1501,300 +1718,50 @@
 <!-- Unified metrics override script (appends at end). -->
 <script>
 (function(){
-  // Grapheme splitter using Intl.Segmenter if available; fallback to Array.from
-  function graphemes(s){
-    if (!s) return [];
-    try {
-      if (typeof Intl !== 'undefined' && Intl.Segmenter) {
-        const seg = new Intl.Segmenter(undefined, {granularity: 'grapheme'});
-        const arr = [];
-        for (const part of seg.segment(s)) arr.push(part.segment);
-        return arr;
-      }
-    } catch (e){}
-    return Array.from(s);
-  }
-
-  // Compute edit distance (Levenshtein) between two arrays (graphemes)
-  function editDistanceArray(a, b) {
-    const n = a.length, m = b.length;
-    if (n === 0) return m;
-    if (m === 0) return n;
-    const dp = Array(n+1).fill(null).map(()=>Array(m+1).fill(0));
-    for (let i=0;i<=n;i++) dp[i][0]=i;
-    for (let j=0;j<=m;j++) dp[0][j]=j;
-    for (let i=1;i<=n;i++){
-      for (let j=1;j<=m;j++){
-        const cost = a[i-1] === b[j-1] ? 0 : 1;
-        dp[i][j] = Math.min(
-          dp[i-1][j] + 1,
-          dp[i][j-1] + 1,
-          dp[i-1][j-1] + cost
-        );
-      }
-    }
-    return dp[n][m];
-  }
-
-  // Unified computeTypingMetrics - replaces/falls back to original name
-  function unifiedComputeTypingMetrics({referenceText = "", typedText = "", timeSeconds = 1, keystrokesOverride = null} = {}) {
-    const ref = typeof referenceText === 'string' ? referenceText : String(referenceText || '');
-    const typed = typeof typedText === 'string' ? typedText : String(typedText || '');
+  /**
+   * Calculates typing metrics based on government exam formulas.
+   * @param {object} options - The options for calculation.
+   * @param {number} [options.timeSeconds=1] - The total time elapsed in seconds.
+   * @param {number} [options.keystrokesOverride=0] - The total number of characters typed.
+   * @param {number} [options.fullMistakes=0] - The count of full-mistake words.
+   * @param {number} [options.halfMistakes=0] - The count of half-mistake words.
+   * @returns {object} An object containing all calculated typing metrics.
+   */
+  function unifiedComputeTypingMetrics({timeSeconds = 1, keystrokesOverride = 0, fullMistakes = 0, halfMistakes = 0} = {}) {
     const timeSec = (typeof timeSeconds === 'number' && timeSeconds > 0) ? timeSeconds : 1;
     const minutes = timeSec / 60;
+    const totalKeystrokes = Number(keystrokesOverride) || 0;
 
-    const typedG = graphemes(typed);
-    const refG = graphemes(ref);
+    // 1. Gross WPM = (Total Characters Typed / 5) / Time (minutes)
+    const grossWPM = minutes > 0 ? ((totalKeystrokes / 5) / minutes) : 0;
 
-    // keystrokes = physical keystrokes if provided, else grapheme length of typed (counts IME/paste reasonably)
-    const totalKeystrokes = (keystrokesOverride != null) ? Number(keystrokesOverride) : typedG.length;
-    const totalKeystrokesSafe = totalKeystrokes > 0 ? totalKeystrokes : typedG.length;
+    // 2. Error Penalty (in words) = Full Mistakes + (Half Mistakes / 2)
+    const errorPenaltyWords = fullMistakes + (halfMistakes / 2);
 
-    // grossWPM per standard: (keystrokes / 5) / minutes
-    const grossWPM = minutes > 0 ? ((totalKeystrokesSafe / 5) / minutes) : 0;
-
-    // errors: use grapheme-level edit distance between reference and typed as errorChars
-    const errorChars = editDistanceArray(refG, typedG);
-
-    // netWPM: penalize by errors converted to "words" (5 chars per word)
-    const netWPM = minutes > 0 ? Math.max(0, ((totalKeystrokesSafe - errorChars) / 5) / minutes) : 0;
-
-    // accuracy by keystrokes
-    const accuracyPercent = totalKeystrokesSafe > 0 ? ((totalKeystrokesSafe - errorChars) / totalKeystrokesSafe) * 100 : 100;
-
-    // errors per minute and raw error count
-    const errorsPerMinute = minutes > 0 ? (errorChars / minutes) : errorChars;
-
-    // Provide a few convenience fields
+    // 3. Net WPM = Gross WPM - Error Penalty (total words, not a rate)
+    const netWPM = Math.max(0, grossWPM - errorPenaltyWords);
+    
+    // 4. Accuracy (%) = (Net WPM / Gross WPM) * 100
+    const accuracyPercent = grossWPM > 0 ? Math.max(0, (netWPM / grossWPM)) * 100 : 100;
+    
     return {
       grossWPM,
       netWPM,
       accuracyPercent,
-      totalKeystrokes: totalKeystrokesSafe,
-      errorChars,
-      errorsPerMinute,
+      totalKeystrokes: totalKeystrokes,
+      errorChars: errorPenaltyWords, // Re-purposing this to hold total penalty in words
       timeSeconds: timeSec,
-      // helpful formatted numbers for display
       grossWPMDisplay: Math.round(grossWPM),
       netWPMDisplay: Math.round(netWPM),
-      accuracyDisplay: Math.round(accuracyPercent),
+      accuracyDisplay: accuracyPercent.toFixed(2),
     };
   }
 
-  // Attempt to replace existing computeTypingMetrics with the unified one
-  try {
-    if (typeof window !== 'undefined') {
-      window.computeTypingMetrics_unified = unifiedComputeTypingMetrics;
-      // Overwrite existing function if present, else create alias
+  if (typeof window !== 'undefined') {
       window.computeTypingMetrics = unifiedComputeTypingMetrics;
-    }
-  } catch(e){ console.warn('Could not attach unified computeTypingMetrics to window', e); }
-
-  // Centralized calculator that reads appState and returns metrics
-  function calculateTypingStatsFromAppState() {
-    try {
-      const state = window.appState || window.state || {};
-      const cfg = state.config || {};
-      const session = state.session || {};
-      const refText = cfg.sourceText || cfg.referenceText || document.querySelector('#sourceText')?.textContent || '';
-      const typedText = session.typedText != null ? session.typedText : (document.querySelector('#hiddenInput')?.value || '');
-      const start = session.startTime || state.startTime || 0;
-      const now = Date.now();
-      const elapsedSec = (start && start > 0) ? Math.round((now - start)/1000) : (session.timeElapsed || cfg.duration || 0);
-      const safeSec = elapsedSec > 0 ? elapsedSec : 1;
-      const keystrokes = session.keystrokes != null ? session.keystrokes : null;
-
-      const metrics = unifiedComputeTypingMetrics({
-        referenceText: refText,
-        typedText: typedText,
-        timeSeconds: safeSec,
-        keystrokesOverride: keystrokes
-      });
-
-      // attach for debugging
-      session._latestMetrics = metrics;
-      if (window.appState) window.appState.session = session;
-      return metrics;
-    } catch (err) {
-      console.error('calculateTypingStatsFromAppState error', err);
-      return unifiedComputeTypingMetrics({referenceText:'', typedText:'', timeSeconds:1, keystrokesOverride:0});
-    }
   }
 
-  // Patch updateStatsDisplay to use unified metrics (if updateStatsDisplay exists)
-  try {
-    if (typeof window.updateStatsDisplay === 'function') {
-      const oldUpdate = window.updateStatsDisplay;
-      window.updateStatsDisplay = function patched_updateStatsDisplay() {
-        try {
-          const metrics = calculateTypingStatsFromAppState();
-
-          // Try to update known DOM containers (be defensive - check existence)
-          // Common ids/classes that may exist in typical layouts:
-          const map = [
-            {id:'#gross-wpm', val: metrics.grossWPMDisplay},
-            {id:'#net-wpm', val: metrics.netWPMDisplay},
-            {id:'#accuracy', val: metrics.accuracyDisplay + '%'},
-            {id:'#errors', val: metrics.errorChars},
-            {id:'#keystrokes', val: metrics.totalKeystrokes}
-          ];
-          map.forEach(item=>{
-            const el = document.querySelector(item.id);
-            if (el) el.textContent = item.val;
-          });
-
-          // Also try to update dom.stats if present (old code used dom.stats.grossWpm etc.)
-          try {
-            if (window.dom && dom.stats) {
-              if (dom.stats.grossWpm) dom.stats.grossWpm.textContent = metrics.grossWPMDisplay;
-              if (dom.stats.netWpm) dom.stats.netWpm.textContent = metrics.netWPMDisplay;
-              if (dom.stats.accuracy) dom.stats.accuracy.textContent = metrics.accuracyDisplay + '%';
-              if (dom.stats.errors) dom.stats.errors.textContent = metrics.errorChars;
-              if (dom.stats.keystrokes) dom.stats.keystrokes.textContent = metrics.totalKeystrokes;
-            }
-          } catch(e){ /* ignore */ }
-
-        } catch(e){
-          console.error('patched_updateStatsDisplay error', e);
-        }
-
-        // Call original to preserve other behaviors (cursor, highlights). Wrap in try/catch.
-        try { oldUpdate.apply(this, arguments); } catch(e){ /* if original fails, ignore */ }
-      };
-      console.info('updateStatsDisplay patched to use unified metrics.');
-    } else {
-      // define a lightweight updateStatsDisplay if none exists
-      window.updateStatsDisplay = function(){
-        const metrics = calculateTypingStatsFromAppState();
-        const elGross = document.querySelector('#gross-wpm');
-        if (elGross) elGross.textContent = metrics.grossWPMDisplay;
-        const elNet = document.querySelector('#net-wpm');
-        if (elNet) elNet.textContent = metrics.netWPMDisplay;
-        const elAcc = document.querySelector('#accuracy');
-        if (elAcc) elAcc.textContent = metrics.accuracyDisplay + '%';
-        const elErr = document.querySelector('#errors');
-        if (elErr) elErr.textContent = metrics.errorChars;
-        const elKs = document.querySelector('#keystrokes');
-        if (elKs) elKs.textContent = metrics.totalKeystrokes;
-      };
-      console.info('updateStatsDisplay created (unified).');
-    }
-  } catch(e){ console.warn('Could not patch updateStatsDisplay', e); }
-
-  // Patch showResults to compute final metrics from unified calculator and write to UI / history
-  try {
-    if (typeof window.showResults === 'function') {
-      const oldShow = window.showResults;
-      window.showResults = function patched_showResults() {
-        try {
-          const metrics = calculateTypingStatsFromAppState();
-          // Try to populate typical result card elements (defensive)
-          const selectors = {
-            gross: ['#result-gross-wpm','#gross-wpm','#finalGrossWpm','.result-gross'],
-            net: ['#result-net-wpm','#net-wpm','#finalNetWpm','.result-net'],
-            acc: ['#result-accuracy','#accuracy','#finalAccuracy','.result-accuracy'],
-            err: ['#result-errors','#errors','.result-errors'],
-            ks:  ['#result-keystrokes','#keystrokes','.result-keystrokes']
-          };
-          function setFirst(selList, value){
-            for (const s of selList){
-              const el = document.querySelector(s);
-              if (el){ el.textContent = value; break; }
-            }
-          }
-          setFirst(selectors.gross, metrics.grossWPMDisplay);
-          setFirst(selectors.net, metrics.netWPMDisplay);
-          setFirst(selectors.acc, metrics.accuracyDisplay + '%');
-          setFirst(selectors.err, metrics.errorChars);
-          setFirst(selectors.ks, metrics.totalKeystrokes);
-
-          // If history saving function exists, try to update it with unified metrics
-          try {
-            if (typeof window.saveResultToHistory === 'function') {
-              // create a minimal result payload
-              const payload = {
-                time: Date.now(),
-                grossWPM: Math.round(metrics.grossWPM),
-                netWPM: Math.round(metrics.netWPM),
-                accuracy: Math.round(metrics.accuracyPercent),
-                keystrokes: metrics.totalKeystrokes,
-                errors: metrics.errorChars,
-                duration: metrics.timeSeconds
-              };
-              try { window.saveResultToHistory(payload); } catch(e){}
-            }
-          } catch(e){}
-
-        } catch(e){
-          console.error('patched_showResults error', e);
-        }
-        // call original to preserve UI flow
-        try { oldShow.apply(this, arguments); } catch(e){ /* ignore */ }
-      };
-      console.info('showResults patched to use unified metrics.');
-    } else {
-      window.showResults = function(){
-        const metrics = calculateTypingStatsFromAppState();
-        alert('Results — Gross: ' + Math.round(metrics.grossWPM) + ' WPM, Net: ' + Math.round(metrics.netWPM) + ' WPM, Accuracy: ' + Math.round(metrics.accuracyPercent) + '%');
-      };
-      console.info('showResults created (unified).');
-    }
-  } catch(e){ console.warn('Could not patch showResults', e); }
-
-  // Enhance keystroke capture: listen for input/paste on common inputs to update appState.session.keystrokes
-  try {
-    function safeIncKeystrokes(delta){
-      try {
-        if (!window.appState) window.appState = {};
-        if (!window.appState.session) window.appState.session = {};
-        if (!window.appState.session.keystrokes) window.appState.session.keystrokes = 0;
-        window.appState.session.keystrokes += Math.max(0, Math.floor(delta));
-      } catch(e){}
-    }
-
-    // Hook common input ids
-    const inputs = ['#hiddenInput', '#typingInput', '#freeHandArea', 'textarea', 'input[type="text"]'];
-    inputs.forEach(sel=>{
-      const el = document.querySelector(sel);
-      if (!el) return;
-      let prevLen = graphemes(el.value || '').length;
-      el.addEventListener('input', function(e){
-        const curlen = graphemes(el.value || '').length;
-        if (curlen > prevLen) safeIncKeystrokes(curlen - prevLen);
-        prevLen = curlen;
-      });
-      el.addEventListener('paste', function(e){
-        setTimeout(()=>{
-          const curlen = graphemes(el.value || '').length;
-          if (curlen > prevLen) safeIncKeystrokes(curlen - prevLen);
-          prevLen = curlen;
-        }, 0);
-      });
-      // keydown fallback
-      el.addEventListener('keydown', function(e){
-        if (e.key && e.key.length === 1) safeIncKeystrokes(1);
-      });
-    });
-
-    // Also global keydown to count keystrokes when typing in the app (defensive)
-    window.addEventListener('keydown', function(e){
-      // ignore modifier-only keys
-      if (!e.key || e.key.length !== 1) return;
-      // heuristic: ensure focus is within app area or body
-      safeIncKeystrokes(1);
-    }, true);
-
-    console.info('Keystroke capture enhanced (input/paste/keydown hooks).');
-  } catch(e){ console.warn('Could not enhance keystroke capture', e); }
-
-  // Expose a debug helper
-  window.typingMetricsDebug = {
-    calculate: calculateTypingStatsFromAppState,
-    compute: unifiedComputeTypingMetrics,
-    graphemes: graphemes
-  };
-
-  console.info('Unified typing metrics override installed. Metrics now use keystrokes/5 for gross, edit-distance punishment for errors, and accuracy based on keystroke correctness. This aligns with common exam-style scoring (SSC/UPSSSC/Railway).');
+  console.info('Government exam typing metrics script installed.');
 
 })();
 </script>
