@@ -247,6 +247,8 @@
         }
         #text-display.hindi {
             font-family: 'Noto Sans Devanagari', serif;
+            word-break: keep-all;
+            overflow-wrap: normal;
         }
 
         /* NEW WORD-BASED STYLES */
@@ -301,12 +303,9 @@
             width: 1px;
             height: 1px;
             opacity: 0;
-            margin: -1px;
-            padding: 0;
-            border: 0;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
+            z-index: -1;
+            touch-action: none;
+            pointer-events: none;
         }
 
         #free-hand-area {
@@ -889,6 +888,7 @@
             };
             
             let appState = {};
+            let practiceStartId = 0; // To prevent race conditions on start
             let speedChartInstance, accuracyChartInstance;
             const textCache = {
                 en: { status: 'idle', promise: null, text: null },
@@ -902,7 +902,7 @@
                         const item = localStorage.getItem(key);
                         return item ? JSON.parse(item) : defaultValue;
                     } catch (e) {
-                        console.error(`Error reading from localStorage for key "${key}":`, e);
+                        console.warn('LocalStorage disabled:', e);
                         return defaultValue;
                     }
                 },
@@ -910,7 +910,7 @@
                     try {
                         localStorage.setItem(key, JSON.stringify(value));
                     } catch (e) {
-                        console.error(`Error writing to localStorage for key "${key}":`, e);
+                        console.warn('LocalStorage disabled:', e);
                     }
                 }
             };
@@ -1242,6 +1242,9 @@
 
             // --- STATE MANAGEMENT ---
             const resetState = () => {
+                if (typeof appState !== 'undefined' && appState.timerId) {
+                    clearInterval(appState.timerId);
+                }
                 appState = {
                     lang: 'en',
                     timerId: null,
@@ -1326,7 +1329,10 @@
 
                     const targetScrollTop = currentWordEl.offsetTop - (dom.textDisplayWrapper.clientHeight * 0.4);
                     if (Math.abs(dom.textDisplayWrapper.scrollTop - targetScrollTop) > 5) {
-                        dom.textDisplayWrapper.scrollTop = Math.max(0, targetScrollTop);
+                        dom.textDisplayWrapper.scrollTo({
+                            top: Math.max(0, targetScrollTop),
+                            behavior: 'smooth'
+                        });
                     }
                 } else {
                     dom.caret.style.display = 'none';
@@ -1409,6 +1415,7 @@
             };
 
             const startPractice = async () => {
+                const currentStartId = ++practiceStartId;
                 const level = dom.levelSelect.value;
 
                 if (level === 'Paste Your Text' && dom.pasteTextArea.value.trim() === '') {
@@ -1439,6 +1446,12 @@
 
                     dom.loadingStatus.textContent = 'Preparing your text...';
                     sourceText = await textGenerator();
+
+                    if (currentStartId !== practiceStartId) {
+                        console.log("Aborting stale practice start.");
+                        dom.startBtn.disabled = false;
+                        return;
+                    }
                     
                     if (!sourceText) throw new Error("Failed to get any practice text.");
 
@@ -1524,18 +1537,11 @@
                     if (session.currentWordIndex >= session.refWords.length - APPEND_WORDS_THRESHOLD) {
                         appendMoreWords();
                     }
-                    updateUI(); 
-                    positionCaretAndScroll();
+                    setTimeout(updateUI, 0); 
                 }
             };
 
             const handleKeyDown = (e) => {
-                if (!appState.isPracticeActive && e.key !== 'Tab' && e.key !== 'Shift') {
-                    appState.isPracticeActive = true;
-                    appState.session.startTime = Date.now();
-                    startTimer();
-                }
-
                 if (e.key === 'Backspace') {
                     appState.session.backspaceCount++;
                     if (dom.hiddenInput.value === '' && appState.session.currentWordIndex > 0) {
@@ -1549,7 +1555,6 @@
                         prevState.status = 'untyped';
                         dom.hiddenInput.value = prevState.typed || '';
                         updateUI();
-                        positionCaretAndScroll();
                         return;
                     }
                 }
@@ -1602,7 +1607,7 @@
             const showResults = () => {
                 const timeTakenSec = appState.session.startTime > 0 ? Math.min(appState.config.duration, Math.round((Date.now() - appState.session.startTime) / 1000)) : appState.config.duration;
                 const effectiveTime = timeTakenSec > 0 ? timeTakenSec : 1;
-                const finalKeystrokes = appState.session.wordStates.slice(0, appState.session.currentWordIndex).reduce((sum, s) => sum + graphemeSplitter(s.typed || '').length + (s.typed ? 1 : 0) , 0) -1;
+                const finalKeystrokes = appState.session.wordStates.slice(0, appState.session.currentWordIndex).reduce((sum, s) => sum + graphemeSplitter(s.typed || '').length + (s.typed ? 1 : 0) , 0);
 
                 const finalMetrics = window.computeTypingMetrics({
                     timeSeconds: effectiveTime,
@@ -1678,6 +1683,16 @@
                 dom.hiddenInput.addEventListener('input', handleInput);
                 dom.textDisplayWrapper.addEventListener('click', () => dom.hiddenInput.focus());
                 
+                dom.hiddenInput.addEventListener('blur', () => {
+                    setTimeout(() => dom.hiddenInput.focus(), 10);
+                });
+
+                window.addEventListener('resize', () => {
+                    if (appState.isPracticeActive) {
+                        requestAnimationFrame(positionCaretAndScroll);
+                    }
+                });
+
                 dom.resultActions.retry.addEventListener('click', () => {
                     hideResults();
                     const oldConfig = { ...appState.config };
