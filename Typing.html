@@ -19,6 +19,7 @@
             --border-color: #333333;
             --font-family: 'Roboto Mono', monospace;
             --current-word-bg: #D4AF37; /* A more vibrant gold/yellow */
+            --subtle-text-color: #bbb;
         }
 
         *, *::before, *::after {
@@ -41,7 +42,75 @@
             min-height: 100vh;
             overflow-x: hidden;
             text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
+        
+        /* Light Theme */
+        body[data-theme="light"] {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --error-color: #d32f2f;
+            --disabled-color: #e0e0e0;
+            --border-color: #dddddd;
+            --current-word-bg: #ffeb3b;
+            --subtle-text-color: #333333;
+        }
+        
+        body[data-theme="light"] .custom-select,
+        body[data-theme="light"] input[type="number"],
+        body[data-theme="light"] #free-hand-area,
+        body[data-theme="light"] #paste-text-area,
+        body[data-theme="light"] .results-actions button {
+            background-color: #fff;
+            color: var(--text-color);
+        }
+        body[data-theme="light"] .mode-toggle-btn {
+            background-color: #e0e0e0;
+        }
+        body[data-theme="light"] .mode-toggle-btn.active {
+            color: #000;
+        }
+
+        body[data-theme="light"] #start-practice-btn:disabled {
+             background-color: var(--disabled-color);
+             color: #9e9e9e;
+        }
+        body[data-theme="light"] .word.current {
+            color: #000;
+        }
+        body[data-theme="light"] .results-content {
+            background-color: #ffffff;
+            color: var(--text-color);
+        }
+        body[data-theme="light"] .result-card,
+        body[data-theme="light"] .results-formula-note {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+        }
+        body[data-theme="light"] .result-card .title {
+            color: var(--subtle-text-color);
+        }
+        body[data-theme="light"] .result-card .value {
+            color: var(--text-color);
+        }
+        body[data-theme="light"] .passage-display {
+            background: #ffffff;
+        }
+        body[data-theme="light"] .results-actions {
+            background-color: #ffffff;
+        }
+        body[data-theme="light"] footer {
+            color: var(--subtle-text-color);
+            border-top: 1px solid var(--border-color);
+        }
+         body[data-theme="light"] #practice-duration-summary strong {
+            color: var(--text-color);
+        }
+        body[data-theme="light"] .results-section-title,
+        body[data-theme="light"] .results-section-subtitle {
+            color: var(--text-color);
+        }
+
 
         body.practice-active header,
         body.practice-active footer {
@@ -62,6 +131,7 @@
             padding: 1rem 0;
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
+            transition: border-color 0.3s ease;
         }
         
         .header-content {
@@ -74,12 +144,31 @@
             font-size: 1.5rem;
             font-weight: 500;
         }
+        
+        #theme-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            border-radius: 6px;
+            padding: 0.5rem;
+            font-size: 1.2rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        #theme-toggle-btn:hover {
+            background-color: var(--border-color);
+        }
 
         .language-switch {
             display: flex;
             border: 1px solid var(--border-color);
             border-radius: 6px;
             overflow: hidden;
+            transition: border-color 0.3s ease;
         }
         
         .lang-btn {
@@ -128,7 +217,7 @@
         .setup-card label {
             text-align: left;
             font-size: 0.9rem;
-            color: #ccc;
+            color: var(--subtle-text-color);
         }
         
         .custom-select {
@@ -141,6 +230,7 @@
             font-family: var(--font-family);
             font-size: 1rem;
             cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
 
         .minus-marking-controls {
@@ -168,6 +258,7 @@
             border: 1px solid var(--border-color);
             border-radius: 4px;
             font-family: var(--font-family);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
 
         #start-practice-btn {
@@ -194,7 +285,7 @@
         #loading-status {
             min-height: 1.2em;
             margin-bottom: 1rem;
-            color: #aaa;
+            color: var(--subtle-text-color);
             font-size: 0.9rem;
         }
 
@@ -227,6 +318,10 @@
             100% { border-color: red; }
         }
         
+        #paste-text-container label {
+            color: var(--subtle-text-color);
+        }
+
         /* Practice View */
         #practice-view {
             gap: 1rem;
@@ -241,6 +336,7 @@
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 1rem;
+            transition: border-color 0.3s ease;
         }
 
         .stat-item {
@@ -250,7 +346,7 @@
         }
         .stat-item .label {
             font-size: 0.8rem;
-            color: #aaa;
+            color: var(--subtle-text-color);
         }
         .stat-item .value {
             font-size: 1.2rem;
@@ -276,10 +372,11 @@
             user-select: none;
             cursor: text;
             white-space: normal; /* Allow text to wrap */
+            transition: border-color 0.3s ease;
         }
         
         #text-display {
-            color: #888;
+            color: var(--subtle-text-color);
             position: relative;
             overflow-wrap: break-word; /* Prevents text from overflowing horizontally */
         }
@@ -313,7 +410,7 @@
             background-color: rgba(255, 165, 0, 0.1);
         }
         .word.omitted {
-            color: #888;
+            color: var(--subtle-text-color);
             background-color: rgba(136, 136, 136, 0.2);
             border-radius: 3px;
         }
@@ -370,6 +467,7 @@
             font-family: inherit;
             resize: none;
             padding: 1rem;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
 
         #submit-test-btn {
@@ -394,7 +492,8 @@
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 0.8rem;
-            color: #ccc;
+            color: var(--subtle-text-color);
+            transition: border-color 0.3s ease;
         }
         .instruction-item {
             display: flex;
@@ -480,6 +579,7 @@
             color: #e0e0e0;
             max-height: calc(100vh - 2rem);
             overflow-y: auto;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
 
         .results-header {
@@ -490,6 +590,7 @@
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border-color);
             font-size: 0.9rem;
+            transition: border-color 0.3s ease;
         }
 
         .results-grid {
@@ -504,6 +605,7 @@
             border-radius: 6px;
             border: 1px solid #444;
             text-align: left;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
         .result-card .title {
@@ -533,6 +635,7 @@
             color: #c0c0c0;
             white-space: pre-wrap;
             line-height: 1.6;
+            transition: background-color 0.3s ease;
         }
         .results-formula-note code {
             color: #fff;
@@ -571,6 +674,7 @@
             white-space: pre-wrap;
             word-wrap: break-word;
             position: relative; /* For caret positioning */
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
         
         .passage-display span {
@@ -614,6 +718,7 @@
             padding-left: 1.5rem;
             padding-right: 1.5rem;
             padding-bottom: 1.5rem;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
         .results-actions button {
@@ -625,8 +730,27 @@
             font-family: var(--font-family);
             cursor: pointer;
         }
+        
+        #practice-duration-summary strong {
+            color: #fff;
+            font-weight: bold;
+        }
 
         /* New styles for analytics */
+        .results-section-title {
+            text-align: left; 
+            margin: 1rem 0 0.5rem; 
+            color: #e0e0e0;
+        }
+        .results-section-subtitle {
+            color: #ccc; 
+            margin-bottom: 0.5rem; 
+            border-bottom: 1px solid var(--border-color); 
+            padding-bottom: 0.25rem;
+        }
+        #mistakes-analysis {
+            font-size: 0.9rem;
+        }
         #mistakes-analysis ul, #improvement-tips ul {
             list-style: none;
             padding-left: 0;
@@ -727,9 +851,12 @@
     <header>
         <div class="container header-content">
             <h1>ExamYatri Typing</h1>
-            <div class="language-switch">
-                <button id="lang-english-btn" class="lang-btn active" data-lang="en">English</button>
-                <button id="lang-hindi-btn" class="lang-btn" data-lang="hi">हिंदी</button>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle Light/Dark Mode"></button>
+                <div class="language-switch">
+                    <button id="lang-english-btn" class="lang-btn active" data-lang="en">English</button>
+                    <button id="lang-hindi-btn" class="lang-btn" data-lang="hi">हिंदी</button>
+                </div>
             </div>
         </div>
     </header>
@@ -763,7 +890,7 @@
                 </div>
             </div>
             <div id="paste-text-container" style="display: none; width: 100%; margin-bottom: 1rem;">
-                <label for="paste-text-area" style="text-align: left; font-size: 0.9rem; color: #ccc; margin-bottom: 0.5rem; display: block;">Paste your text below:</label>
+                <label for="paste-text-area" style="text-align: left; font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Paste your text below:</label>
                 <textarea id="paste-text-area" style="width: 100%; height: 150px; background: #111; color: var(--text-color); border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit; font-size: 1rem; padding: 0.75rem; resize: vertical;"></textarea>
             </div>
             <p id="loading-status"></p>
@@ -849,31 +976,32 @@
             </div>
              <div id="res-keystroke-warning" style="color: var(--error-color); text-align: center; font-size: 0.9rem; margin-top: 1rem;"></div>
             
-             <div id="practice-duration-summary" class="result-card" style="text-align: left; display: none; background-color: #333338;">
+             <div id="practice-duration-summary" class="result-card" style="text-align: left; display: none;">
                 <div class="title">Practice Duration Summary</div>
-                <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem; font-size: 0.9rem; color: #e0e0e0; padding-top: 0.5rem;">
-                    <div>Today's Practice: <strong id="res-today-practice-time" style="color: #fff; font-weight: bold;">0m 0s</strong></div>
-                    <div>Total on Device: <strong id="res-total-practice-time" style="color: #fff; font-weight: bold;">0h 0m 0s</strong></div>
+                <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem; font-size: 0.9rem; padding-top: 0.5rem;">
+                    <div>⏲️ Session: <strong id="res-session-practice-time">0m 0s</strong></div>
+                    <div>📅 Today: <strong id="res-today-practice-time">0m 0s</strong></div>
+                    <div>💾 Total: <strong id="res-total-practice-time">0h 0m 0s</strong></div>
                 </div>
             </div>
             
             <!-- New Analytics Sections -->
-            <div id="weakness-analysis-section" class="result-card" style="text-align: left; display: none; background-color: #333338;">
+            <div id="weakness-analysis-section" class="result-card" style="text-align: left; display: none;">
                 <div class="title">Common Mistakes & Weak Areas</div>
-                <div id="mistakes-analysis" style="font-size: 0.9rem; color: #e0e0e0;">
+                <div id="mistakes-analysis">
                     <div id="english-mistakes-container" style="display: none; margin-bottom: 1rem;">
-                        <h4 style="color: #ccc; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem;">English Mistakes</h4>
+                        <h4 class="results-section-subtitle">English Mistakes</h4>
                         <div id="english-mistakes-list"></div>
                     </div>
                     <div id="hindi-mistakes-container" style="display: none;">
-                        <h4 style="color: #ccc; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem;">Hindi Mistakes</h4>
+                        <h4 class="results-section-subtitle">Hindi Mistakes</h4>
                         <div id="hindi-mistakes-list"></div>
                     </div>
                 </div>
             </div>
             
             <div id="progress-graphs-section" style="display: none;">
-                <h3 style="text-align: left; margin: 1rem 0 0.5rem; color: #e0e0e0;">Your Progress (Last 10 Tests)</h3>
+                <h3 class="results-section-title">Your Progress (Last 10 Tests)</h3>
                 <div class="charts-container">
                     <canvas id="speed-chart"></canvas>
                     <canvas id="accuracy-chart"></canvas>
@@ -898,13 +1026,8 @@
         </div>
     </div>
 
-    <textarea id="hidden-input" autofocus autocapitalize="none" autocorrect="off"></textarea>
+    <textarea id="hidden-input" autocapitalize="none" autocorrect="off"></textarea>
     
-    <footer style="margin-top: auto; padding: 1rem 0; font-size: 0.9rem; color: #888; border-top: 1px solid var(--border-color); display:none;">
-        Visitor Count: <span id="visitCount">0</span>
-    </footer>
-
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const autoShiftEnabled = false;
@@ -916,25 +1039,40 @@
             
             const RSS_PROXY_URL = 'https://api.rss2json.com/v1/api.json?rss_url=';
             const RSS_FEEDS = {
-                en: {
-                    primary: 'https://pib.gov.in/RssFeedEnglish.aspx',
-                    fallbacks: [
-                        'https://indianexpress.com/section/education/feed/',
-                        'https://timesofindia.indiatimes.com/rssfeeds/913168846.cms',
-                        'https://www.hindustantimes.com/rss/education/rssfeed.xml',
-                        'https://www.indiatoday.in/rss/1206578',
-                        'https://www.thehindu.com/education/feeder/default.rss'
-                    ]
-                },
-                hi: {
-                    primary: 'https://pib.gov.in/RssFeedHindi.aspx',
-                    fallbacks: [
-                        'https://jansatta.com/education/feed/',
-                        'https://navbharattimes.indiatimes.com/education/rssfeed.cms',
-                        'https://www.livehindustan.com/rss/career/news.xml',
-                        'https://www.aajtak.in/rss/education'
-                    ]
-                }
+                en: [
+                    'https://pib.gov.in/RssFeedEnglish.aspx',
+                    'https://indianexpress.com/section/education/feed/',
+                    'https://timesofindia.indiatimes.com/rssfeeds/913168846.cms',
+                    'https://www.hindustantimes.com/rss/education/rssfeed.xml',
+                    'https://www.indiatoday.in/rss/1206578',
+                    'https://www.thehindu.com/education/feeder/default.rss',
+                    'https://timesofindia.indiatimes.com/rssfeedstopstories.cms',
+                    'https://feeds.bbci.co.uk/news/rss.xml',
+                    'http://rss.cnn.com/rss/edition.rss',
+                    'https://thebetterindia.com/rss/categories/education',
+                    'https://www.careerindia.com/rss/education-news-fb.xml',
+                    'https://www.thehindu.com/opinion/editorial/feeder/default.rss',
+                    'https://www.thehindu.com/business/Economy/feeder/default.rss',
+                    'https://www.thehindu.com/sport/cricket/feeder/default.rss'
+                ],
+                hi: [
+                    'https://pib.gov.in/RssFeedHindi.aspx',
+                    'https://jansatta.com/education/feed/',
+                    'https://navbharattimes.indiatimes.com/education/rssfeed.cms',
+                    'https://www.livehindustan.com/rss/career/news.xml',
+                    'https://www.aajtak.in/rss/education',
+                    'https://www.abplive.com/education/feed',
+                    'https://www.abplive.com/education/jobs/feed',
+                    'https://www.indiatv.in/rssnews/topstory-education.xml',
+                    'https://www.amarujala.com/rss/podcast/niti-kathayen.xml',
+                    'https://www.amarujala.com/rss/podcast/audio-headlines.xml',
+                    'https://hindi.news18.com/commonfeeds/v1/hin/rss/career/career-career.xml',
+                    'https://www.republicbharat.com/rss/india/economy.xml',
+                    'https://www.republicbharat.com/rss/india/education.xml',
+                    'https://www.bhaskar.com/rss-v1--category-11945.xml',
+                    'https://www.bhaskar.com/rss-v1--category-1061.xml',
+                    'https://www.bhaskar.com/rss-v1--category-1051.xml'
+                ]
             };
 
             const dom = {
@@ -949,6 +1087,8 @@
                 startBtn: document.getElementById('start-practice-btn'),
                 pasteTextContainer: document.getElementById('paste-text-container'),
                 pasteTextArea: document.getElementById('paste-text-area'),
+
+                themeToggleBtn: document.getElementById('theme-toggle-btn'),
 
                 mode: {
                     laptopBtn: document.getElementById('laptop-mode-btn'),
@@ -1053,7 +1193,58 @@
 
             const MISTAKES_KEY = 'typingMistakes';
             const HISTORY_KEY = 'typingHistory';
+            const DURATION_KEY = 'typingPracticeDuration';
             const MAX_HISTORY_ITEMS = 10;
+            
+            const formatDuration = (totalSeconds, detailed = false) => {
+                if (isNaN(totalSeconds) || totalSeconds < 0) return detailed ? '0h 0m 0s' : '0m 0s';
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = Math.floor(totalSeconds % 60);
+                
+                if (detailed) {
+                    return `${hours}h ${minutes}m ${seconds}s`;
+                }
+                return `${minutes}m ${seconds}s`;
+            };
+
+            const formatTimeMMSS = (totalSeconds) => {
+                if (isNaN(totalSeconds) || totalSeconds < 0) return '00:00';
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = Math.floor(totalSeconds % 60);
+                return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            };
+
+            const updateAndDisplayDurations = (sessionSeconds) => {
+                const today = new Date().toISOString().split('T')[0];
+                const durationData = storage.get(DURATION_KEY, {
+                    totalSeconds: 0,
+                    todaySeconds: 0,
+                    lastPracticeDate: today
+                });
+
+                if (durationData.lastPracticeDate !== today) {
+                    durationData.todaySeconds = 0;
+                    durationData.lastPracticeDate = today;
+                }
+
+                durationData.totalSeconds += sessionSeconds;
+                durationData.todaySeconds += sessionSeconds;
+                storage.set(DURATION_KEY, durationData);
+
+                const sessionEl = document.getElementById('res-session-practice-time');
+                const todayEl = document.getElementById('res-today-practice-time');
+                const totalEl = document.getElementById('res-total-practice-time');
+                const container = document.getElementById('practice-duration-summary');
+
+                if (sessionEl && todayEl && totalEl && container) {
+                    sessionEl.textContent = formatDuration(sessionSeconds);
+                    todayEl.textContent = formatDuration(durationData.todaySeconds);
+                    totalEl.textContent = formatDuration(durationData.totalSeconds, true);
+                    container.style.display = 'block';
+                }
+            };
+
 
             const updateMistakeHistory = () => {
                 const mistakesData = storage.get(MISTAKES_KEY, { en: {}, hi: {} });
@@ -1132,6 +1323,11 @@
                 const speedData = history.map(item => Math.round(item.netWPM));
                 const accuracyData = history.map(item => Number(item.accuracy) || 0);
 
+                const isLightTheme = document.body.dataset.theme === 'light';
+                const textColor = isLightTheme ? '#000000' : '#fff';
+                const gridColor = isLightTheme ? '#dddddd' : '#444';
+                const ticksColor = isLightTheme ? '#333333' : '#ccc';
+
                 const speedCtx = document.getElementById('speed-chart').getContext('2d');
                 if (speedChartInstance) speedChartInstance.destroy();
                 speedChartInstance = new Chart(speedCtx, {
@@ -1150,10 +1346,10 @@
                     options: {
                         responsive: true,
                         plugins: {
-                            title: { display: true, text: 'Net Speed (WPM) Trend', color: '#fff' },
+                            title: { display: true, text: 'Net Speed (WPM) Trend', color: textColor },
                             tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${context.raw} (Lang: ${history[context.dataIndex].lang.toUpperCase()})` } }
                         },
-                        scales: { y: { beginAtZero: true, ticks: { color: '#ccc' }, grid: { color: '#444' } }, x: { ticks: { color: '#ccc' }, grid: { color: '#444' } } }
+                        scales: { y: { beginAtZero: true, ticks: { color: ticksColor }, grid: { color: gridColor } }, x: { ticks: { color: ticksColor }, grid: { color: gridColor } } }
                     }
                 });
 
@@ -1175,10 +1371,10 @@
                     options: {
                         responsive: true,
                         plugins: {
-                            title: { display: true, text: 'Accuracy (%) Trend', color: '#fff' },
+                            title: { display: true, text: 'Accuracy (%) Trend', color: textColor },
                             tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${context.raw}% (Lang: ${history[context.dataIndex].lang.toUpperCase()})` } }
                         },
-                        scales: { y: { min: 0, max: 100, ticks: { color: '#ccc' }, grid: { color: '#444' } }, x: { ticks: { color: '#ccc' }, grid: { color: '#444' } } }
+                        scales: { y: { min: 0, max: 100, ticks: { color: ticksColor }, grid: { color: gridColor } }, x: { ticks: { color: ticksColor }, grid: { color: gridColor } } }
                     }
                 });
             };
@@ -1212,8 +1408,8 @@
             
             // --- TEXT GENERATORS & FETCHING ---
             const fetchPracticeText = async (language = 'en') => {
-                const feeds = RSS_FEEDS[language];
-                const urlsToTry = [feeds.primary, ...feeds.fallbacks.sort(() => 0.5 - Math.random())];
+                // Create a shuffled copy of the feeds array for the selected language.
+                const urlsToTry = [...RSS_FEEDS[language]].sort(() => 0.5 - Math.random());
 
                 for (const url of urlsToTry) {
                     try {
@@ -1387,6 +1583,7 @@
                     timerId: null,
                     isPracticeActive: false,
                     isFetchingMore: false,
+                    isFetchingMoreText: false,
                     config: {
                         level: '',
                         method: '',
@@ -1409,6 +1606,22 @@
             };
             
             // --- UI AND RENDERING ---
+            const cleanupPracticeView = () => {
+                dom.hiddenInput.value = '';
+                dom.freeHandArea.value = '';
+                dom.textDisplay.innerHTML = '';
+                dom.liveTypedDisplay.innerHTML = '';
+                if (dom.caret) {
+                    dom.caret.style.display = 'none';
+                }
+                // Reset stats display
+                dom.stats.time.textContent = '00:00';
+                dom.stats.grossWpm.textContent = '0';
+                dom.stats.netWpm.textContent = '0';
+                dom.stats.errors.textContent = '0';
+                dom.stats.accuracy.textContent = '100%';
+            };
+
             const populateLevels = () => { dom.levelSelect.innerHTML = Object.keys(practiceLevels).map(level => `<option value="${level}">${level}</option>`).join(''); };
             const populateMethods = () => { const selectedLevel = dom.levelSelect.value; const methods = Object.keys(practiceLevels[selectedLevel]); dom.methodSelect.innerHTML = methods.map(method => `<option value="${method}">${method}</option>`).join(''); handleLevelChange(); };
             const handleLevelChange = () => {
@@ -1418,6 +1631,9 @@
                 dom.durationCard.style.display = (level === 'Free Hand') ? 'none' : 'flex';
             };
             const switchView = (view) => {
+                if (view === 'setup') {
+                    cleanupPracticeView();
+                }
                 dom.setupView.classList.toggle('active', view === 'setup');
                 dom.practiceView.classList.toggle('active', view === 'practice');
                 document.body.classList.toggle('practice-active', view === 'practice');
@@ -1526,7 +1742,7 @@
             
             const updateLiveStats = () => {
                 const elapsedSeconds = appState.session.startTime > 0 ? (Date.now() - appState.session.startTime) / 1000 : 0;
-                if (elapsedSeconds <= 0 && appState.isPracticeActive) return;
+                if (!appState.isPracticeActive && elapsedSeconds <= 0) return;
 
                 const minutes = Math.floor(appState.session.timeLeft / 60);
                 const seconds = appState.session.timeLeft % 60;
@@ -1537,8 +1753,8 @@
                     const typedWord = dom.hiddenInput.value;
                     const baseKeystrokes = appState.session.wordStates
                         .slice(0, appState.session.currentWordIndex)
-                        .reduce((sum, s) => sum + (s.typed?.length || 0) + 1, 0);
-                    currentKeystrokes = baseKeystrokes + typedWord.length;
+                        .reduce((sum, s) => sum + graphemeSplitter(s.typed || '').length + 1, 0);
+                    currentKeystrokes = baseKeystrokes + graphemeSplitter(typedWord).length;
                 }
 
                 const metrics = window.computeTypingMetrics({
@@ -1653,10 +1869,12 @@
 
                     const fragment = document.createDocumentFragment();
                     nextChunk.forEach((word, index) => {
-                        const wordEl = document.createElement('span');
-                        wordEl.innerHTML = createWordHtml(word, currentLength + index);
-                        fragment.appendChild(wordEl.firstChild);
-                        fragment.appendChild(document.createTextNode(' '));
+                        const tempContainer = document.createElement('div');
+                        tempContainer.innerHTML = createWordHtml(word, currentLength + index);
+                        if(tempContainer.firstElementChild) {
+                            fragment.appendChild(tempContainer.firstElementChild);
+                            fragment.appendChild(document.createTextNode(' '));
+                        }
                     });
                     dom.textDisplay.appendChild(fragment);
                 }
@@ -1783,13 +2001,64 @@
                 session.currentWordIndex++;
                 dom.hiddenInput.value = '';
 
+                // Pre-fetch more text if we are getting close to the end of our master list
+                const remainingTotalWords = session.allRefWords.length - session.currentWordIndex;
+                if (remainingTotalWords < 100 && !appState.isFetchingMoreText) {
+                    fetchAndAppendMoreText(); // This is a fire-and-forget pre-fetch
+                }
+
+                // Now, handle the current state
                 if (session.currentWordIndex >= session.allRefWords.length) {
-                    endPractice();
+                    // The user has typed all available words. The fetch should already be running.
+                    // If not, trigger it now. This also shows the loading indicator.
+                    if (!appState.isFetchingMoreText) {
+                        fetchAndAppendMoreText();
+                    }
+                    // We pause UI updates until the fetch promise resolves and calls updateUI itself.
                 } else {
+                    // Normal path: we still have words.
+                    // Render more words to the screen if needed.
                     if (session.currentWordIndex >= session.refWords.length - APPEND_WORDS_THRESHOLD) {
                         appendMoreWords();
                     }
-                    setTimeout(updateUI, 0); 
+                    // Update caret, colors, etc.
+                    setTimeout(updateUI, 0);
+                }
+            };
+
+            const fetchAndAppendMoreText = async () => {
+                if (appState.isFetchingMoreText) return;
+                appState.isFetchingMoreText = true;
+            
+                // Show a loading indicator only if the user has completely run out of words
+                let loader = document.getElementById('text-loader');
+                if (!loader && appState.session.currentWordIndex >= appState.session.allRefWords.length) {
+                    loader = document.createElement('span');
+                    loader.id = 'text-loader';
+                    loader.textContent = ' Loading more text...';
+                    loader.style.color = 'var(--primary-color)';
+                    dom.textDisplay.appendChild(loader);
+                    dom.textDisplayWrapper.scrollTop = dom.textDisplayWrapper.scrollHeight;
+                }
+            
+                try {
+                    const newText = await fetchPracticeText(appState.lang);
+                    if (newText) {
+                        const newWords = tokenize(newText);
+                        appState.session.allRefWords.push(...newWords);
+                        
+                        // If the user was "paused" waiting for text, kickstart the UI again
+                        if (appState.session.currentWordIndex >= appState.session.refWords.length) {
+                            appendMoreWords();
+                            updateUI();
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch additional text:", e);
+                } finally {
+                    appState.isFetchingMoreText = false;
+                    const finalLoader = document.getElementById('text-loader');
+                    if (finalLoader) finalLoader.remove();
                 }
             };
 
@@ -1874,8 +2143,8 @@
                 
                 const isQualified = appState.lang === 'en' ? (finalMetrics.netWPM >= 30) : (finalMetrics.netWPM >= 25);
                 dom.newResults.passageTitle.textContent = `${appState.config.level}: ${appState.config.method}`;
-                dom.newResults.timeDuration.textContent = (appState.config.duration / 60).toFixed(2);
-                dom.newResults.timeTaken.textContent = (effectiveTime / 60).toFixed(2);
+                dom.newResults.timeDuration.textContent = formatTimeMMSS(appState.config.duration);
+                dom.newResults.timeTaken.textContent = formatTimeMMSS(effectiveTime);
                 dom.newResults.keystrokes.textContent = finalMetrics.totalKeystrokes;
                 dom.newResults.wordsTyped.textContent = appState.session.wordStates.slice(0, appState.session.currentWordIndex).filter(s => s.typed).length;
                 dom.newResults.fullMistakes.textContent = appState.session.fullMistakes;
@@ -1887,7 +2156,7 @@
                 dom.newResults.backspaceCount.textContent = appState.session.backspaceCount;
                 dom.newResults.resultText.textContent = isQualified ? "Qualified" : "Not Qualified";
                 dom.newResults.resultCard.className = isQualified ? 'result-card qualified' : 'result-card not-qualified';
-                dom.newResults.formulaNote.innerHTML = `<code>Gross WPM</code> = (Total Keystrokes / 5) / Time (min)<br><code>Error Penalty</code> = Full Mistakes + (Half Mistakes / 2)<br><code>Net WPM</code> = Gross WPM - (Error Penalty / Time(min))<br><code>Accuracy</code> = (Net WPM / Gross WPM) * 100`.trim().replace(/\s{2,}/g, ' ');
+                dom.newResults.formulaNote.innerHTML = `<code>Gross WPM</code> = (Total Keystrokes / 5) / Time (min)<br><code>Error Penalty</code> = Full Mistakes + (Half Mistakes / 2)<br><code>Net WPM</code> = Gross WPM - Error Penalty<br><code>Accuracy</code> = (Net WPM / Gross WPM) * 100`.trim().replace(/\s{2,}/g, ' ');
 
                 let originalHTML = '', typedHTML = '';
                 appState.session.wordStates.slice(0, appState.session.currentWordIndex).forEach(state => {
@@ -1907,6 +2176,7 @@
                 dom.newResults.originalPassage.innerHTML = originalHTML;
                 dom.newResults.typedPassage.innerHTML = typedHTML;
                 
+                updateAndDisplayDurations(timeTakenSec);
                 updateMistakeHistory();
                 renderMistakeAnalysis();
                 updatePracticeHistory(finalMetrics);
@@ -1945,6 +2215,16 @@
                 setMode(mode);
             };
 
+            // --- THEME LOGIC ---
+            const setTheme = (theme) => {
+                document.body.dataset.theme = theme;
+                dom.themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+                localStorage.setItem('typingTheme', theme);
+                if (accuracyChartInstance || speedChartInstance) {
+                    renderProgressGraphs(); // Re-render charts with new theme colors
+                }
+            };
+            
             // --- INITIALIZATION ---
             const init = () => {
                 resetState();
@@ -2017,6 +2297,19 @@
                     detectAndSetMode();
                 }
 
+                // Theme setup
+                dom.themeToggleBtn.addEventListener('click', () => {
+                    const currentTheme = document.body.dataset.theme || 'dark';
+                    setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+                });
+                const savedTheme = storage.get('typingTheme');
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (savedTheme) {
+                    setTheme(savedTheme);
+                } else {
+                    setTheme(prefersDark ? 'dark' : 'light');
+                }
+
                 dom.loadingStatus.textContent = 'Fetching fresh articles... This may take a moment on your first visit.';
                 prefetchArticle('en');
                 prefetchArticle('hi');
@@ -2049,14 +2342,11 @@
     // 2. Error Penalty (in words) = Full Mistakes + (Half Mistakes / 2)
     const errorPenaltyWords = fullMistakes + (halfMistakes / 2);
 
-    // 3. Net WPM = Gross WPM - (Error Penalty / Time (minutes))
-    // According to many government exam rules, the penalty is subtracted from the total words typed, not the WPM rate. 
-    // This is equivalent to subtracting the error rate from the gross rate.
-    // Net WPM = Gross WPM - (Total Error Penalty Words / Total Time in Minutes)
-    const netWPM = minutes > 0 ? Math.max(0, grossWPM - (errorPenaltyWords / minutes)) : 0;
+    // 3. Net WPM = Gross WPM - Error Penalty
+    const netWPM = Math.max(0, grossWPM - errorPenaltyWords);
     
     // 4. Accuracy (%) = (Net WPM / Gross WPM) * 100
-    const accuracyPercent = totalKeystrokes === 0 ? 0 : (grossWPM > 0 ? Math.max(0, (netWPM / grossWPM)) * 100 : 100);
+    const accuracyPercent = totalKeystrokes === 0 ? 100 : (grossWPM > 0 ? Math.max(0, (netWPM / grossWPM)) * 100 : 100);
     
     return {
       grossWPM,
@@ -2081,7 +2371,7 @@
 })();
 </script>
     <!-- 🌍 Live Visitor Counter -->
-<footer style="margin-top:auto; padding:1rem 0; font-size:0.9rem; color:#ccc; text-align:center; border-top:1px solid #333;">
+<footer style="margin-top:auto; padding:1rem 0; font-size:0.9rem; color:#ccc; text-align:center; border-top:1px solid var(--border-color); transition: border-color 0.3s ease, color 0.3s ease;">
   👁️ <strong>Live Visitors:</strong>
   <a href="https://hits.sh/examyatri.live/Typing.html/" target="_blank" style="text-decoration:none;">
     <img src="https://hits.sh/examyatri.live/Typing.html.svg?view=today-total&label=Visitors&color=brightgreen&style=for-the-badge"
