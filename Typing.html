@@ -43,6 +43,11 @@
             text-align: center;
         }
 
+        body.practice-active header,
+        body.practice-active footer {
+            display: none;
+        }
+
         .container {
             width: 90%;
             max-width: 900px;
@@ -192,6 +197,35 @@
             color: #aaa;
             font-size: 0.9rem;
         }
+
+        /* === New Mode Toggle Styles === */
+        .mode-toggle-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .mode-toggle-btn {
+            background-color: #222;
+            color: var(--text-color);
+            border: 2px solid transparent;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: var(--font-family);
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .mode-toggle-btn.active {
+            background-color: var(--primary-color);
+            color: #000;
+            animation: flashing-border 2s infinite;
+        }
+        @keyframes flashing-border {
+            0% { border-color: red; }
+            50% { border-color: blue; }
+            100% { border-color: red; }
+        }
         
         /* Practice View */
         #practice-view {
@@ -222,7 +256,11 @@
             font-size: 1.2rem;
             font-weight: 700;
         }
-
+        
+        #split-display-container {
+            display: contents; /* Behaves as if it's not there by default */
+        }
+        
         #text-display-wrapper {
             border: 1px solid var(--border-color);
             padding: 1rem;
@@ -283,6 +321,21 @@
         .char { 
             display: inline-block; 
             position: relative;
+            transition: color 0.1s, background-color 0.1s;
+        }
+        
+        /* New character feedback styles */
+        .word.current .char.correct-char { color: var(--primary-color); }
+        .word.current .char.incorrect-char {
+            color: var(--error-color);
+            background-color: rgba(244, 67, 54, 0.2);
+            border-radius: 2px;
+        }
+        .extra-char {
+            display: inline-block;
+            color: var(--error-color);
+            background-color: rgba(244, 67, 54, 0.2);
+            border-radius: 2px;
         }
         
         .caret {
@@ -297,15 +350,12 @@
         @keyframes blink { 50% { opacity: 0; } }
 
         #hidden-input {
-            position: fixed;
-            left: 0;
-            top: 0;
+            position: absolute;
+            left: -9999px;
+            top: auto;
             width: 1px;
             height: 1px;
             opacity: 0;
-            z-index: -1;
-            touch-action: none;
-            pointer-events: none;
         }
 
         #free-hand-area {
@@ -330,6 +380,69 @@
             border-radius: 6px;
             cursor: pointer;
             margin: 0 auto;
+        }
+
+        /* Color Instructions */
+        .color-instructions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+        .instruction-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .color-box {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+
+        /* === New Laptop/Phone Mode Layouts === */
+        #live-typed-display { display: none; }
+
+        body.laptop-mode .container {
+            max-height: calc(100vh - 65px - 50px); /* header and footer height */
+            padding-bottom: 0;
+        }
+        body.laptop-mode.practice-active .container {
+            max-height: 100vh;
+        }
+        body.laptop-mode #practice-view {
+            flex-grow: 1;
+            min-height: 0;
+        }
+        body.laptop-mode #split-display-container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-height: 0;
+            gap: 1rem;
+        }
+        body.laptop-mode #text-display-wrapper,
+        body.laptop-mode #live-typed-display {
+            flex: 1; /* This ensures both divs share the space equally */
+            min-height: 0; /* Crucial for scrolling inside flex items */
+            font-size: 1.3rem; /* Slightly smaller for more text */
+        }
+        body.laptop-mode #live-typed-display {
+            display: block !important;
+        }
+        body.laptop-mode #practice-view.free-hand-active #split-display-container {
+            display: none;
+        }
+        body.laptop-mode #practice-view.free-hand-active #free-hand-area {
+            display: block !important;
+            flex-grow: 1;
         }
         
         /* New Results Modal */
@@ -457,6 +570,7 @@
             text-align: left;
             white-space: pre-wrap;
             word-wrap: break-word;
+            position: relative; /* For caret positioning */
         }
         
         .passage-display span {
@@ -623,6 +737,10 @@
     <main class="container">
         <!-- Setup View -->
         <section id="setup-view" class="view active">
+             <div class="mode-toggle-container">
+                <button id="laptop-mode-btn" class="mode-toggle-btn">💻 Laptop Mode</button>
+                <button id="phone-mode-btn" class="mode-toggle-btn">📱 Phone Mode</button>
+            </div>
             <div class="setup-grid">
                 <div class="setup-card">
                     <label for="level-select">Select Practice Type</label>
@@ -661,11 +779,21 @@
                 <div class="stat-item"><span class="label">Errors:</span><span id="stat-errors" class="value">0</span></div>
                 <div class="stat-item"><span class="label">Accuracy:</span><span id="stat-accuracy" class="value">100%</span></div>
             </div>
-            <div id="text-display-wrapper" style="display: block;">
-                <div id="text-display"></div>
-                <div id="caret" class="caret" style="display: none;"></div>
+            <div id="split-display-container">
+                <div id="text-display-wrapper" style="display: block;">
+                    <div id="text-display"></div>
+                    <div id="caret" class="caret" style="display: none;"></div>
+                </div>
+                <div id="live-typed-display" class="passage-display" aria-readonly="true" role="textbox" aria-label="Your Typed Passage"></div>
             </div>
             <textarea id="free-hand-area" style="display: none;" placeholder="Start typing..."></textarea>
+            <div class="color-instructions">
+                <span class="instruction-item"><span class="color-box" style="background-color: var(--primary-color);"></span>Correct</span>
+                <span class="instruction-item"><span class="color-box" style="background-color: var(--error-color);"></span>Full Mistake</span>
+                <span class="instruction-item"><span class="color-box" style="background-color: #FFA500;"></span>Half Mistake</span>
+                <span class="instruction-item"><span class="color-box" style="background-color: rgba(136, 136, 136, 0.4);"></span>Omitted</span>
+                <span class="instruction-item"><span class="color-box" style="background-color: var(--current-word-bg);"></span>Current</span>
+            </div>
             <button id="submit-test-btn">Submit Now</button>
         </section>
     </main>
@@ -822,6 +950,11 @@
                 pasteTextContainer: document.getElementById('paste-text-container'),
                 pasteTextArea: document.getElementById('paste-text-area'),
 
+                mode: {
+                    laptopBtn: document.getElementById('laptop-mode-btn'),
+                    phoneBtn: document.getElementById('phone-mode-btn'),
+                },
+                
                 stats: {
                     dashboard: document.querySelector('.stats-dashboard'),
                     time: document.getElementById('stat-time'),
@@ -830,8 +963,11 @@
                     errors: document.getElementById('stat-errors'),
                     accuracy: document.getElementById('stat-accuracy'),
                 },
+                
+                splitDisplayContainer: document.getElementById('split-display-container'),
                 textDisplayWrapper: document.getElementById('text-display-wrapper'),
                 textDisplay: document.getElementById('text-display'),
+                liveTypedDisplay: document.getElementById('live-typed-display'),
                 caret: document.getElementById('caret'),
                 hiddenInput: document.getElementById('hidden-input'),
                 freeHandArea: document.getElementById('free-hand-area'),
@@ -954,7 +1090,8 @@
 
                     if (sortedMistakes.length > 0) {
                         listEl.innerHTML = `<ul>${sortedMistakes.map(([word, data]) => {
-                            const mostCommonTyped = Object.entries(data.typedAs).sort(([, a], [, b]) => b - a)[0][0];
+                            const typedEntries = Object.entries(data.typedAs || {});
+                            const mostCommonTyped = typedEntries.length ? typedEntries.sort(([, a], [, b]) => b - a)[0][0] : '(no examples)';
                             return `<li>You mistyped <span class="mistake-word">'${word}'</span> as <span class="suggestion-word">'${mostCommonTyped}'</span> (${data.count} times total)</li>`;
                         }).join('')}</ul>`;
                         container.style.display = 'block';
@@ -993,7 +1130,7 @@
 
                 const labels = history.map((_, i) => `Test ${i + 1}`);
                 const speedData = history.map(item => Math.round(item.netWPM));
-                const accuracyData = history.map(item => parseFloat(item.accuracy.toFixed(2)));
+                const accuracyData = history.map(item => Number(item.accuracy) || 0);
 
                 const speedCtx = document.getElementById('speed-chart').getContext('2d');
                 if (speedChartInstance) speedChartInstance.destroy();
@@ -1100,9 +1237,9 @@
                         const description = randomArticle.description || randomArticle.content || '';
                         let text = `${randomArticle.title}. ${description}`;
 
-                        const tempEl = document.createElement('textarea');
+                        const tempEl = document.createElement('div');
                         tempEl.innerHTML = text;
-                        text = tempEl.value;
+                        text = tempEl.textContent || tempEl.innerText || '';
                         
                         text = text.replace(/<[^>]+>/g, '').replace(/\s\s+/g, ' ').replace(/\[read more\]/gi, '').replace(/Read More »/gi, '').trim();
                         
@@ -1139,7 +1276,7 @@
                     }
                 } catch (error) {
                     console.error(`Pre-fetching failed for ${language}:`, error);
-                    textCache[language].status = 'failed';
+                    textCache[language].status = 'idle';
                     textCache[language].text = null;
                 } finally {
                     textCache[language].promise = null;
@@ -1280,13 +1417,17 @@
                 dom.methodCard.style.display = (level === 'Paste Your Text' || level === 'Free Hand') ? 'none' : 'flex';
                 dom.durationCard.style.display = (level === 'Free Hand') ? 'none' : 'flex';
             };
-            const switchView = (view) => { dom.setupView.classList.toggle('active', view === 'setup'); dom.practiceView.classList.toggle('active', view === 'practice'); };
+            const switchView = (view) => {
+                dom.setupView.classList.toggle('active', view === 'setup');
+                dom.practiceView.classList.toggle('active', view === 'practice');
+                document.body.classList.toggle('practice-active', view === 'practice');
+            };
             
             const createWordHtml = (word, index) => {
                  const charsHtml = graphemeSplitter(word).map((char, charIndex) => 
                     `<span class="char" id="word-${index}-char-${charIndex}">${char}</span>`
                 ).join('');
-                return `<span class="word" id="word-${index}">${charsHtml}</span>`;
+                return `<span class="word" id="word-${index}">${charsHtml}<span class="extra-chars-wrapper"></span></span>`;
             };
 
             const renderWords = () => {
@@ -1296,46 +1437,90 @@
             };
 
             const positionCaretAndScroll = () => {
-                const { session } = appState;
-                const currentWordEl = document.getElementById(`word-${session.currentWordIndex}`);
-                if (currentWordEl) {
-                    dom.caret.style.display = 'block';
-                    const typedValue = dom.hiddenInput.value;
-                    const typedLength = graphemeSplitter(typedValue).length;
+                if (document.body.classList.contains('laptop-mode')) {
+                    // --- LAPTOP MODE ---
+                    const liveDisplay = dom.liveTypedDisplay;
+                    const caretAnchor = document.getElementById('caret-anchor');
                     
-                    let targetChar;
-                    const chars = currentWordEl.querySelectorAll('.char');
-                    
-                    if (typedLength < chars.length) {
-                       targetChar = chars[typedLength];
-                    } else {
-                       targetChar = chars.length > 0 ? chars[chars.length - 1] : currentWordEl;
-                    }
-                    
-                    const wrapperRect = dom.textDisplayWrapper.getBoundingClientRect();
-                    const targetRect = targetChar.getBoundingClientRect();
-                    
-                    let left;
-                    if (typedLength >= chars.length && chars.length > 0) {
-                        left = targetRect.right - wrapperRect.left;
-                    } else {
-                        left = targetRect.left - wrapperRect.left;
-                    }
-                    
-                    const top = targetRect.top - wrapperRect.top + dom.textDisplayWrapper.scrollTop;
-                    
-                    dom.caret.style.left = `${left}px`;
-                    dom.caret.style.top = `${top}px`;
+                    if (caretAnchor) {
+                        dom.caret.style.display = 'block';
+                        const liveDisplayRect = liveDisplay.getBoundingClientRect();
+                        const anchorRect = caretAnchor.getBoundingClientRect();
+                        
+                        const top = anchorRect.top - liveDisplayRect.top + liveDisplay.scrollTop;
+                        const left = anchorRect.left - liveDisplayRect.left + liveDisplay.scrollLeft;
 
-                    const targetScrollTop = currentWordEl.offsetTop - (dom.textDisplayWrapper.clientHeight * 0.4);
-                    if (Math.abs(dom.textDisplayWrapper.scrollTop - targetScrollTop) > 5) {
-                        dom.textDisplayWrapper.scrollTo({
-                            top: Math.max(0, targetScrollTop),
-                            behavior: 'smooth'
-                        });
+                        dom.caret.style.left = `${left}px`;
+                        dom.caret.style.top = `${top}px`;
+                    } else {
+                         dom.caret.style.display = appState.isPracticeActive ? 'block' : 'none';
+                         dom.caret.style.left = '0px';
+                         dom.caret.style.top = '0px';
+                    }
+                    liveDisplay.scrollTop = liveDisplay.scrollHeight;
+                    
+                    const { session } = appState;
+                    const currentWordEl = document.getElementById(`word-${session.currentWordIndex}`);
+                    if (currentWordEl) {
+                        const targetScrollTop = currentWordEl.offsetTop - (dom.textDisplayWrapper.clientHeight * 0.4);
+                        if (Math.abs(dom.textDisplayWrapper.scrollTop - targetScrollTop) > 5) {
+                            dom.textDisplayWrapper.scrollTo({ top: Math.max(0, targetScrollTop), behavior: 'smooth' });
+                        }
                     }
                 } else {
-                    dom.caret.style.display = 'none';
+                    // --- PHONE MODE ---
+                    const { session } = appState;
+                    const currentWordEl = document.getElementById(`word-${session.currentWordIndex}`);
+                    if (currentWordEl) {
+                        dom.caret.style.display = 'block';
+                        const typedValue = dom.hiddenInput.value;
+                        const typedLength = graphemeSplitter(typedValue).length;
+                        
+                        let targetEl;
+                        let positionAt = 'left';
+
+                        const originalChars = currentWordEl.querySelectorAll('.char');
+
+                        if (typedLength === 0) {
+                            targetEl = currentWordEl;
+                        } else if (typedLength <= originalChars.length) {
+                            targetEl = originalChars[typedLength - 1];
+                            positionAt = 'right';
+                        } else {
+                            const extraChars = currentWordEl.querySelectorAll('.extra-char');
+                            const extraIndex = typedLength - originalChars.length - 1;
+                            if (extraChars.length > 0 && extraChars[extraIndex]) {
+                                targetEl = extraChars[extraIndex];
+                                positionAt = 'right';
+                            } else {
+                                targetEl = originalChars.length > 0 ? originalChars[originalChars.length - 1] : currentWordEl;
+                                positionAt = 'right';
+                            }
+                        }
+
+                        if (!targetEl || !targetEl.getBoundingClientRect) {
+                            dom.caret.style.display = 'none';
+                        } else {
+                            const wrapperRect = dom.textDisplayWrapper.getBoundingClientRect();
+                            const targetRect = targetEl.getBoundingClientRect();
+                            
+                            let left = (positionAt === 'right') 
+                                ? (targetRect.right - wrapperRect.left) 
+                                : (targetRect.left - wrapperRect.left);
+                            
+                            const top = targetRect.top - wrapperRect.top + dom.textDisplayWrapper.scrollTop;
+                            
+                            dom.caret.style.left = `${left}px`;
+                            dom.caret.style.top = `${top}px`;
+                        }
+
+                        const targetScrollTop = currentWordEl.offsetTop - (dom.textDisplayWrapper.clientHeight * 0.4);
+                        if (Math.abs(dom.textDisplayWrapper.scrollTop - targetScrollTop) > 5) {
+                            dom.textDisplayWrapper.scrollTo({ top: Math.max(0, targetScrollTop), behavior: 'smooth' });
+                        }
+                    } else {
+                        dom.caret.style.display = 'none';
+                    }
                 }
             };
             
@@ -1365,8 +1550,68 @@
                 
                 dom.stats.grossWpm.textContent = metrics.grossWPMDisplay;
                 dom.stats.netWpm.textContent = metrics.netWPMDisplay;
-                dom.stats.errors.textContent = metrics.errorChars.toFixed(1);
+                dom.stats.errors.textContent = (metrics.errorPenaltyWords || 0).toFixed(1);
                 dom.stats.accuracy.textContent = `${metrics.accuracyDisplay}%`;
+            };
+
+            const updateLiveTypedDisplay = () => {
+                const { session } = appState;
+                let typedHTML = '';
+                
+                session.wordStates.slice(0, session.currentWordIndex).forEach(state => {
+                    const t = state.typed || '';
+                    if (state.status === 'omitted') {
+                        typedHTML += ` `;
+                    } else {
+                        const statusClass = { 'correct': 'correct-word', 'wrong': 'wrong-word', 'half': 'half-mistake-word'}[state.status] || '';
+                        typedHTML += `<span class="${statusClass}">${t}</span> `;
+                    }
+                });
+                
+                const currentTypedWord = dom.hiddenInput.value;
+                if (currentTypedWord) {
+                    typedHTML += `<span>${currentTypedWord}</span>`;
+                }
+
+                typedHTML += '<span id="caret-anchor"></span>';
+                dom.liveTypedDisplay.innerHTML = typedHTML;
+                dom.liveTypedDisplay.scrollTop = dom.liveTypedDisplay.scrollHeight;
+            };
+
+            const updateCurrentWordVisuals = () => {
+                const { session } = appState;
+                const currentWordEl = document.getElementById(`word-${session.currentWordIndex}`);
+                if (!currentWordEl) return;
+
+                const refWord = session.refWords[session.currentWordIndex] || '';
+                const typedWord = dom.hiddenInput.value;
+                const refChars = graphemeSplitter(refWord);
+                const typedChars = graphemeSplitter(typedWord);
+
+                const charElements = currentWordEl.querySelectorAll('.char');
+                
+                charElements.forEach((charEl, i) => {
+                    charEl.classList.remove('correct-char', 'incorrect-char');
+                    if (i < typedChars.length) {
+                        if (typedChars[i] === refChars[i]) {
+                            charEl.classList.add('correct-char');
+                        } else {
+                            charEl.classList.add('incorrect-char');
+                        }
+                    }
+                });
+
+                const extraCharsWrapper = currentWordEl.querySelector('.extra-chars-wrapper');
+                if (extraCharsWrapper) {
+                    if (typedChars.length > refChars.length) {
+                        const extraText = typedChars.slice(refChars.length).join('');
+                        extraCharsWrapper.innerHTML = graphemeSplitter(extraText)
+                            .map(char => `<span class="extra-char">${char}</span>`)
+                            .join('');
+                    } else {
+                        extraCharsWrapper.innerHTML = '';
+                    }
+                }
             };
 
             const updateUI = () => {
@@ -1383,6 +1628,10 @@
                             if (el.className !== newClass) el.className = newClass;
                         }
                     });
+
+                    if (document.body.classList.contains('laptop-mode')) {
+                        updateLiveTypedDisplay();
+                    }
                     
                     positionCaretAndScroll();
                     updateLiveStats();
@@ -1432,15 +1681,17 @@
                     const textGenerator = practiceLevels[level][method];
                     let sourceText;
 
+                    dom.practiceView.classList.remove('free-hand-active');
                     if (level === 'Free Hand') {
                         appState.config = { level, method, duration: 0, sourceText: '' };
                         switchView('practice');
                         dom.stats.dashboard.style.display = 'none';
-                        dom.textDisplayWrapper.style.display = 'none';
+                        dom.splitDisplayContainer.style.display = 'none';
                         dom.freeHandArea.style.display = 'block';
                         dom.freeHandArea.value = '';
                         dom.freeHandArea.focus();
                         dom.submitBtn.textContent = 'Back to Setup';
+                        dom.practiceView.classList.add('free-hand-active');
                         return;
                     }
 
@@ -1468,6 +1719,7 @@
                     appState.session.timeLeft = appState.config.duration;
                     
                     dom.stats.dashboard.style.display = 'flex';
+                    dom.splitDisplayContainer.style.display = ''; // Reset display
                     dom.textDisplayWrapper.style.display = 'block';
                     dom.freeHandArea.style.display = 'none';
                     dom.submitBtn.textContent = 'Submit Now';
@@ -1542,7 +1794,7 @@
             };
 
             const handleKeyDown = (e) => {
-                if (e.key === 'Backspace') {
+                if (e.key === 'Backspace' && !e.repeat) {
                     appState.session.backspaceCount++;
                     if (dom.hiddenInput.value === '' && appState.session.currentWordIndex > 0) {
                         e.preventDefault();
@@ -1554,6 +1806,7 @@
                         session.totalKeystrokes -= (graphemeSplitter(prevState.typed || '').length + (prevState.typed ? 1 : 0));
                         prevState.status = 'untyped';
                         dom.hiddenInput.value = prevState.typed || '';
+                        updateCurrentWordVisuals(); // Update visuals on backspace to previous word
                         updateUI();
                         return;
                     }
@@ -1580,6 +1833,8 @@
                     return;
                 }
                 
+                updateCurrentWordVisuals();
+
                 const { session } = appState;
                 const refWord = session.refWords[session.currentWordIndex];
                 if (autoShiftEnabled && refWord && graphemeSplitter(typedValue).length === graphemeSplitter(refWord).length) {
@@ -1595,11 +1850,12 @@
                     return;
                 }
                 if (appState.timerId) clearInterval(appState.timerId);
-                if (!appState.isPracticeActive && appState.session.startTime > 0) return;
+                if (!appState.isPracticeActive && appState.timerId == null) return;
                 if(dom.hiddenInput.value && appState.session.currentWordIndex < appState.session.refWords.length){
                     commitCurrentWord();
                 }
                 appState.isPracticeActive = false;
+                appState.timerId = null;
                 dom.hiddenInput.blur();
                 showResults();
             };
@@ -1631,7 +1887,7 @@
                 dom.newResults.backspaceCount.textContent = appState.session.backspaceCount;
                 dom.newResults.resultText.textContent = isQualified ? "Qualified" : "Not Qualified";
                 dom.newResults.resultCard.className = isQualified ? 'result-card qualified' : 'result-card not-qualified';
-                dom.newResults.formulaNote.innerHTML = `<code>Gross WPM</code> = (Total Keystrokes / 5) / Time (min)<br><code>Error Penalty</code> = Full Mistakes + (Half Mistakes / 2)<br><code>Net WPM</code> = Gross WPM - Error Penalty<br><code>Accuracy</code> = (Net WPM / Gross WPM) * 100`.trim().replace(/\s{2,}/g, ' ');
+                dom.newResults.formulaNote.innerHTML = `<code>Gross WPM</code> = (Total Keystrokes / 5) / Time (min)<br><code>Error Penalty</code> = Full Mistakes + (Half Mistakes / 2)<br><code>Net WPM</code> = Gross WPM - (Error Penalty / Time(min))<br><code>Accuracy</code> = (Net WPM / Gross WPM) * 100`.trim().replace(/\s{2,}/g, ' ');
 
                 let originalHTML = '', typedHTML = '';
                 appState.session.wordStates.slice(0, appState.session.currentWordIndex).forEach(state => {
@@ -1662,6 +1918,33 @@
 
             const hideResults = () => { dom.resultsModal.classList.remove('active'); };
             
+            // --- New Display Mode Logic ---
+            const setMode = (mode, fromUser = false) => {
+                document.body.classList.remove('laptop-mode', 'phone-mode');
+                document.body.classList.add(`${mode}-mode`);
+
+                dom.mode.laptopBtn.classList.toggle('active', mode === 'laptop');
+                dom.mode.phoneBtn.classList.toggle('active', mode === 'phone');
+                
+                if (mode === 'laptop') {
+                    dom.liveTypedDisplay.appendChild(dom.caret);
+                } else {
+                    dom.textDisplayWrapper.appendChild(dom.caret);
+                }
+
+                if (fromUser) {
+                    storage.set('typingDisplayMode', mode);
+                }
+                if (appState.isPracticeActive) {
+                    setTimeout(() => updateUI(), 0);
+                }
+            };
+            
+            const detectAndSetMode = () => {
+                const mode = window.innerWidth >= 768 ? 'laptop' : 'phone';
+                setMode(mode);
+            };
+
             // --- INITIALIZATION ---
             const init = () => {
                 resetState();
@@ -1690,9 +1973,9 @@
                 });
 
                 window.addEventListener('resize', () => {
-                    if (appState.isPracticeActive) {
-                        requestAnimationFrame(positionCaretAndScroll);
-                    }
+                    const savedMode = storage.get('typingDisplayMode');
+                    if (!savedMode) detectAndSetMode();
+                    if(appState.isPracticeActive) requestAnimationFrame(positionCaretAndScroll);
                 });
 
                 dom.resultActions.retry.addEventListener('click', () => {
@@ -1723,6 +2006,17 @@
                     switchView('setup');
                 });
                 
+                // Mode buttons setup
+                dom.mode.laptopBtn.addEventListener('click', () => setMode('laptop', true));
+                dom.mode.phoneBtn.addEventListener('click', () => setMode('phone', true));
+                
+                const savedMode = storage.get('typingDisplayMode');
+                if (savedMode) {
+                    setMode(savedMode);
+                } else {
+                    detectAndSetMode();
+                }
+
                 dom.loadingStatus.textContent = 'Fetching fresh articles... This may take a moment on your first visit.';
                 prefetchArticle('en');
                 prefetchArticle('hi');
@@ -1755,18 +2049,22 @@
     // 2. Error Penalty (in words) = Full Mistakes + (Half Mistakes / 2)
     const errorPenaltyWords = fullMistakes + (halfMistakes / 2);
 
-    // 3. Net WPM = Gross WPM - Error Penalty (total words, not a rate)
-    const netWPM = Math.max(0, grossWPM - errorPenaltyWords);
+    // 3. Net WPM = Gross WPM - (Error Penalty / Time (minutes))
+    // According to many government exam rules, the penalty is subtracted from the total words typed, not the WPM rate. 
+    // This is equivalent to subtracting the error rate from the gross rate.
+    // Net WPM = Gross WPM - (Total Error Penalty Words / Total Time in Minutes)
+    const netWPM = minutes > 0 ? Math.max(0, grossWPM - (errorPenaltyWords / minutes)) : 0;
     
     // 4. Accuracy (%) = (Net WPM / Gross WPM) * 100
-    const accuracyPercent = grossWPM > 0 ? Math.max(0, (netWPM / grossWPM)) * 100 : 100;
+    const accuracyPercent = totalKeystrokes === 0 ? 0 : (grossWPM > 0 ? Math.max(0, (netWPM / grossWPM)) * 100 : 100);
     
     return {
       grossWPM,
       netWPM,
       accuracyPercent,
       totalKeystrokes: totalKeystrokes,
-      errorChars: errorPenaltyWords, // Re-purposing this to hold total penalty in words
+      errorPenaltyWords: errorPenaltyWords,
+      errorChars: errorPenaltyWords, // kept for backward compatibility
       timeSeconds: timeSec,
       grossWPMDisplay: Math.round(grossWPM),
       netWPMDisplay: Math.round(netWPM),
