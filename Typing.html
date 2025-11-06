@@ -2425,50 +2425,6 @@ try {
   console.info('Government exam typing metrics script installed.');
 
 })();
-/* === Automatic Device Detection and Mode Switch === */
-window.addEventListener('load', () => {
-  const laptopBtn = document.getElementById('laptop-mode-btn');
-  const phoneBtn = document.getElementById('phone-mode-btn');
-
-  // Detect if the device is likely mobile
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
-                     .test(navigator.userAgent) || window.innerWidth < 768;
-
-  if (isMobile) {
-    document.body.classList.add('phone-mode');
-    document.body.classList.remove('laptop-mode');
-    if (phoneBtn) phoneBtn.classList.add('active');
-    if (laptopBtn) laptopBtn.classList.remove('active');
-    console.log('📱 Phone mode activated automatically');
-  } else {
-    document.body.classList.add('laptop-mode');
-    document.body.classList.remove('phone-mode');
-    if (laptopBtn) laptopBtn.classList.add('active');
-    if (phoneBtn) phoneBtn.classList.remove('active');
-    console.log('💻 Laptop mode activated automatically');
-  }
-});
-
-// Optional: Auto switch if window resized
-window.addEventListener('resize', () => {
-  const isMobile = window.innerWidth < 768;
-  const laptopBtn = document.getElementById('laptop-mode-btn');
-  const phoneBtn = document.getElementById('phone-mode-btn');
-
-  if (isMobile && !document.body.classList.contains('phone-mode')) {
-    document.body.classList.add('phone-mode');
-    document.body.classList.remove('laptop-mode');
-    if (phoneBtn) phoneBtn.classList.add('active');
-    if (laptopBtn) laptopBtn.classList.remove('active');
-    console.log('📱 Switched to phone mode (resize)');
-  } else if (!isMobile && !document.body.classList.contains('laptop-mode')) {
-    document.body.classList.add('laptop-mode');
-    document.body.classList.remove('phone-mode');
-    if (laptopBtn) laptopBtn.classList.add('active');
-    if (phoneBtn) phoneBtn.classList.remove('active');
-    console.log('💻 Switched to laptop mode (resize)');
-  }
-});
 </script>
     <!-- 🌍 Live Visitor Counter -->
 <footer style="margin-top:auto; padding:1rem 0; font-size:0.9rem; color:#ccc; text-align:center; border-top:1px solid var(--border-color); transition: border-color 0.3s ease, color 0.3s ease;">
