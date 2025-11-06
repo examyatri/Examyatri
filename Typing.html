@@ -80,7 +80,7 @@
         }
         body[data-theme="light"] .results-content {
             background-color: #ffffff;
-            color: var(--text-color);
+            color: #000000;
         }
         body[data-theme="light"] .result-card,
         body[data-theme="light"] .results-formula-note {
@@ -89,6 +89,7 @@
         }
         body[data-theme="light"] .result-card .title {
             color: var(--subtle-text-color);
+            font-weight: 700;
         }
         body[data-theme="light"] .result-card .value {
             color: var(--text-color);
@@ -142,7 +143,7 @@
 
         header h1 {
             font-size: 1.5rem;
-            font-weight: 500;
+            font-weight: 700;
         }
         
         #theme-toggle-btn {
@@ -218,6 +219,7 @@
             text-align: left;
             font-size: 0.9rem;
             color: var(--subtle-text-color);
+            font-weight: 700;
         }
         
         .custom-select {
@@ -347,6 +349,7 @@
         .stat-item .label {
             font-size: 0.8rem;
             color: var(--subtle-text-color);
+            font-weight: 700;
         }
         .stat-item .value {
             font-size: 1.2rem;
@@ -376,7 +379,7 @@
         }
         
         #text-display {
-            color: var(--subtle-text-color);
+            color: var(--text-color); /* MODIFIED: Was --subtle-text-color */
             position: relative;
             overflow-wrap: break-word; /* Prevents text from overflowing horizontally */
         }
@@ -434,6 +437,10 @@
             background-color: rgba(244, 67, 54, 0.2);
             border-radius: 2px;
         }
+
+        /* NEW: Styles for live typed chars in laptop mode */
+        .live-char-correct { display: inline-block; color: var(--primary-color); }
+        .live-char-incorrect { display: inline-block; color: var(--error-color); background-color: rgba(244, 67, 54, 0.2); border-radius: 2px; }
         
         .caret {
             position: absolute;
@@ -567,7 +574,7 @@
         }
 
         .results-content {
-            background-color: #2a2a2e;
+            background-color: #111111;
             padding: 1.5rem;
             border-radius: 8px;
             border: 1px solid var(--border-color);
@@ -576,7 +583,7 @@
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
-            color: #e0e0e0;
+            color: #FFFFFF;
             max-height: calc(100vh - 2rem);
             overflow-y: auto;
             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
@@ -600,7 +607,7 @@
         }
         
         .result-card {
-            background-color: #333338;
+            background-color: #222222;
             padding: 1rem;
             border-radius: 6px;
             border: 1px solid #444;
@@ -612,6 +619,7 @@
             font-size: 0.85rem;
             color: #aaa;
             margin-bottom: 0.5rem;
+            font-weight: 700;
         }
 
         .result-card .value {
@@ -627,7 +635,7 @@
         }
 
         .results-formula-note {
-            background-color: #333338;
+            background-color: #222222;
             padding: 0.75rem;
             border-radius: 6px;
             font-size: 0.8rem;
@@ -712,7 +720,7 @@
             padding-top: 1.5rem;
             position: sticky;
             bottom: -1.5rem;
-            background-color: #2a2a2e;
+            background-color: #111111;
             margin-left: -1.5rem;
             margin-right: -1.5rem;
             padding-left: 1.5rem;
@@ -1653,90 +1661,66 @@
             };
 
             const positionCaretAndScroll = () => {
-                if (document.body.classList.contains('laptop-mode')) {
-                    // --- LAPTOP MODE ---
-                    const liveDisplay = dom.liveTypedDisplay;
-                    const caretAnchor = document.getElementById('caret-anchor');
+                const { session } = appState;
+                const currentWordEl = document.getElementById(`word-${session.currentWordIndex}`);
+                
+                if (currentWordEl && dom.practiceView.classList.contains('active')) {
+                    dom.caret.style.display = 'block';
+                    const typedValue = dom.hiddenInput.value;
+                    const typedLength = graphemeSplitter(typedValue).length;
                     
-                    if (caretAnchor) {
-                        dom.caret.style.display = 'block';
-                        const liveDisplayRect = liveDisplay.getBoundingClientRect();
-                        const anchorRect = caretAnchor.getBoundingClientRect();
-                        
-                        const top = anchorRect.top - liveDisplayRect.top + liveDisplay.scrollTop;
-                        const left = anchorRect.left - liveDisplayRect.left + liveDisplay.scrollLeft;
+                    let targetEl;
+                    let positionAt = 'left';
 
-                        dom.caret.style.left = `${left}px`;
-                        dom.caret.style.top = `${top}px`;
+                    const originalChars = currentWordEl.querySelectorAll('.char');
+
+                    if (typedLength === 0) {
+                        targetEl = currentWordEl;
+                    } else if (typedLength <= originalChars.length) {
+                        targetEl = originalChars[typedLength - 1];
+                        positionAt = 'right';
                     } else {
-                         dom.caret.style.display = appState.isPracticeActive ? 'block' : 'none';
-                         dom.caret.style.left = '0px';
-                         dom.caret.style.top = '0px';
-                    }
-                    liveDisplay.scrollTop = liveDisplay.scrollHeight;
-                    
-                    const { session } = appState;
-                    const currentWordEl = document.getElementById(`word-${session.currentWordIndex}`);
-                    if (currentWordEl) {
-                        const targetScrollTop = currentWordEl.offsetTop - (dom.textDisplayWrapper.clientHeight * 0.4);
-                        if (Math.abs(dom.textDisplayWrapper.scrollTop - targetScrollTop) > 5) {
-                            dom.textDisplayWrapper.scrollTo({ top: Math.max(0, targetScrollTop), behavior: 'smooth' });
-                        }
-                    }
-                } else {
-                    // --- PHONE MODE ---
-                    const { session } = appState;
-                    const currentWordEl = document.getElementById(`word-${session.currentWordIndex}`);
-                    if (currentWordEl) {
-                        dom.caret.style.display = 'block';
-                        const typedValue = dom.hiddenInput.value;
-                        const typedLength = graphemeSplitter(typedValue).length;
-                        
-                        let targetEl;
-                        let positionAt = 'left';
-
-                        const originalChars = currentWordEl.querySelectorAll('.char');
-
-                        if (typedLength === 0) {
-                            targetEl = currentWordEl;
-                        } else if (typedLength <= originalChars.length) {
-                            targetEl = originalChars[typedLength - 1];
+                        const extraChars = currentWordEl.querySelectorAll('.extra-char');
+                        const extraIndex = typedLength - originalChars.length - 1;
+                        if (extraChars.length > 0 && extraChars[extraIndex]) {
+                            targetEl = extraChars[extraIndex];
                             positionAt = 'right';
                         } else {
-                            const extraChars = currentWordEl.querySelectorAll('.extra-char');
-                            const extraIndex = typedLength - originalChars.length - 1;
-                            if (extraChars.length > 0 && extraChars[extraIndex]) {
-                                targetEl = extraChars[extraIndex];
-                                positionAt = 'right';
-                            } else {
-                                targetEl = originalChars.length > 0 ? originalChars[originalChars.length - 1] : currentWordEl;
-                                positionAt = 'right';
-                            }
+                            targetEl = originalChars.length > 0 ? originalChars[originalChars.length - 1] : currentWordEl;
+                            positionAt = 'right';
                         }
-
-                        if (!targetEl || !targetEl.getBoundingClientRect) {
-                            dom.caret.style.display = 'none';
-                        } else {
-                            const wrapperRect = dom.textDisplayWrapper.getBoundingClientRect();
-                            const targetRect = targetEl.getBoundingClientRect();
-                            
-                            let left = (positionAt === 'right') 
-                                ? (targetRect.right - wrapperRect.left) 
-                                : (targetRect.left - wrapperRect.left);
-                            
-                            const top = targetRect.top - wrapperRect.top + dom.textDisplayWrapper.scrollTop;
-                            
-                            dom.caret.style.left = `${left}px`;
-                            dom.caret.style.top = `${top}px`;
-                        }
-
-                        const targetScrollTop = currentWordEl.offsetTop - (dom.textDisplayWrapper.clientHeight * 0.4);
-                        if (Math.abs(dom.textDisplayWrapper.scrollTop - targetScrollTop) > 5) {
-                            dom.textDisplayWrapper.scrollTo({ top: Math.max(0, targetScrollTop), behavior: 'smooth' });
-                        }
-                    } else {
-                        dom.caret.style.display = 'none';
                     }
+
+                    if (!targetEl || !targetEl.getBoundingClientRect) {
+                        dom.caret.style.display = 'none';
+                    } else {
+                        const wrapperRect = dom.textDisplayWrapper.getBoundingClientRect();
+                        const targetRect = targetEl.getBoundingClientRect();
+                        
+                        let left = (positionAt === 'right') 
+                            ? (targetRect.right - wrapperRect.left) 
+                            : (targetRect.left - wrapperRect.left);
+                        
+                        const top = targetRect.top - wrapperRect.top + dom.textDisplayWrapper.scrollTop;
+                        
+                        dom.caret.style.left = `${left}px`;
+                        dom.caret.style.top = `${top}px`;
+                    }
+
+                    // Scroll the reference text (top pane)
+                    const targetScrollTop = currentWordEl.offsetTop - (dom.textDisplayWrapper.clientHeight * 0.4);
+                    if (Math.abs(dom.textDisplayWrapper.scrollTop - targetScrollTop) > 5) {
+                        dom.textDisplayWrapper.scrollTo({ top: Math.max(0, targetScrollTop), behavior: 'smooth' });
+                    }
+                    
+                    // If in laptop mode, also scroll the typed text (bottom pane) to the bottom
+                    if (document.body.classList.contains('laptop-mode')) {
+                        const liveDisplay = dom.liveTypedDisplay;
+                        liveDisplay.scrollTop = liveDisplay.scrollHeight;
+                    }
+
+                } else {
+                    dom.caret.style.display = 'none';
                 }
             };
             
@@ -1774,6 +1758,7 @@
                 const { session } = appState;
                 let typedHTML = '';
                 
+                // Render already typed words with their final status
                 session.wordStates.slice(0, session.currentWordIndex).forEach(state => {
                     const t = state.typed || '';
                     if (state.status === 'omitted') {
@@ -1784,14 +1769,31 @@
                     }
                 });
                 
+                // Render the word currently being typed with live character feedback
                 const currentTypedWord = dom.hiddenInput.value;
-                if (currentTypedWord) {
+                if (appState.isPracticeActive && session.currentWordIndex < session.refWords.length) {
+                    const refWord = session.refWords[session.currentWordIndex] || '';
+                    const typedChars = graphemeSplitter(currentTypedWord);
+                    const refChars = graphemeSplitter(refWord);
+                    let currentWordHTML = '';
+
+                    for (let i = 0; i < typedChars.length; i++) {
+                        let charClass = '';
+                        if (i >= refChars.length) {
+                            charClass = 'extra-char';
+                        } else if (typedChars[i] === refChars[i]) {
+                            charClass = 'live-char-correct';
+                        } else {
+                            charClass = 'live-char-incorrect';
+                        }
+                        const char = typedChars[i];
+                        currentWordHTML += `<span class="${charClass}">${char}</span>`;
+                    }
+                    typedHTML += currentWordHTML;
+                } else if (currentTypedWord) {
                     typedHTML += `<span>${currentTypedWord}</span>`;
                 }
-
-                typedHTML += '<span id="caret-anchor"></span>';
                 dom.liveTypedDisplay.innerHTML = typedHTML;
-                dom.liveTypedDisplay.scrollTop = dom.liveTypedDisplay.scrollHeight;
             };
 
             const updateCurrentWordVisuals = () => {
@@ -1805,7 +1807,6 @@
                 const typedChars = graphemeSplitter(typedWord);
 
                 const charElements = currentWordEl.querySelectorAll('.char');
-                
                 charElements.forEach((charEl, i) => {
                     charEl.classList.remove('correct-char', 'incorrect-char');
                     if (i < typedChars.length) {
@@ -1832,21 +1833,27 @@
 
             const updateUI = () => {
                 requestAnimationFrame(() => {
-                    if (!appState.isPracticeActive && appState.session.startTime === 0) return;
-
                     const { session } = appState;
+                    const isLaptopMode = document.body.classList.contains('laptop-mode');
+
                     session.wordStates.forEach((state, index) => {
                         const el = document.getElementById(`word-${index}`);
                         if(el) {
                             let newClass = 'word';
-                            if (index === session.currentWordIndex) newClass += ' current';
-                            else if (state.status !== 'untyped') newClass += ` ${state.status}`;
+                            if (index === session.currentWordIndex) {
+                                newClass += ' current';
+                            }
+                            else if (state.status !== 'untyped' && !isLaptopMode) {
+                                newClass += ` ${state.status}`;
+                            }
                             if (el.className !== newClass) el.className = newClass;
                         }
                     });
 
-                    if (document.body.classList.contains('laptop-mode')) {
+                    if (isLaptopMode) {
                         updateLiveTypedDisplay();
+                    } else {
+                        updateCurrentWordVisuals();
                     }
                     
                     positionCaretAndScroll();
@@ -1944,6 +1951,7 @@
 
                     switchView('practice');
                     renderWords();
+                    positionCaretAndScroll();
                     dom.hiddenInput.focus();
                 } catch (error) {
                     console.error("Failed to start practice:", error);
@@ -2196,11 +2204,7 @@
                 dom.mode.laptopBtn.classList.toggle('active', mode === 'laptop');
                 dom.mode.phoneBtn.classList.toggle('active', mode === 'phone');
                 
-                if (mode === 'laptop') {
-                    dom.liveTypedDisplay.appendChild(dom.caret);
-                } else {
-                    dom.textDisplayWrapper.appendChild(dom.caret);
-                }
+                dom.textDisplayWrapper.appendChild(dom.caret);
 
                 if (fromUser) {
                     storage.set('typingDisplayMode', mode);
@@ -2273,6 +2277,7 @@
                     
                     switchView('practice');
                     renderWords();
+                    positionCaretAndScroll();
                     dom.hiddenInput.focus();
                 });
                 dom.resultActions.newTest.addEventListener('click', () => {
