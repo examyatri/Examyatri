@@ -539,6 +539,7 @@
             flex: 1; /* This ensures both divs share the space equally */
             min-height: 0; /* Crucial for scrolling inside flex items */
             font-size: 1.3rem; /* Slightly smaller for more text */
+            height: auto; /* Override fixed height to allow flex to work */
         }
         body.laptop-mode #live-typed-display {
             display: block !important;
@@ -852,7 +853,26 @@
                 word-break: break-all;
             }
         }
-    </style>
+    
+/* === Fix Equal Height & Scroll Position in Laptop Mode === */
+body.laptop-mode #text-display-wrapper {
+    height: auto !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+}
+
+body.laptop-mode #live-typed-display {
+    flex: 1 !important;
+    min-height: 0 !important;
+}
+
+/* Smooth vertical alignment: keep current text between 20–60% viewport */
+body.laptop-mode #text-display-wrapper {
+    scroll-margin-top: 20%;
+    scroll-margin-bottom: 40%;
+}
+
+</style>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -1581,6 +1601,22 @@
 
             const tokenize = (text) => text.normalize("NFC").trim().split(/\s+/).filter(Boolean);
 
+            const filterTextByLanguage = (text, lang) => {
+                if (!text) return '';
+                let filteredText = text;
+                if (lang === 'hi') {
+                    // Allow Hindi chars (Devanagari), numbers, specific punctuation, and danda.
+                    const hindiRegex = /[^ \u0900-\u097F0-9.,()\/@%।]+/gu;
+                    filteredText = text.replace(hindiRegex, ' ');
+                } else { // 'en' and default
+                    // Allow only basic ASCII characters for English.
+                    const englishRegex = /[^\x00-\x7F]+/g;
+                    filteredText = text.replace(englishRegex, ' ');
+                }
+                // Clean up by collapsing multiple spaces into a single space.
+                return filteredText.replace(/\s\s+/g, ' ').trim();
+            };
+
             // --- STATE MANAGEMENT ---
             const resetState = () => {
                 if (typeof appState !== 'undefined' && appState.timerId) {
@@ -1695,6 +1731,18 @@
                         dom.caret.style.display = 'none';
                     } else {
                         const wrapperRect = dom.textDisplayWrapper.getBoundingClientRect();
+
+// === Scroll centering logic for laptop mode ===
+try {
+    const wrapperHeight = dom.textDisplayWrapper.clientHeight;
+    const currentPos = targetRect.top - wrapperRect.top;
+    if (currentPos < wrapperHeight * 0.2 || currentPos > wrapperHeight * 0.6) {
+        dom.textDisplayWrapper.scrollTop += currentPos - wrapperHeight * 0.4;
+    }
+} catch (e) {
+    console.warn('Scroll centering skipped:', e);
+}
+
                         const targetRect = targetEl.getBoundingClientRect();
                         
                         let left = (positionAt === 'right') 
@@ -1930,6 +1978,8 @@
                     }
                     
                     if (!sourceText) throw new Error("Failed to get any practice text.");
+                    
+                    sourceText = filterTextByLanguage(sourceText, appState.lang);
 
                     if (sourceText.length > maxCharsForSmoothPerformance) {
                         sourceText = sourceText.substring(0, maxCharsForSmoothPerformance);
@@ -2052,7 +2102,8 @@
                 try {
                     const newText = await fetchPracticeText(appState.lang);
                     if (newText) {
-                        const newWords = tokenize(newText);
+                        const filteredText = filterTextByLanguage(newText, appState.lang);
+                        const newWords = tokenize(filteredText);
                         appState.session.allRefWords.push(...newWords);
                         
                         // If the user was "paused" waiting for text, kickstart the UI again
