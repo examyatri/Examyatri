@@ -1731,18 +1731,6 @@ body.laptop-mode #text-display-wrapper {
                         dom.caret.style.display = 'none';
                     } else {
                         const wrapperRect = dom.textDisplayWrapper.getBoundingClientRect();
-
-// === Scroll centering logic for laptop mode ===
-try {
-    const wrapperHeight = dom.textDisplayWrapper.clientHeight;
-    const currentPos = targetRect.top - wrapperRect.top;
-    if (currentPos < wrapperHeight * 0.2 || currentPos > wrapperHeight * 0.6) {
-        dom.textDisplayWrapper.scrollTop += currentPos - wrapperHeight * 0.4;
-    }
-} catch (e) {
-    console.warn('Scroll centering skipped:', e);
-}
-
                         const targetRect = targetEl.getBoundingClientRect();
                         
                         let left = (positionAt === 'right') 
@@ -1753,9 +1741,24 @@ try {
                         
                         dom.caret.style.left = `${left}px`;
                         dom.caret.style.top = `${top}px`;
+                        
+                        // Scroll centering logic (previously buggy)
+                        try {
+                            if (document.body.classList.contains('laptop-mode')) {
+                                const wrapperHeight = dom.textDisplayWrapper.clientHeight;
+                                const currentPos = targetRect.top - wrapperRect.top;
+                                // If current line is not in the middle 40% of the view, scroll it there.
+                                if (currentPos < wrapperHeight * 0.2 || currentPos > wrapperHeight * 0.6) {
+                                    dom.textDisplayWrapper.scrollTop += currentPos - (wrapperHeight * 0.4);
+                                }
+                            }
+                        } catch (e) {
+                            // This might fail if elements are not visible, which is okay.
+                            console.warn('Scroll centering failed:', e.message);
+                        }
                     }
 
-                    // Scroll the reference text (top pane)
+                    // Fallback scrolling for phone mode or if centering fails
                     const targetScrollTop = currentWordEl.offsetTop - (dom.textDisplayWrapper.clientHeight * 0.4);
                     if (Math.abs(dom.textDisplayWrapper.scrollTop - targetScrollTop) > 5) {
                         dom.textDisplayWrapper.scrollTo({ top: Math.max(0, targetScrollTop), behavior: 'smooth' });
@@ -2266,8 +2269,10 @@ try {
             };
             
             const detectAndSetMode = () => {
-                const mode = window.innerWidth >= 768 ? 'laptop' : 'phone';
-                setMode(mode);
+                const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                // Default to laptop unless it's a narrow touch device (likely a phone)
+                const mode = isTouchDevice && window.innerWidth < 800 ? 'phone' : 'laptop';
+                setMode(mode, false); // `fromUser` is false
             };
 
             // --- THEME LOGIC ---
@@ -2308,8 +2313,7 @@ try {
                 });
 
                 window.addEventListener('resize', () => {
-                    const savedMode = storage.get('typingDisplayMode');
-                    if (!savedMode) detectAndSetMode();
+                    // Do not switch modes on resize, only reposition the caret.
                     if(appState.isPracticeActive) requestAnimationFrame(positionCaretAndScroll);
                 });
 
