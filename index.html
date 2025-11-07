@@ -3515,10 +3515,10 @@ Now, generate the questions based on all the instructions above and the followin
 --- START OF SOURCE MATERIAL ---
 ${sourceText}
 --- END OF SOURCE MATERIAL --- 
-Before giving the final output, check and verify all questions, options, correct answers, and explanations. Ensure everything is factually correct and consistent. In the explanation, clearly discuss all options and justify why the correct one is right and others are wrong, *also explain each option in explination one by one* . Fix any contradiction or error automatically. `;
+Before giving the final output, check and verify all questions, options, correct answers, and explanations. Ensure everything is factually correct and consistent. In the explanation, clearly discuss all options and justify why the correct one is right and others are wrong, *also explain each option in explination one by one* . Fix any contradiction or error automatically. Generate {{count}} unique and non-repetitive questions. Each question must explore a different aspect of the topic and subtopic using varied sentence structure, reasoning, and examples. Never duplicate or slightly rephrase any earlier question and never use same line to generate multiple question `;
         } else {
              prompt += `
-Before giving the final output, check and verify all questions, options, correct answers, and explanations. Ensure everything is factually correct and consistent. In the explanation, clearly discuss all options and justify why the correct one is right and others are wrong, *also explain each option in explination one by one* . Fix any contradiction or error automatically. `;
+Before giving the final output, check and verify all questions, options, correct answers, and explanations. Ensure everything is factually correct and consistent. In the explanation, clearly discuss all options and justify why the correct one is right and others are wrong, *also explain each option in explination one by one* . Fix any contradiction or error automatically. Generate {{count}} unique and non-repetitive questions. Each question must explore a different aspect of the topic using varied sentence structure, reasoning, and examples. Never duplicate or slightly rephrase any earlier question `;
         }
 
         promptForGemini = prompt;
