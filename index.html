@@ -692,6 +692,168 @@ function showQuizSavedNotification() {
     .ai-platform-option { display: flex; flex-direction: column; flex: 1; text-align: center; }
     .ai-tip { font-size: 0.8em; color: #6c757d; margin-top: 5px; }
     body.dark-mode .ai-tip { color: #aaa; }
+
+    /* ===== AI MODEL SELECTOR (NEW) ===== */
+    .ai-model-selector-section {
+        margin: 1.5rem 0 0.5rem 0;
+        padding: 1rem 1.2rem 1.2rem 1.2rem;
+        background: linear-gradient(135deg, var(--component-bg) 0%, var(--primary-bg) 100%);
+        border: 1.5px solid var(--border-color);
+        border-radius: 12px;
+    }
+    .ai-model-selector-label {
+        font-size: 0.85em;
+        font-weight: 700;
+        color: var(--accent-color);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.7rem;
+        display: block;
+    }
+    .ai-model-cards {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    @media (max-width: 500px) {
+        .ai-model-cards { grid-template-columns: repeat(2, 1fr); }
+    }
+    .ai-model-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        padding: 10px 6px;
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        cursor: pointer;
+        background: var(--secondary-bg);
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .ai-model-card:hover {
+        border-color: var(--accent-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px var(--shadow-color);
+    }
+    .ai-model-card.selected {
+        border-color: var(--accent-color);
+        background: linear-gradient(135deg, rgba(0,123,255,0.1), rgba(0,123,255,0.05));
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.2);
+    }
+    body.dark-mode .ai-model-card.selected {
+        background: linear-gradient(135deg, rgba(77,171,247,0.15), rgba(77,171,247,0.05));
+        box-shadow: 0 0 0 3px rgba(77,171,247,0.25);
+    }
+    .ai-model-card .ai-logo {
+        font-size: 1.6rem;
+        line-height: 1;
+    }
+    .ai-model-card .ai-name {
+        font-size: 0.75em;
+        font-weight: 600;
+        text-align: center;
+        color: var(--text-color);
+    }
+    .ai-model-card .ai-check {
+        position: absolute;
+        top: 4px;
+        right: 6px;
+        font-size: 0.7rem;
+        opacity: 0;
+        transition: opacity 0.2s;
+        color: var(--accent-color);
+        font-weight: 700;
+    }
+    .ai-model-card.selected .ai-check { opacity: 1; }
+
+    /* ===== ENHANCED INSTRUCTIONS MODAL (NEW) ===== */
+    #gemini-instructions-modal-overlay .modal-content {
+        max-width: 520px;
+    }
+    #ai-instructions-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 1rem;
+    }
+    #ai-instructions-logo {
+        font-size: 2rem;
+        line-height: 1;
+    }
+    #ai-instructions-title {
+        margin: 0;
+        color: var(--accent-color);
+    }
+    #open-ai-btn {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        font-size: 1.05em;
+        padding: 14px 20px;
+        border-radius: 10px;
+        letter-spacing: 0.3px;
+        transition: all 0.3s;
+    }
+    #open-ai-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+    }
+    .ai-copy-success-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.8em;
+        background: #d4edda;
+        color: #155724;
+        padding: 4px 10px;
+        border-radius: 20px;
+        margin-top: 8px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    body.dark-mode .ai-copy-success-badge { background: #1c3c24; color: #a3d9b1; }
+    .ai-copy-success-badge.visible { opacity: 1; }
+
+    /* ===== PROMPT COPIED POPUP (NEW) ===== */
+    #prompt-copied-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        background: var(--secondary-bg);
+        border: 2px solid var(--accent-color);
+        border-radius: 16px;
+        padding: 2rem 2.5rem;
+        text-align: center;
+        z-index: 99999;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s ease;
+        max-width: 320px;
+        width: 90%;
+    }
+    #prompt-copied-popup.show {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    #prompt-copied-popup .popup-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    #prompt-copied-popup .popup-title { font-size: 1.1em; font-weight: 700; margin-bottom: 0.4rem; color: var(--accent-color); }
+    #prompt-copied-popup .popup-msg { font-size: 0.9em; color: var(--text-color); opacity: 0.85; line-height: 1.4; }
+    #prompt-copied-popup .popup-close-btn {
+        margin-top: 1rem;
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9em;
+        font-weight: 600;
+        transition: background 0.2s;
+    }
+    #prompt-copied-popup .popup-close-btn:hover { background: var(--accent-hover); }
     #results-screen h2 { color: var(--correct-color); border-bottom-color: var(--correct-color); }
     #score-summary { font-size: 1.5rem; font-weight: bold; text-align: center; margin-bottom: 1.5rem; transform: scale(0.8); opacity: 0; transition: transform 0.5s ease-out, opacity 0.5s ease-out; }
     #score-summary.visible { transform: scale(1); opacity: 1; }
@@ -1392,6 +1554,15 @@ function showQuizSavedNotification() {
             <div class="input-group"><label for="prompt-difficulty-topic" class="input-label">Difficulty Level</label><select id="prompt-difficulty-topic" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
             <div class="input-group"><label class="input-label">Target Exam (Required)</label><div class="exam-buttons-container"></div><input type="text" class="prompt-exam-other input-field hidden" placeholder="Enter Other exam name" style="margin-top: 10px;"></div>
             <div class="input-group"><label for="question-format-select-topic" class="input-label">Question Format</label><select id="question-format-select-topic" class="input-field"></select></div>
+            <div class="ai-model-selector-section">
+                <span class="ai-model-selector-label">🤖 Select AI Model</span>
+                <div class="ai-model-cards" id="ai-model-cards-topic">
+                    <div class="ai-model-card selected" data-ai="gemini"><span class="ai-logo">✨</span><span class="ai-name">Gemini</span><span class="ai-check">✔</span></div>
+                    <div class="ai-model-card" data-ai="chatgpt"><span class="ai-logo">💬</span><span class="ai-name">ChatGPT</span><span class="ai-check">✔</span></div>
+                    <div class="ai-model-card" data-ai="grok"><span class="ai-logo">⚡</span><span class="ai-name">Grok</span><span class="ai-check">✔</span></div>
+                    <div class="ai-model-card" data-ai="claude"><span class="ai-logo">🧠</span><span class="ai-name">Claude</span><span class="ai-check">✔</span></div>
+                </div>
+            </div>
             <button id="generate-prompt-btn-topic" class="btn btn-full-width glowing">Start 🚀</button>
             <button class="btn btn-secondary back-to-creation-selection-btn" style="margin-top: 1rem; width: 100%;">&larr; Back to Options</button>
         </div>
@@ -1421,6 +1592,15 @@ function showQuizSavedNotification() {
             <div class="input-group"><label for="prompt-difficulty-text" class="input-label">Difficulty Level</label><select id="prompt-difficulty-text" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
             <div class="input-group"><label class="input-label">Target Exam (Required)</label><div class="exam-buttons-container"></div><input type="text" class="prompt-exam-other input-field hidden" placeholder="Enter other exam name" style="margin-top: 10px;"></div>
             <div class="input-group"><label for="question-format-select-text" class="input-label">Question Format</label><select id="question-format-select-text" class="input-field"></select></div>
+            <div class="ai-model-selector-section">
+                <span class="ai-model-selector-label">🤖 Select AI Model</span>
+                <div class="ai-model-cards" id="ai-model-cards-text">
+                    <div class="ai-model-card selected" data-ai="gemini"><span class="ai-logo">✨</span><span class="ai-name">Gemini</span><span class="ai-check">✔</span></div>
+                    <div class="ai-model-card" data-ai="chatgpt"><span class="ai-logo">💬</span><span class="ai-name">ChatGPT</span><span class="ai-check">✔</span></div>
+                    <div class="ai-model-card" data-ai="grok"><span class="ai-logo">⚡</span><span class="ai-name">Grok</span><span class="ai-check">✔</span></div>
+                    <div class="ai-model-card" data-ai="claude"><span class="ai-logo">🧠</span><span class="ai-name">Claude</span><span class="ai-check">✔</span></div>
+                </div>
+            </div>
             <button id="generate-prompt-btn-text" class="btn btn-full-width glowing">Start 🚀</button>
              <button class="btn btn-secondary back-to-creation-selection-btn" style="margin-top: 1rem; width: 100%;">&larr; Back to Options</button>
         </div>
@@ -1474,6 +1654,15 @@ function showQuizSavedNotification() {
                 <div class="input-group"><label for="prompt-difficulty-image" class="input-label">Difficulty Level</label><select id="prompt-difficulty-image" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
                 <div class="input-group"><label class="input-label">Target Exam (Required)</label><div class="exam-buttons-container"></div><input type="text" class="prompt-exam-other input-field hidden" placeholder="Enter other exam name" style="margin-top: 10px;"></div>
                 <div class="input-group"><label for="question-format-select-image" class="input-label">Question Format</label><select id="question-format-select-image" class="input-field"></select></div>
+                <div class="ai-model-selector-section">
+                    <span class="ai-model-selector-label">🤖 Select AI Model</span>
+                    <div class="ai-model-cards" id="ai-model-cards-image">
+                        <div class="ai-model-card selected" data-ai="gemini"><span class="ai-logo">✨</span><span class="ai-name">Gemini</span><span class="ai-check">✔</span></div>
+                        <div class="ai-model-card" data-ai="chatgpt"><span class="ai-logo">💬</span><span class="ai-name">ChatGPT</span><span class="ai-check">✔</span></div>
+                        <div class="ai-model-card" data-ai="grok"><span class="ai-logo">⚡</span><span class="ai-name">Grok</span><span class="ai-check">✔</span></div>
+                        <div class="ai-model-card" data-ai="claude"><span class="ai-logo">🧠</span><span class="ai-name">Claude</span><span class="ai-check">✔</span></div>
+                    </div>
+                </div>
                 <button id="generate-prompt-btn-image" class="btn btn-full-width glowing">Start 🚀</button>
             </div>
             <button class="btn btn-secondary back-to-creation-selection-btn" style="margin-top: 1rem; width: 100%;">&larr; Back to Options</button>
@@ -1531,6 +1720,15 @@ function showQuizSavedNotification() {
                 <div class="input-group"><label for="prompt-difficulty-pdf" class="input-label">Difficulty Level</label><select id="prompt-difficulty-pdf" class="input-field"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option><option value="Expert">Expert</option></select></div>
                 <div class="input-group"><label class="input-label">Target Exam (Required)</label><div class="exam-buttons-container"></div><input type="text" class="prompt-exam-other input-field hidden" placeholder="Enter other exam name" style="margin-top: 10px;"></div>
                 <div class="input-group"><label for="question-format-select-pdf" class="input-label">Question Format</label><select id="question-format-select-pdf" class="input-field"></select></div>
+                <div class="ai-model-selector-section">
+                    <span class="ai-model-selector-label">🤖 Select AI Model</span>
+                    <div class="ai-model-cards" id="ai-model-cards-pdf">
+                        <div class="ai-model-card selected" data-ai="gemini"><span class="ai-logo">✨</span><span class="ai-name">Gemini</span><span class="ai-check">✔</span></div>
+                        <div class="ai-model-card" data-ai="chatgpt"><span class="ai-logo">💬</span><span class="ai-name">ChatGPT</span><span class="ai-check">✔</span></div>
+                        <div class="ai-model-card" data-ai="grok"><span class="ai-logo">⚡</span><span class="ai-name">Grok</span><span class="ai-check">✔</span></div>
+                        <div class="ai-model-card" data-ai="claude"><span class="ai-logo">🧠</span><span class="ai-name">Claude</span><span class="ai-check">✔</span></div>
+                    </div>
+                </div>
                 <button id="generate-prompt-btn-pdf" class="btn btn-full-width glowing">Start 🚀</button>
             </div>
              <button class="btn btn-secondary back-to-creation-selection-btn" style="margin-top: 1rem; width: 100%;">&larr; Back to Options</button>
@@ -1542,7 +1740,7 @@ function showQuizSavedNotification() {
         <p style="text-align: center; font-size: 1.1em;"><b>Welcome back!</b> Waiting for the questions from the AI.</p>
         <div id="ai-link-fallback" class="hidden">
             <p>⚠️ It looks like the AI tab was blocked by your browser.</p>
-            <a href="https://gemini.google.com" target="_blank" class="btn">Click Here to Open Gemini Manually</a>
+            <a href="https://gemini.google.com" target="_blank" class="btn" id="ai-fallback-link">Click Here to Open AI Manually</a>
         </div>
         <div class="input-group">
             <div class="prompt-actions-row" style="margin-bottom: 1rem;">
@@ -1710,7 +1908,51 @@ function showQuizSavedNotification() {
 <div id="manual-copy-modal-overlay" class="modal-overlay hidden"><div id="manual-copy-modal-content" class="modal-content"><h3>Automatic Copy Failed</h3><p>Please manually copy the text below (it's already selected for you):</p><textarea id="manual-copy-textarea" readonly></textarea><button id="manual-copy-close-btn" class="btn">Close</button></div></div>
 <div id="crop-modal-overlay" class="modal-overlay hidden"><div id="crop-modal-content" class="modal-content"><h3>Crop Image</h3><div id="crop-image-container"><img id="image-to-crop" src="" alt="Image for cropping"></div><div class="modal-actions"><button id="cancel-crop-btn" class="btn btn-secondary">Cancel</button><button id="save-crop-btn" class="btn">Crop & Save</button></div></div></div>
 <div id="telegram-backup-modal-overlay" class="modal-overlay hidden"><div class="modal-content"><button class="modal-close-btn-top" title="Close guide">&times;</button><h3>How to Backup on Telegram</h3><div id="telegram-backup-modal-content" class="guide-step"><p><strong>Step 1: Create a Telegram Channel</strong><br>Open Telegram, create a "New Channel". Make sure you set it to "Public" and give it a unique, easy-to-remember username (e.g., "my_upsc_notes_123").</p><p><strong>Step 2: Copy Questions from EXAMYATRI</strong><br>On this results page, click the "⭐ Copy Bookmarked" or "📋 Copy All" button. This copies the text to your clipboard.</p><p><strong>Step 3: Enter Username & Open</strong><br>Type the channel username you created (e.g., "my_upsc_notes_123") into the box above the 🤔 button and click "Open".</p><p><strong>Step 4: Paste and Save</strong><br>This will open your channel in Telegram. Just paste the copied questions into the message box and send. Your notes are now saved!</p></div><div class="modal-actions"><button id="telegram-backup-close-btn" class="btn">Okay, I Understand</button></div></div></div>
-<div id="gemini-instructions-modal-overlay" class="modal-overlay hidden"><div class="modal-content"><h3>Ready for AI Magic? ✨</h3><div id="gemini-instructions-content-wrapper"><div class="guide-step"><strong>1️⃣ When Gemini opens:</strong><p>Just paste the instructions into the message box and hit send.</p></div><div class="guide-step"><strong>2️⃣ Copy the Generated Questions:</strong><p>Once the AI finishes, copy the entire response.</p><ul style="padding-left: 20px; margin-top: 0.5em; font-size: 0.9em;"><li><strong>Method 1:</strong> Tap on 3 Vertical Dots (⋮) at the start of the generated question.</li><li><strong>Method 2:</strong> Tap the Copy Icon (📋) at the end of the generated question.</li></ul></div><div class="guide-step"><strong>3️⃣ Return to Examyatri:</strong><p>Come back to this tab to start the assessment.</p><ul style="padding-left: 20px; margin-top: 0.5em; font-size: 0.9em;"><li><strong>Method 1:</strong> Press your device's 'Back' button twice.</li><li><strong>Method 2:</strong> Manually switch tabs from Gemini back to Examyatri.</li></ul></div></div><div class="modal-actions" style="justify-content: center;"><button id="open-gemini-btn" class="btn btn-full-width fire-animation">Got it and Open Gemini Now ➜</button></div></div></div>
+
+<!-- UPGRADED: Dynamic AI Instructions Modal -->
+<div id="gemini-instructions-modal-overlay" class="modal-overlay hidden">
+    <div class="modal-content">
+        <button class="modal-close-btn-top" title="Close">&times;</button>
+        <div id="ai-instructions-header">
+            <span id="ai-instructions-logo">✨</span>
+            <h3 id="ai-instructions-title">Ready for AI Magic?</h3>
+        </div>
+        <div id="gemini-instructions-content-wrapper">
+            <div class="guide-step">
+                <strong id="ai-step1-title">1️⃣ When Gemini opens:</strong>
+                <p>Your prompt has been <strong>auto-copied</strong> to the clipboard. Just paste it into the AI chat and hit send.</p>
+                <span class="ai-copy-success-badge" id="ai-copy-badge">✅ Prompt copied to clipboard!</span>
+            </div>
+            <div class="guide-step">
+                <strong>2️⃣ Copy the Generated Questions:</strong>
+                <p>Once the AI finishes, copy the entire response.</p>
+                <ul style="padding-left: 20px; margin-top: 0.5em; font-size: 0.9em;">
+                    <li><strong>Method 1:</strong> Tap the 3 dots (⋮) at the start of the response.</li>
+                    <li><strong>Method 2:</strong> Tap the Copy Icon (📋) at the end of the response.</li>
+                </ul>
+            </div>
+            <div class="guide-step">
+                <strong>3️⃣ Return to Examyatri:</strong>
+                <p>Come back to this tab — it will <strong>auto-detect and start</strong> your quiz.</p>
+                <ul style="padding-left: 20px; margin-top: 0.5em; font-size: 0.9em;">
+                    <li><strong>Method 1:</strong> Press your device's 'Back' button twice.</li>
+                    <li><strong>Method 2:</strong> Manually switch tabs back to Examyatri.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="modal-actions" style="justify-content: center; flex-direction: column; align-items: stretch; gap: 10px;">
+            <button id="open-ai-btn" class="btn btn-full-width fire-animation">Got it &amp; Open <span id="open-ai-btn-label">Gemini</span> ➜</button>
+        </div>
+    </div>
+</div>
+
+<!-- Prompt Copied Popup (fallback when auto-open blocked) -->
+<div id="prompt-copied-popup">
+    <div class="popup-icon">📋</div>
+    <div class="popup-title">Prompt Copied!</div>
+    <div class="popup-msg">Open <span id="popup-ai-name">Gemini</span> manually and paste the prompt to generate questions.</div>
+    <button class="popup-close-btn" onclick="document.getElementById('prompt-copied-popup').classList.remove('show')">Got it</button>
+</div>
 
 
 <!-- SCRIPTS -->
@@ -1880,69 +2122,84 @@ document.addEventListener('DOMContentLoaded', () => {
         'mix': { name: 'Mixed Format' }
     };
 
-    // --- UPDATED LEGACY_FORMAT_TEXT & INDIVIDUAL EXAMPLES ---
-    const MCQ_EXAMPLE = `1. Multiple Choice Questions
-Question: What is the capital of France?
-Options:
-a) Berlin
-b) Madrid
-c) Paris
-d) Rome
-Correct Answer: c
-Explanation: Paris is the capital and most populous city of France.`;
+    // --- UPGRADED FORMAT EXAMPLES (v3 - Real Exam Quality) ---
+    // These examples teach the AI the EXACT style, trap-patterns, and depth required.
 
-    const AR_EXAMPLE = `1. Assertion-Reason Based Questions
-Assertion (A): The sun appears yellow from Earth.
-Reason (R): The Earth's atmosphere scatters shorter wavelength blue light more than longer wavelength yellow and red light.
+    const MCQ_EXAMPLE = `FORMAT REFERENCE — MCQ (Multiple Choice Question):
+[TRAP PATTERN: One option is a near-synonym of the correct answer but wrong in one key detail. One option is historically associated but contextually incorrect. Correct answer should NOT always be 'c'.]
+
+Question: Under the Government of India Act 1935, which of the following features was NOT adopted in the Indian Constitution?
+Options:
+a) Federal structure with a strong Centre
+b) Provincial autonomy
+c) Bicameral legislature at the Centre
+d) Joint electorate for all communities
+Correct Answer: d
+Explanation: The Government of India Act 1935 retained separate electorates for religious communities — this was specifically NOT carried forward into the Indian Constitution, which adopted joint electorates. Option (a) Federal structure with strong Centre was adopted (though modified). Option (b) Provincial autonomy was adopted and expanded. Option (c) Bicameral legislature was also adopted. The trap here is that candidates confuse 'joint electorate' with 'universal adult franchise' — both are about voting but completely different concepts.`;
+
+    const AR_EXAMPLE = `FORMAT REFERENCE — Assertion-Reason:
+[TRAP PATTERN: Both A and R are individually true, but R does NOT correctly explain A — this is the most common trap in government exams. Never make A false and R true as the answer — it's rarely tested. Mix up the answer positions.]
+
+Question:
+Assertion (A): India follows a quasi-federal structure rather than a purely federal one.
+Reason (R): The Indian Constitution provides for a single citizenship for all residents of India.
 Options:
 a) Both A and R are true and R is the correct explanation of A.
 b) Both A and R are true but R is not the correct explanation of A.
 c) A is true but R is false.
 d) A is false but R is true.
-Correct Answer: a
-Explanation: This phenomenon is known as Rayleigh scattering.`;
-
-    const STATEMENT_EXAMPLE = `1. Statement-Based Questions
-Question: Consider the following statements regarding photosynthesis:
-* Photosynthesis primarily occurs in the chloroplasts of plant cells.
-* Oxygen is released as a byproduct during photosynthesis.
-* Photosynthesis converts light energy into chemical energy.
-Which of the above statements are correct?
-Options:
-a) 1 and 2 only
-b) 2 and 3 only
-c) 1 and 3 only
-d) 1, 2, and 3
-Correct Answer: d
-Explanation: All three statements are correct.`;
-
-    const MATH_EXAMPLE = `1. Maths, Physics, or Other Questions
-Question: What is the value of the integral of 3x^2, i.e., \\( \\int 3x^2 \\,dx \\)?
-Options:
-a) \\( 3x^3 + C \\)
-b) \\( x^3 + C \\)
-c) \\( 6x + C \\)
-d) \\( \\frac{1}{3}x^3 + C \\)
 Correct Answer: b
-Explanation: Using the power rule for integration, the integral of \\( 3x^2 \\) is \\( x^3 + C \\). C is the constant of integration. For math symbols, you MUST use LaTeX format enclosed in \\( ... \\) delimiters.`;
+Explanation: Assertion (A) is TRUE — India is called quasi-federal because it has federal features (division of powers, written constitution, independent judiciary) but also unitary features (strong centre, single Constitution, emergency provisions). Reason (R) is also TRUE — India does follow single citizenship unlike the USA which has dual citizenship. However, R does NOT explain A. The quasi-federal nature stems from provisions like Article 356, residuary powers with Centre, and appointment of Governors — NOT from single citizenship. This is a classic 'both true but R doesn't explain A' trap.`;
 
-    const TF_EXAMPLE = `1. True/False Questions
-Question: The Earth is the fourth planet from the Sun.
+    const STATEMENT_EXAMPLE = `FORMAT REFERENCE — Statement-Based:
+[TRAP PATTERN: Include exactly ONE statement that is 90% correct but wrong in one specific detail (e.g., a wrong year, reversed cause-effect, or incorrect attribution). Never make ALL statements correct — that makes it too easy. Correct answer should vary — sometimes only 1 is correct, sometimes 2, sometimes none.]
+
+Question: Consider the following statements regarding the Rowlatt Act, 1919:
+* It empowered the British government to arrest and detain any person without trial or judicial review.
+* Mahatma Gandhi launched the Non-Cooperation Movement directly in response to the Rowlatt Act.
+* The Jallianwala Bagh massacre occurred in the context of protests against this Act.
+Which of the above statements is/are correct?
+Options:
+a) 1 and 3 only
+b) 2 and 3 only
+c) 1 only
+d) 1, 2, and 3
+Correct Answer: a
+Explanation: Statement 1 is CORRECT — The Rowlatt Act allowed indefinite detention without trial, which is why it was called the 'Black Act'. Statement 2 is INCORRECT — This is the key trap. Gandhi launched the Non-Cooperation Movement (1920) in response to the Jallianwala Bagh massacre and the Khilafat issue — NOT directly to the Rowlatt Act. His immediate response to Rowlatt Act was the Satyagraha movement (1919). Many candidates confuse these two movements. Statement 3 is CORRECT — The Jallianwala Bagh massacre on April 13, 1919 occurred when people gathered to protest the arrest of leaders under the Rowlatt Act.`;
+
+    const MATH_EXAMPLE = `FORMAT REFERENCE — Maths/Physics/Chemistry:
+[TRAP PATTERN: Include one option that gives the correct numerical value but wrong unit/sign. Include one option that results from a common calculation mistake (e.g., forgetting to square, forgetting constant of integration). Distractors must be believable wrong answers.]
+
+Question: A ball is thrown vertically upward with an initial velocity of 20 m/s. What is the maximum height reached by the ball? (Take \\( g = 10 \\text{ m/s}^2 \\))
+Options:
+a) \\( 10 \\text{ m} \\)
+b) \\( 40 \\text{ m} \\)
+c) \\( 20 \\text{ m} \\)
+d) \\( 2 \\text{ m} \\)
+Correct Answer: c
+Explanation: Using \\( v^2 = u^2 - 2gh \\), at maximum height \\( v = 0 \\). So \\( 0 = (20)^2 - 2(10)(h) \\), giving \\( h = \\frac{400}{20} = 20 \\text{ m} \\). Option (a) 10 m is wrong — a common error from using \\( h = u/g \\) instead of \\( h = u^2/2g \\). Option (b) 40 m results from forgetting to divide by 2 in the formula. Option (d) 2 m results from inverting the formula \\( h = 2g/u^2 \\). For all math/physics symbols, use LaTeX enclosed in \\( ... \\) for inline and \\[ ... \\] for display equations.`;
+
+    const TF_EXAMPLE = `FORMAT REFERENCE — True/False:
+[TRAP PATTERN: The statement should be a half-truth — partially correct but wrong in one specific measurable detail like a number, date, name, or causal direction. Never make an obviously false statement.]
+
+Question: The Right to Education Act (RTE), 2009 makes free and compulsory education a fundamental right for children in the age group of 6 to 16 years.
 Options:
 a) True
 b) False
 Correct Answer: b
-Explanation: The Earth is the third planet from the Sun. Mars is the fourth.`;
+Explanation: This is FALSE. The Right to Education Act (RTE), 2009 guarantees free and compulsory education for children between 6 and 14 years of age — NOT 16 years. It is enshrined under Article 21-A of the Constitution. The age group '6 to 16' is the most common trap in this question — many candidates confuse it with the Child Labour (Prohibition) Act which covers up to 14 years for hazardous work. The RTE applies to children from Class 1 to Class 8.`;
 
-    const FILL_BLANK_EXAMPLE = `1. Fill-in-the-Blank Questions
-Question: The powerhouse of the cell is the __________.
+    const FILL_BLANK_EXAMPLE = `FORMAT REFERENCE — Fill-in-the-Blank:
+[TRAP PATTERN: All four options should be related to the same domain/topic — not random words. Two options should be plausible choices that a partially-prepared candidate might select. The blank should test a specific, testable fact — not a general concept.]
+
+Question: The __________ is the constitutional body in India responsible for superintendence, direction, and control of the preparation of electoral rolls and the conduct of elections to Parliament and State Legislatures.
 Options:
-a) Nucleus
-b) Ribosome
-c) Mitochondrion
-d) Endoplasmic Reticulum
-Correct Answer: c
-Explanation: The mitochondrion is responsible for generating most of the cell's supply of adenosine triphosphate (ATP), used as a source of chemical energy.`;
+a) Union Public Service Commission
+b) Election Commission of India
+c) Finance Commission
+d) National Human Rights Commission
+Correct Answer: b
+Explanation: The Election Commission of India (ECI), established under Article 324 of the Constitution, is the permanent constitutional body responsible for administering all elections. Option (a) UPSC conducts civil services examinations — not elections. Option (c) Finance Commission deals with tax devolution between Centre and States. Option (d) NHRC is a statutory body (not constitutional) that handles human rights complaints. The trap here is that all options are well-known constitutional/statutory bodies, making it tempting to confuse their mandates.`;
 
     // This is used for the 'mix' format option.
     const LEGACY_FORMAT_TEXT = [MCQ_EXAMPLE, AR_EXAMPLE, STATEMENT_EXAMPLE, MATH_EXAMPLE, TF_EXAMPLE, FILL_BLANK_EXAMPLE].join('\n\n');
@@ -2106,9 +2363,18 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
     let cropper = null;
     let currentEditingImageId = null;
     let selectedExam = '';
+    let selectedAiModel = 'gemini'; // NEW: Track selected AI model
     let blogPostsLoaded = false;
     let isFromSearchPractice = false;
     let creationWorkflow = null; // MODIFIED: To track how quiz was created
+
+    // AI model config
+    const AI_MODELS = {
+        gemini:  { name: 'Gemini',  logo: '✨', url: 'https://gemini.google.com',      fallbackUrl: 'https://gemini.google.com' },
+        chatgpt: { name: 'ChatGPT', logo: '💬', url: 'https://chat.openai.com',        fallbackUrl: 'https://chat.openai.com' },
+        grok:    { name: 'Grok',    logo: '⚡', url: 'https://grok.com',               fallbackUrl: 'https://grok.com' },
+        claude:  { name: 'Claude',  logo: '🧠', url: 'https://claude.ai/new',          fallbackUrl: 'https://claude.ai' }
+    };
     
     // --- OCR State (FIX) ---
     let ocrWorker = null;
@@ -2527,7 +2793,29 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             if (effectiveId === 'manual-copy-close-btn') { elements.manualCopyModalOverlay.classList.add('hidden'); return; }
             if (effectiveId === 'cancel-crop-btn') { closeCropModal(); return; }
             if (effectiveId === 'save-crop-btn') { saveCrop(); return; }
+            if (effectiveId === 'open-ai-btn') { if (promptForGemini) { executePostPromptActions(promptForGemini); } return; }
+            // Legacy alias (in case old ID appears somewhere)
             if (effectiveId === 'open-gemini-btn') { if (promptForGemini) { executePostPromptActions(promptForGemini); } return; }
+
+            // --- AI Model Card Selection ---
+            const aiCard = target.closest('.ai-model-card');
+            if (aiCard) {
+                const container = aiCard.closest('.ai-model-cards');
+                if (container) {
+                    container.querySelectorAll('.ai-model-card').forEach(c => c.classList.remove('selected'));
+                    aiCard.classList.add('selected');
+                    selectedAiModel = aiCard.dataset.ai;
+                    // Sync all other AI model card sets to same selection
+                    document.querySelectorAll('.ai-model-cards').forEach(otherContainer => {
+                        if (otherContainer !== container) {
+                            otherContainer.querySelectorAll('.ai-model-card').forEach(c => c.classList.remove('selected'));
+                            const toSelect = otherContainer.querySelector(`.ai-model-card[data-ai="${selectedAiModel}"]`);
+                            if (toSelect) toSelect.classList.add('selected');
+                        }
+                    });
+                }
+                return;
+            }
             if (effectiveId === 'pressure-mode-toggle-btn') { elements.pressureModeControls.classList.toggle('hidden'); return; }
 
         });
@@ -3444,17 +3732,16 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
         }
     }
     
-    // --- UPDATED PROMPT GENERATION FUNCTION ---
+    // --- UPGRADED PROMPT GENERATION FUNCTION (v3 - Exam DNA + Anti-Pattern + Answer Distribution Fix) ---
     function generatePrompt(source, sourceType) {
-        creationWorkflow = sourceType; // MODIFIED: Track the workflow
-        isFromSearchPractice = false; // Reset flag for new quizzes
+        creationWorkflow = sourceType;
+        isFromSearchPractice = false;
         const { numQuestions, topic, subject, difficulty, language, formatKey, exam, sourceText } = source;
 
         if (sourceType === 'topic' && !topic) { alert('Please enter a Primary Topic.'); return null; }
         if ((sourceType !== 'topic' && !sourceText) || !numQuestions) { alert('Please ensure you have provided source material and the number of questions.'); return null; }
         if (!exam) { alert("Please select a target exam before generating questions."); return null; }
         
-        // MODIFIED: Store the final exam name
         quizMetaData.examName = exam;
         
         let sampleFormat = "";
@@ -3468,93 +3755,347 @@ Explanation: The mitochondrion is responsible for generating most of the cell's 
             default: sampleFormat = LEGACY_FORMAT_TEXT; break;
         }
 
-        let prompt = `You are an expert at generating high-quality assessment questions in plain text format. Your responses must be very fast and precise.
+        // ── DIFFICULTY DNA ──────────────────────────────────────────────
+        const difficultyInstructions = {
+            'Easy':   `EASY LEVEL RULES:
+- Test direct factual recall. One clear correct answer with no ambiguity.
+- Distractors must still be from the same topic — no random/absurd options.
+- Question style: "What is...", "Which of the following is...", "Who was..."
+- No double-negatives, no trick phrasing.
+- Explanation: 2-3 sentences confirming the fact and briefly noting why other options are wrong.`,
+            'Medium': `MEDIUM LEVEL RULES:
+- Test conceptual understanding, not just recall. Require 2-step thinking.
+- Question style: "Which of the following is NOT...", "Consider the following and identify...", cause-and-effect questions.
+- Include at least one distractor that is a commonly confused fact (e.g., similar name, nearby year, related but wrong concept).
+- Explanation: Must address each option — explain WHY the wrong ones are wrong, not just why the right one is right.`,
+            'Hard':   `HARD LEVEL RULES:
+- Require multi-step analytical reasoning or elimination-based logic.
+- Questions must include at least one of these trap types:
+  (a) Near-synonym trap: two options are almost identical, differing by one precise word
+  (b) Partial-truth trap: a distractor is 90% correct but has one wrong detail (wrong year, wrong person, reversed relationship)
+  (c) Exception trap: "Which of the following is NOT..." or "Which is INCORRECT..."
+- Statement-based: never make all statements correct — include at least one with a subtle factual error.
+- Explanation: Discuss EVERY option individually. For wrong options, state exactly what detail makes them wrong.`,
+            'Expert': `EXPERT LEVEL — PYQ REPLICA RULES:
+- Every question must feel like it was taken directly from an official exam paper.
+- Mandatory trap types — use ALL of the following across your question set:
+  (a) Double-negative or "EXCEPT" style: "Which is NOT among the correct statements?"
+  (b) Inverted logic: The reason/cause is correct but assigned to the wrong effect
+  (c) One-word difference: Options differ only in a single critical word (e.g., Article 32 vs Article 226)
+  (d) Chronological confusion: Mixing years/events that are similar but distinct
+  (e) Authority confusion: Same power/function but wrong body named
+- Statement-based: Always include exactly one statement that is 85-90% correct but fails on one verifiable detail.
+- For Assertion-Reason: Ensure that "Both true but R is NOT the explanation of A" is a likely answer — this is the most under-tested and most exam-relevant pattern.
+- Explanation: Must be 4-6 sentences. Must justify every option. Must reference the source of truth (Article no., Act, year, author) wherever applicable.`
+        };
 
-CRITICAL INSTRUCTIONS (MUST be followed):
-1.  **Output Format:** Provide the entire response as a single block of plain text. DO NOT use Markdown, JSON, code blocks, or any other formatting.
-2.  **Strict Format Adherence:** You MUST generate questions that EXACTLY match the requested "Question Format" parameter below. For example, if asked for "Multiple Choice (MCQ)", you MUST generate ONLY MCQs.
-3.  **Question Structure:** STRICTLY follow the sample format provided below for every single question.
-4.  **Statement Formatting:** For Statement-Based questions, individual statements MUST be preceded by an asterisk (*) and a space. DO NOT number the statements (e.g., use "* Statement text" NOT "1. Statement text"). The provided sample for Statement-Based questions demonstrates this correct format.
-5.  **Correct Answer Line:** The 'Correct Answer:' line MUST contain ONLY the letter of the correct option (e.g., "Correct Answer: c"). DO NOT include the text of the answer.
-6.  **Completeness:** Each question MUST have a question, all options, a single correct answer letter, and a detailed explanation.
-7.  **Math/Physics Symbols:** Use valid LaTeX for all formulas. Enclose all inline math with \\( ... \\) delimiters (e.g., \\(x^2\\)) and all display math with \\[ ... \\]. DO NOT use $ or $$.
-8.  **Terminology:** Use the term "questions" or "assessment". DO NOT use the word "quiz".
-9.  **Option Randomizer:** Place the correct answer in a completely random position among options A, B, C, and D. Do not follow any fixed or repeating pattern, Ensure two adjacent questions never have the same correct option
-10. **Content Integrity:** Create logical and accurate MCQs. Ensure the question, options, correct answer, and explanation are factually correct, consistent, and non-contradictory. The explanation must clearly justify the correct answer. Recheck for logical connection and factual accuracy before finalizing.
---- ASSESSMENT PARAMETERS ---
-*   **Number of Questions:** ${numQuestions}
-*   **Primary Topic:** ${topic || (sourceType === 'text' ? 'Multiple Topics' : 'Not specified')}
-*   **Subject:** ${subject || (sourceType === 'text' ? 'Multiple Subjects' : 'Not specified')}
-*   **Difficulty Level:** ${difficulty}
-*   **Language:** ${language}
-*   **Question Format:** ${QUESTION_FORMATS[formatKey].name}
-*   **Target Exam:** ${exam}
-*   **Target Exam Instructions:** Generate questions based on analysis of previous year questions that are relevant, and match the syllabus, question pattern, and difficulty level of the '${exam}' exam.
---- SOURCE MATERIAL INSTRUCTIONS ---
+        // ── EXAM DNA — unique question style fingerprint per exam ───────
+        const examDNA = {
+            'UPSC': `UPSC EXAM DNA:
+- Preferred question stems: "Consider the following statements:", "With reference to X, consider the following:", "Which of the following pairs is/are correctly matched?", "Arrange the following in chronological order:"
+- Typical trap: Statement 2 looks correct but has a slightly wrong attribution or year. Statement 3 is fully correct. Combined options (1 and 2 only, 2 and 3 only, etc.) are the answer choices.
+- Language: Formal, administrative English. Precise vocabulary. No colloquialisms.
+- Topic depth: Constitutional provisions, Articles, landmark judgments, government schemes (with exact launch year), geography (rivers, passes, national parks), and current affairs integrated with static knowledge.
+- Anti-pattern (NEVER DO): Do not ask "What is the capital of X?" — UPSC never asks this directly. Always embed the fact inside a conceptual or comparative question.
+- Explanation style: Reference the exact Article, Act year, Committee name, or Constitutional provision. E.g., "As per Article 324 of the Constitution..." or "Under the Government of India Act, 1935..."`,
+            'SSC': `SSC EXAM DNA:
+- Preferred question stems: Direct one-liners. "Who is known as...?", "In which year was...?", "Which Article deals with...?", "_______ is the author of..."
+- Typical trap: Two options with very similar names (e.g., National Human Rights Commission vs National Commission for Human Rights). One wrong option is always from the same domain but different function.
+- Language: Simple, direct English. No complex sentence structures. Questions are shorter than UPSC.
+- Topic depth: Static GK (Indian History, Geography, Polity, Science facts), Idioms and Phrases, Grammar, Basic Maths (Percentage, Profit-Loss, Time-Work, SI/CI).
+- Anti-pattern (NEVER DO): Do not write long analytical paragraph-style questions — SSC is always concise. Do not use "Consider the following statements" format — that is UPSC style.
+- Explanation style: Short and direct. "The correct answer is X because Y." Reference a specific fact, year, or constitutional provision briefly.`,
+            'JEE': `JEE EXAM DNA:
+- Question style: Numerical, formula-based, concept-application. Often require 2-3 step derivation.
+- Trap types: (a) Forgetting boundary conditions, (b) Sign errors in vectors, (c) Unit conversion errors, (d) Special cases that look like general rules.
+- Use LaTeX compulsorily for all mathematical expressions using \\( ... \\) syntax.
+- Preferred formats: Single-correct MCQ, numerical value, matrix-match.
+- Anti-pattern (NEVER DO): Do not ask conceptual definition questions like "What is Newton's first law?" — JEE always tests APPLICATION, never definitions.
+- Explanation style: Step-by-step mathematical derivation. Show intermediate steps. Identify the common mistake and explain why it gives a wrong answer. E.g., "Many students choose (b) because they forget to account for the normal force component — here's why that's wrong..."`,
+            'NEET': `NEET EXAM DNA:
+- Question style: Based on NCERT Biology/Chemistry/Physics. Diagram-based concepts tested as text questions.
+- Trap types: (a) Similar-sounding biological terms (e.g., mitosis vs meiosis at a specific phase), (b) Enzyme/hormone confusion, (c) "EXCEPT" style — all options are from same topic but one doesn't belong.
+- Language: NCERT language — use exact textbook terminology. Never paraphrase if NCERT has a precise term.
+- Anti-pattern (NEVER DO): Do not create questions about topics outside NCERT scope. Do not use research-level facts — NEET is strictly NCERT-bounded.
+- Explanation style: Reference the exact NCERT chapter or concept. E.g., "As per NCERT Class 12 Biology, Chapter 13..." State the specific phase, enzyme, or step that makes the answer correct.`,
+            'BANK': `BANK PO/CLERK EXAM DNA (IBPS/SBI):
+- Question style: Mix of Current Affairs, Banking/Finance Awareness, and General Awareness.
+- Preferred stems: "Which of the following banks...?", "RBI's ___ policy deals with...", "As per the Union Budget ____, which scheme was launched?"
+- Trap types: (a) Correct scheme name but wrong ministry/year, (b) Correct percentage/rate but for the wrong financial metric (e.g., CRR vs SLR), (c) Two schemes with overlapping beneficiaries.
+- Anti-pattern (NEVER DO): Do not ask questions about ancient history or classical literature — irrelevant to Bank exams. Focus: current financial news, banking regulations, government economic schemes.
+- Explanation style: Include the exact rate, percentage, regulatory body, or notification date. E.g., "As per RBI's Monetary Policy Committee (MPC) meeting of [date], the repo rate was set at X%."`,
+            'RRB': `RRB/RAILWAY EXAM DNA:
+- Question style: Mix of General Science, Current Affairs, Railway-specific GK, and Basic Maths.
+- Preferred stems: "Which railway zone...?", "The headquarters of X railway zone is...?", "Which Act governs Indian Railways?"
+- Trap types: (a) Correct railway zone but wrong headquarters city, (b) Correct invention but wrong inventor name, (c) Similar-sounding scientific terms.
+- Anti-pattern (NEVER DO): Do not ask complex analytical questions — RRB tests broad factual knowledge at moderate depth.
+- Explanation style: Direct and factual. Include the specific zone, headquarter, or regulation where relevant.`,
+            'NEET PG': `NEET PG EXAM DNA:
+- Question style: Clinical scenario-based. "A 35-year-old patient presents with X, Y, Z. The most likely diagnosis is..."
+- Trap types: (a) Two diagnoses with overlapping symptoms — one extra symptom differentiates, (b) Correct diagnosis but wrong first-line treatment, (c) Drug of choice vs drug of choice in special populations (pregnancy, renal failure).
+- Anti-pattern (NEVER DO): Do not write textbook definition questions — NEET PG always tests clinical application and decision-making.
+- Explanation style: Clinical reasoning. "The key differentiating feature here is X. Option (b) would be correct if the patient also had Y, but the absence of Z rules it out."`,
+            'CTET': `CTET EXAM DNA:
+- Question style: Pedagogy-focused. "According to Piaget, a child in the ___ stage...", "Which teaching method is most appropriate for...?"
+- Trap types: (a) Confusing theorist names with theories (e.g., Vygotsky vs Piaget vs Bruner), (b) Correct concept but wrong age group, (c) Similar-sounding pedagogical terms.
+- Anti-pattern (NEVER DO): Do not ask pure academic questions without pedagogical context.
+- Explanation style: Mention the theorist, the stage/concept, and why the other theorists' approaches would give a different answer.`,
+            'UPSSSC': `UPSSSC EXAM DNA:
+- Question style: UP-specific GK, Hindi Language, and General Studies.
+- Focus: UP geography, UP government schemes, UP history, UP culture.
+- Anti-pattern: Do not ignore UP-specific context — a question about "rivers" should reference UP rivers specifically when possible.`,
+            'CUET': `CUET EXAM DNA:
+- Question style: Domain-specific (chosen subject) + General Test.
+- Level: Class 12 NCERT standard. Application-based but not JEE-level difficulty.
+- Anti-pattern: Do not write questions harder than Class 12 board level.`,
+            'State PSC': `STATE PSC EXAM DNA:
+- Closely mirrors UPSC pattern but with a strong state-specific GK component.
+- Include state government schemes, state geography, state history, and state polity (state list subjects).
+- Anti-pattern: Do not write only central government focused questions — state PSC always has significant state-specific portion.`,
+            'Police': `POLICE EXAM DNA:
+- Question style: Current Affairs, Basic Science, Indian Constitution, IPC/CrPC provisions.
+- Trap types: Similar section numbers (e.g., IPC 302 vs IPC 307), similar article numbers.
+- Anti-pattern: Do not ask highly technical legal questions — Police exams test basic awareness of law and civic knowledge.`,
+            'CBSE': `CBSE EXAM DNA:
+- Strictly NCERT-based. Competency-based questions (CBQ) style.
+- Question style: Case-study based, application of concepts to real-world scenarios.
+- Anti-pattern: Do not write pure recall questions — CBSE has moved to Higher Order Thinking Skills (HOTS) questions.`
+        };
+
+        const examSpecificDNA = examDNA[exam] || `GENERAL EXAM DNA:
+- Use standard competitive exam question style.
+- Ensure all 4 options are from the same domain/topic.
+- At least 2 options must be plausibly correct to someone with partial knowledge.`;
+
+        // ── ANTI-PATTERN LIST (what NOT to do) ──────────────────────────
+        const antiPatterns = `
+STRICT ANTI-PATTERNS — THESE ARE FAILURES. NEVER DO ANY OF THE FOLLOWING:
+✗ NEVER make the correct answer 'c' or 'd' for more than 3 consecutive questions.
+✗ NEVER have more than 40% of questions with the same correct option letter. If generating 10 questions, no letter (a/b/c/d) should be correct more than 3-4 times.
+✗ NEVER write an option like "All of the above" or "None of the above" — real exams avoid these.
+✗ NEVER make one option obviously absurd or unrelated to the topic (e.g., "d) The Moon" in a question about Indian rivers).
+✗ NEVER write a statement-based question where ALL statements are correct — always include at least one incorrect statement.
+✗ NEVER repeat a fact, concept, or subtopic across two questions in the same set.
+✗ NEVER use vague language in question stems like "sometimes", "often", "generally" — exam questions are precise.
+✗ NEVER write an explanation that only says "X is correct." — always explain WHY each wrong option is wrong.
+✗ NEVER generate a question whose answer can be guessed from the question stem itself.
+✗ NEVER use the word "quiz" — use "assessment" or "question paper" instead.`;
+
+        // ── ANSWER DISTRIBUTION ENFORCEMENT ────────────────────────────
+        const n = parseInt(numQuestions, 10) || 10;
+        // Build a pre-shuffled answer key distribution to embed in prompt
+        const letters = ['a','b','c','d'];
+        let answerDistribution = [];
+        // Ensure roughly equal distribution
+        const baseCount = Math.floor(n / 4);
+        const remainder = n % 4;
+        let dist = [baseCount, baseCount, baseCount, baseCount];
+        for (let i = 0; i < remainder; i++) dist[i]++;
+        // Shuffle distribution into sequence
+        let pool = [];
+        dist.forEach((count, idx) => { for(let k=0;k<count;k++) pool.push(letters[idx]); });
+        // Fisher-Yates shuffle
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        // Fix: never have same letter 3 times in a row
+        for (let i = 2; i < pool.length; i++) {
+            if (pool[i] === pool[i-1] && pool[i] === pool[i-2]) {
+                // Swap with a later element that's different
+                for (let j = i+1; j < pool.length; j++) {
+                    if (pool[j] !== pool[i]) { [pool[i], pool[j]] = [pool[j], pool[i]]; break; }
+                }
+            }
+        }
+        const answerKey = pool.map((letter, idx) => `Q${idx+1}: ${letter}`).join(', ');
+
+        let prompt = `You are a senior question paper setter with 20+ years of experience designing official competitive exam papers (UPSC, SSC, JEE, NEET, BANK PO, RRB, etc.). You have deep knowledge of how examiners think — you know every trap, every trick, and every pattern used in real PYQs.
+
+════════════════════════════════════════════
+CRITICAL OUTPUT RULES — ZERO EXCEPTIONS
+════════════════════════════════════════════
+1. OUTPUT FORMAT: Plain text only. NO Markdown, NO JSON, NO asterisks for bold, NO hashtags (#), NO code blocks. Pure plain text output.
+2. QUESTION FORMAT: Generate ONLY "${QUESTION_FORMATS[formatKey].name}" format. No mixing formats.
+3. STRUCTURE: Follow the sample format example exactly. Every question must have: stem, 4 options (a/b/c/d), correct answer letter only (e.g., "Correct Answer: b"), then explanation.
+4. ANSWER LINE: Write ONLY the letter. Example: "Correct Answer: b" — never write the answer text on this line.
+5. STATEMENTS: For Statement-Based questions, each statement begins with asterisk-space (* ). Never number statements.
+6. MATH/PHYSICS: All math expressions in LaTeX: \\( ... \\) for inline, \\[ ... \\] for display. Never use $ symbols.
+7. COMPLETENESS: No question can be skipped or truncated. Every question needs all 4 parts (stem + options + answer + explanation).
+
+════════════════════════════════════════════
+MANDATORY ANSWER DISTRIBUTION — MUST FOLLOW
+════════════════════════════════════════════
+You MUST use this EXACT pre-assigned answer key. Do NOT deviate from it:
+${answerKey}
+
+This ensures answers are evenly distributed across a, b, c, d with no clustering.
+Write the correct answer as assigned above for each question number.
+Build each question so that the assigned option IS factually correct.
+
+════════════════════════════════════════════
+ASSESSMENT PARAMETERS
+════════════════════════════════════════════
+* Number of Questions: ${numQuestions}
+* Primary Topic: ${topic || (sourceType === 'text' ? 'Multiple Topics (see source)' : 'Not specified')}
+* Subject: ${subject || (sourceType === 'text' ? 'Mixed Subjects' : 'Not specified')}
+* Difficulty Level: ${difficulty}
+* Language: ${language}
+* Question Format: ${QUESTION_FORMATS[formatKey].name}
+* Target Exam: ${exam}
+
+════════════════════════════════════════════
+DIFFICULTY INSTRUCTIONS
+════════════════════════════════════════════
+${difficultyInstructions[difficulty] || difficultyInstructions['Medium']}
+
+════════════════════════════════════════════
+EXAM DNA — STYLE FINGERPRINT FOR ${exam}
+════════════════════════════════════════════
+${examSpecificDNA}
+
+${antiPatterns}
+
+════════════════════════════════════════════
+EXPLANATION QUALITY STANDARD
+════════════════════════════════════════════
+Every explanation MUST:
+- Address EACH of the 4 options individually (not just the correct one)
+- State exactly what makes each wrong option incorrect — a specific wrong fact, wrong year, wrong body, wrong Article, etc.
+- Be 3-6 sentences long (not a single line)
+- Reference a source of truth wherever applicable: Article number, Act name with year, Committee name, NCERT chapter, formula name
+- Reveal the examiner's trap if one exists: "The trap here is that..."
+- NEVER just say "Option X is correct because X is the answer." Explain the underlying concept.
+
+════════════════════════════════════════════
+FORMAT EXAMPLE (Follow this structure exactly)
+════════════════════════════════════════════
+${sampleFormat}
+════════════════════════════════════════════
+
 `;
 
-        if (sourceType === 'pdf') {
-            prompt += `*   **Knowledge Base:** You MUST generate questions based primarily on the "Source Material" provided below. Use the provided text as the core context for the questions.
-    *   For 'Easy' difficulty, generate questions directly from the lines and facts present.
-    *   For 'Medium', 'Hard', and 'Expert' difficulties, increase the conceptual depth of the questions
-    *   Use only the extracted text as the reference source. Create new, original, and high-quality questions inspired by this text. Focus on understanding each line and concept — do not copy sentences directly. Slightly twist or reframe questions so they test conceptual understanding, not rote recall. Never introduce any new terms, topics, or facts not present in the source text. Use your own knowledge only to clarify and structure the questions correctly, not to add new content. Additionally, verify every fact, statement, and option for accuracy and logical correctness, since the extracted text may contain OCR-related errors or distortions. All questions must remain strictly within the syllabus and context of the extracted material. `;
-        } else { // For topic, text, image
-            prompt += `*   **Knowledge Base:** Use your own expert knowledge to generate fresh, high-quality, and exam-accurate questions that perfectly match the syllabus, pattern, and difficulty of the target exam, using the provided Primary Topic, Subject, and Source Material only as contextual guidance. `;
+        if (sourceType === 'pdf' || sourceType === 'image') {
+            prompt += `SOURCE MATERIAL RULES:
+- Generate questions STRICTLY from the source material below. It is your ONLY content reference.
+- Do NOT introduce any fact, date, name, or concept that is not present in the source material.
+- OCR may have minor errors — correct obvious typos using context, but do not add new content.
+- REFRAME — never copy sentences directly. Convert statements into questions that test understanding.
+- Easy: Direct fact-recall from the text. Medium/Hard: Inference, application, and analysis from the text.
+
+`;
+        } else {
+            prompt += `KNOWLEDGE BASE RULES:
+- Use your expert knowledge to generate fresh, accurate questions matching the ${exam} syllabus and PYQ pattern.
+- Every fact must be independently verifiable. If you are unsure of a date, name, or number — do not guess. Choose a fact you are certain about.
+- Questions must cover DIFFERENT subtopics within the given topic — no two questions test the same fact.
+
+`;
         }
 
-        prompt += `
-
---- REQUIRED QUESTION SAMPLE FORMAT (Follow Strictly) ---
-${sampleFormat}
--------------------------------------------------------
-`;
-
         if (sourceText) {
-            prompt += `
-Now, generate the questions based on all the instructions above and the following source material/details:
---- START OF SOURCE MATERIAL ---
+            prompt += `Now generate exactly ${numQuestions} questions following ALL rules above. Use the mandatory answer key provided (${answerKey}).
+
+--- SOURCE MATERIAL START ---
 ${sourceText}
---- END OF SOURCE MATERIAL --- 
-Before giving the final output, check and verify all questions, options, correct answers, and explanations. Ensure everything is factually correct and consistent. In the explanation, clearly discuss all options and justify why the correct one is right and others are wrong, *also explain each option in explination one by one* . Fix any contradiction or error automatically. Generate {{count}} unique and non-repetitive questions. Each question must explore a different aspect of the topic and subtopic using varied sentence structure, reasoning, and examples. Never duplicate or slightly rephrase any earlier question and never use same line to generate multiple question `;
+--- SOURCE MATERIAL END ---
+
+FINAL PRE-OUTPUT CHECKLIST (verify silently before generating):
+□ Answer distribution matches the mandatory key exactly
+□ No answer letter repeats more than 3-4 times across all questions
+□ Every explanation addresses all 4 options individually
+□ At least one trap/trick question exists in the set (unless Easy difficulty)
+□ No two questions test the same fact or subtopic
+□ Statement-based questions (if any) do NOT have all-correct statements
+□ All facts, dates, names, and figures are 100% accurate
+□ Language and style matches ${exam} exam pattern
+
+Generate all ${numQuestions} questions now:`;
         } else {
-             prompt += `
-Before giving the final output, check and verify all questions, options, correct answers, and explanations. Ensure everything is factually correct and consistent. In the explanation, clearly discuss all options and justify why the correct one is right and others are wrong, *also explain each option in explination one by one* . Fix any contradiction or error automatically. Generate {{count}} unique and non-repetitive questions. Each question must explore a different aspect of the topic using varied sentence structure, reasoning, and examples. Never duplicate or slightly rephrase any earlier question `;
+            prompt += `Generate exactly ${numQuestions} questions following ALL rules above. Use the mandatory answer key (${answerKey}).
+
+FINAL PRE-OUTPUT CHECKLIST (verify silently before generating):
+□ Answer distribution matches the mandatory key exactly
+□ No answer letter repeats more than 3-4 times across all questions
+□ Every explanation addresses all 4 options individually
+□ At least one trap/trick question exists in the set (unless Easy difficulty)
+□ No two questions test the same fact or subtopic
+□ Statement-based questions (if any) do NOT have all-correct statements
+□ All facts, dates, names, and figures are 100% accurate
+□ Language and style matches ${exam} exam pattern
+
+Generate all ${numQuestions} questions now:`;
         }
 
         promptForGemini = prompt;
+
+        // --- Update modal UI for selected AI ---
+        const model = AI_MODELS[selectedAiModel] || AI_MODELS.gemini;
+        const logoEl = document.getElementById('ai-instructions-logo');
+        const titleEl = document.getElementById('ai-instructions-title');
+        const btnLabelEl = document.getElementById('open-ai-btn-label');
+        const step1El = document.getElementById('ai-step1-title');
+        const badgeEl = document.getElementById('ai-copy-badge');
+
+        if (logoEl) logoEl.textContent = model.logo;
+        if (titleEl) titleEl.textContent = `Ready for ${model.name}? ${model.logo}`;
+        if (btnLabelEl) btnLabelEl.textContent = model.name;
+        if (step1El) step1El.textContent = `1️⃣ When ${model.name} opens:`;
+
+        // Show copy badge after a short delay (simulate clipboard copy)
+        if (badgeEl) {
+            badgeEl.classList.remove('visible');
+            setTimeout(() => badgeEl.classList.add('visible'), 400);
+        }
+
         elements.geminiInstructionsModalOverlay.classList.remove('hidden');
     }
     
     async function executePostPromptActions(prompt) {
+        const model = AI_MODELS[selectedAiModel] || AI_MODELS.gemini;
+
         // Hide the modal first
         elements.geminiInstructionsModalOverlay.classList.add('hidden');
         
         // 1. Copy the prompt to the clipboard
+        let copySuccess = false;
         try {
             await copyTextToClipboard(prompt);
             showPasteNotification('✅ AI prompt copied to clipboard!');
+            copySuccess = true;
         } catch (err) {
-            // This will trigger the manual copy modal if the modern API fails.
-            // The function already handles this fallback.
             console.error("Could not automatically copy the prompt.");
-            // We still proceed to open Gemini.
         }
 
-        // 2. Open Gemini in a new tab
-        const aiWindow = window.open('https://gemini.google.com', '_blank');
+        // 2. Open the selected AI in a new tab
+        const aiWindow = window.open(model.url, '_blank');
     
         if (!aiWindow || aiWindow.closed || typeof aiWindow.closed === 'undefined') {
-            showPasteNotification('⚠️ Popup blocked! Click the link to open manually.');
-            elements.aiLinkFallback.classList.remove('hidden');
+            // Popup blocked — show professional popup
+            const popup = document.getElementById('prompt-copied-popup');
+            const aiNameSpan = document.getElementById('popup-ai-name');
+            if (aiNameSpan) aiNameSpan.textContent = model.name;
+            if (popup) popup.classList.add('show');
+            setTimeout(() => { if (popup) popup.classList.remove('show'); }, 6000);
+
+            // Also show link fallback in paste container
+            if (elements.aiLinkFallback) {
+                elements.aiLinkFallback.classList.remove('hidden');
+                const linkEl = elements.aiLinkFallback.querySelector('a');
+                if (linkEl) {
+                    linkEl.href = model.url;
+                    linkEl.textContent = `Click Here to Open ${model.name} Manually`;
+                }
+            }
         } else {
-            elements.aiLinkFallback.classList.add('hidden');
+            if (elements.aiLinkFallback) elements.aiLinkFallback.classList.add('hidden');
         }
     
         // 3. Prepare the app for the user's return
         clearFormState();
         sessionStorage.setItem('gameMode', gameMode);
         showScreen('paste');
-        promptForGemini = null; // Clear the prompt after use
+        promptForGemini = null;
     }
 
     
