@@ -1402,6 +1402,22 @@ function showQuizSavedNotification() {
   overflow: hidden !important;
 }
 
+/* ===== PASTE WAITING STATE ===== */
+@keyframes paste-pulse {
+    0%   { transform: scale(1);   opacity: 1; }
+    50%  { transform: scale(1.18); opacity: 0.7; }
+    100% { transform: scale(1);   opacity: 1; }
+}
+@keyframes paste-status-fade {
+    0%   { opacity: 0; transform: translateY(4px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+#paste-status-msg.active {
+    animation: paste-status-fade 0.3s ease-out forwards;
+}
+#paste-waiting-state ol li { margin-bottom: 0.2rem; }
+#paste-manual-fallback textarea { width: 100%; min-height: 120px; box-sizing: border-box; }
+
 </style>
 <link rel="stylesheet" href="/index.css">
 </head>
@@ -1737,19 +1753,39 @@ function showQuizSavedNotification() {
 
     <!-- ===== PASTE CONTAINER (UNIFIED FOR SINGLE/MULTI) ====== -->
     <div id="paste-quiz-container" class="hidden">
-        <p style="text-align: center; font-size: 1.1em;"><b>Welcome back!</b> Waiting for the questions from the AI.</p>
-        <div id="ai-link-fallback" class="hidden">
+        <!-- WAITING STATE (shown while user is on AI tab) -->
+        <div id="paste-waiting-state">
+            <div style="text-align:center; padding: 1.5rem 0;">
+                <div id="paste-pulse-icon" style="font-size:3rem; animation: paste-pulse 1.5s infinite ease-in-out;">📋</div>
+                <h3 style="margin: 0.8rem 0 0.3rem; color: var(--accent-color);">Waiting for you to return...</h3>
+                <p style="font-size:0.95em; opacity:0.85; margin:0;">Go to the AI tab → copy the response → come back here.<br>Quiz will <strong>start automatically</strong> when you return!</p>
+            </div>
+            <div style="background: var(--component-bg); border: 1.5px dashed var(--accent-color); border-radius:10px; padding:1rem 1.2rem; margin: 1rem 0; font-size:0.9em; line-height:1.7;">
+                <strong style="color:var(--accent-color);">📌 How to copy from AI:</strong>
+                <ol style="margin: 0.5rem 0 0 1.2rem; padding:0;">
+                    <li>Wait for the AI to <strong>finish</strong> generating all questions</li>
+                    <li>Tap the <strong>Copy icon (📋)</strong> at the bottom of the response</li>
+                    <li><strong>Switch back</strong> to this tab — quiz starts automatically!</li>
+                </ol>
+            </div>
+            <div id="paste-status-msg" style="text-align:center; min-height:1.5em; font-size:0.95em; color:var(--accent-color); font-weight:600;"></div>
+        </div>
+
+        <!-- MANUAL FALLBACK (shown if auto-paste fails) -->
+        <div id="paste-manual-fallback" class="hidden">
+            <p style="text-align:center; font-size:1em; margin-bottom:0.5rem;"><b>Auto-paste not available.</b> Please paste manually:</p>
+            <div class="prompt-actions-row" style="margin-bottom: 0.8rem;">
+                <button id="paste-from-clipboard-btn" class="btn btn-success btn-full-width" style="font-size:1.05em; padding:14px;">📋 Tap Here to Paste & Start Quiz</button>
+            </div>
+            <p style="text-align:center; font-size: 0.85em; margin: 0.5rem 0 0.3rem; opacity:0.7;">...or paste manually into the box below then press Start:</p>
+            <textarea id="quiz-data-input" placeholder="Paste the AI response here..."></textarea>
+            <button id="start-manual-quiz-btn" class="btn btn-full-width" style="margin-top:0.8rem;">Parse & Start! 🧠</button>
+        </div>
+
+        <div id="ai-link-fallback" class="hidden" style="margin-top:1rem;">
             <p>⚠️ It looks like the AI tab was blocked by your browser.</p>
             <a href="https://gemini.google.com" target="_blank" class="btn" id="ai-fallback-link">Click Here to Open AI Manually</a>
         </div>
-        <div class="input-group">
-            <div class="prompt-actions-row" style="margin-bottom: 1rem;">
-                <button id="paste-from-clipboard-btn" class="btn btn-secondary">📋 Paste from Clipboard</button>
-            </div>
-            <p style="text-align:center; font-size: 0.9em; margin-top: 0;">...or paste manually into the box below.</p>
-            <textarea id="quiz-data-input" placeholder="I'll try to paste and start automatically when you return to this tab. If that doesn't work, use the button above or paste manually here."></textarea>
-        </div>
-        <button id="start-manual-quiz-btn" class="btn btn-full-width">Parse & Start! 🧠</button>
     </div>
 
     <!-- ===== MULTIPLAYER STEP 3: CONFIGURE ROOM ===== -->
@@ -1925,18 +1961,20 @@ function showQuizSavedNotification() {
             </div>
             <div class="guide-step">
                 <strong>2️⃣ Copy the Generated Questions:</strong>
-                <p>Once the AI finishes, copy the entire response.</p>
+                <p>Wait for the AI to <strong>finish completely</strong>, then copy the entire response.</p>
                 <ul style="padding-left: 20px; margin-top: 0.5em; font-size: 0.9em;">
-                    <li><strong>Method 1:</strong> Tap the 3 dots (⋮) at the start of the response.</li>
-                    <li><strong>Method 2:</strong> Tap the Copy Icon (📋) at the end of the response.</li>
+                    <li><strong>Gemini:</strong> Tap the Copy icon (📋) at the bottom of the response</li>
+                    <li><strong>ChatGPT:</strong> Tap the Copy icon below the message</li>
+                    <li><strong>Grok / Claude:</strong> Tap the Copy icon at the end of the response</li>
                 </ul>
             </div>
             <div class="guide-step">
                 <strong>3️⃣ Return to Examyatri:</strong>
-                <p>Come back to this tab — it will <strong>auto-detect and start</strong> your quiz.</p>
+                <p>Come back to this tab — it will <strong>auto-detect your clipboard and start the quiz instantly</strong>. No button needed!</p>
                 <ul style="padding-left: 20px; margin-top: 0.5em; font-size: 0.9em;">
-                    <li><strong>Method 1:</strong> Press your device's 'Back' button twice.</li>
-                    <li><strong>Method 2:</strong> Manually switch tabs back to Examyatri.</li>
+                    <li><strong>Android/iOS:</strong> Press Back twice or tap the Examyatri tab</li>
+                    <li><strong>Desktop:</strong> Switch back to the Examyatri browser tab</li>
+                    <li>If auto-start fails, tap the <strong>📋 Paste button</strong> shown on screen</li>
                 </ul>
             </div>
         </div>
@@ -2904,8 +2942,9 @@ Explanation: The Election Commission of India (ECI), established under Article 3
     // --- PARSER, VALIDATOR, AND QUIZ START LOGIC ---
     function handlePasteAndParse() {
         const gameMode = sessionStorage.getItem('gameMode');
-        const text = elements.quizDataInput.value.trim();
-        if (!text) { alert('Please paste the response into the box.'); return; }
+        const taEl = document.getElementById('quiz-data-input');
+        const text = taEl ? taEl.value.trim() : '';
+        if (!text) { alert('Please paste the AI response into the box first.'); return; }
 
         sessionStorage.removeItem('gameMode');
 
@@ -2913,10 +2952,24 @@ Explanation: The Election Commission of India (ECI), established under Article 3
             localStorage.setItem('multiplayerQuizText', text);
             showScreen('configureRoom');
         } else {
-            // Single Player Logic
             if (!quizMetaData || Object.keys(quizMetaData).length === 0) { quizMetaData = { topic: '', subject: '' }; }
             const parsedQuestions = flexibleParser(text);
-            if (!parsedQuestions || parsedQuestions.length === 0) { alert('Parsing Failed: Could not find any valid questions. Please check the text from the AI.'); return; }
+            if (!parsedQuestions || parsedQuestions.length === 0) {
+                // Intelligent debug: tell user what was found
+                const hasQuestion = /Question\s*:/i.test(text) || /Q\s*\d+[\.\)]/i.test(text) || /^\d+[\.\)]/m.test(text);
+                const hasOptions = /^[a-dA-D][\.\)]/m.test(text) || /^\([a-dA-D]\)/m.test(text);
+                const hasAnswer = /Correct\s*Answer|Answer\s*:/i.test(text);
+                let hint = '';
+                if (!hasQuestion) hint += '\n• No question lines found (need "Question:" or "1." prefix)';
+                if (!hasOptions) hint += '\n• No option lines found (need "a)" or "a." format)';
+                if (!hasAnswer) hint += '\n• No answer line found (need "Correct Answer: b")';
+                alert(`❌ Parsing Failed!\n\nNo questions were extracted.${hint ? '\n\nMissing elements:' + hint : ''}\n\nTips:\n1. Make sure you copied the FULL AI response\n2. The AI may have used wrong format — regenerate and try again\n3. Or paste manually into the box below`);
+                const fallbackEl = document.getElementById('paste-manual-fallback');
+                if (fallbackEl) fallbackEl.classList.remove('hidden');
+                const waitingEl = document.getElementById('paste-waiting-state');
+                if (waitingEl) waitingEl.classList.add('hidden');
+                return;
+            }
             
             quizData = parsedQuestions;
             startQuiz();
@@ -3683,52 +3736,144 @@ Explanation: The Election Commission of India (ECI), established under Article 3
     async function loadQuizState() { const state = await dbHelper.get(QUIZ_STATE_KEY); if (!state) return false; try { originalQuizData = state.originalQuizData; quizData = JSON.parse(JSON.stringify(originalQuizData)); userAnswers = state.userAnswers; currentQuestionIndex = state.currentQuestionIndex; bookmarkedQuestions = new Set(state.bookmarkedQuestions); quizStartTime = new Date(state.quizStartTime); quizMetaData = state.quizMetaData || {}; creationWorkflow = state.creationWorkflow || null; _displayScreen('player'); loadQuestion(currentQuestionIndex); showPasteNotification('✅ Your active assessment has been restored.'); return true; } catch (e) { console.error("Failed to load state:", e); await dbHelper.set(QUIZ_STATE_KEY, null); return false; } }
     
     function setupPasteScreen() {
-        const tryAutoPaste = async () => {
-            // This function attempts to read the clipboard when the user returns to the tab.
-            // Modern browsers require the page to be in focus and often require a user gesture for this to succeed.
-            // It will fail silently if permission is denied, which is the desired behavior.
-            if (!navigator.clipboard || !navigator.clipboard.readText) return;
-            if (elements.quizDataInput.value.trim() !== '') return;
-            if (document.hidden) return;
+        // --- Helper: does text look like a quiz? (broad check) ---
+        function looksLikeQuiz(text) {
+            if (!text || text.trim().length < 50) return false;
+            const t = text;
+            // Check for any of the known quiz markers
+            const markers = [
+                /Correct\s*Answer\s*:/i,
+                /Answer\s*:/i,
+                /Ans\s*:/i,
+                /Correct\s*:/i,
+                /\bQuestion\s*:/i,
+                /\bQ\s*\d+[\.\)]/i,
+                /^\s*\d+[\.\)]\s+/m,         // numbered question like "1. What is..."
+                /Assertion\s*\(A\)\s*:/i,
+                /Reason\s*\(R\)\s*:/i,
+                /Explanation\s*:/i,
+                /^\s*[a-d][\.\)]\s+/im,       // options like "a) ..." or "a. ..."
+                /Options\s*:/i,
+                /\(A\)\s+.+\n.*\(B\)/i,       // (A) ... (B) option style
+            ];
+            let hits = 0;
+            for (const re of markers) { if (re.test(t)) hits++; }
+            return hits >= 2; // Need at least 2 markers to be confident
+        }
+
+        // --- State ---
+        let autoPasteAttempted = false;
+        let pollingInterval = null;
+
+        function setPasteStatusMsg(msg, isLoading = false) {
+            const el = document.getElementById('paste-status-msg');
+            if (!el) return;
+            el.textContent = msg;
+            el.classList.remove('active');
+            void el.offsetWidth; // force reflow for animation restart
+            el.classList.add('active');
+        }
+
+        // --- Core auto-paste attempt ---
+        async function tryAutoPaste() {
+            if (document.hidden) return false;
+            if (!navigator.clipboard || !navigator.clipboard.readText) return false;
+
+            // Check if textarea already has content
+            const ta = document.getElementById('quiz-data-input');
+            if (ta && ta.value.trim().length > 50) return false;
 
             try {
                 const text = await navigator.clipboard.readText();
-                // **FIX:** Broadened the check to detect more quiz formats automatically.
-                if (text && text.trim() && (text.includes("Question:") || text.includes("Correct Answer:") || text.includes("Assertion (A):"))) {
-                    elements.quizDataInput.value = text;
-                    showPasteNotification('✨ Auto-pasted! Processing...');
-                    handlePasteAndParse();
+                if (looksLikeQuiz(text)) {
+                    setPasteStatusMsg('✨ Quiz detected! Starting...');
+                    if (ta) ta.value = text;
+                    clearInterval(pollingInterval);
+                    setTimeout(() => {
+                        showPasteNotification('✨ Auto-pasted! Processing...');
+                        handlePasteAndParse();
+                    }, 400);
+                    return true;
                 }
             } catch (err) {
-                // This error is expected if the user hasn't granted permission or the browser restricts access.
-                // We fail silently and let the user paste manually.
-                console.log("Silent auto-paste attempt failed. User can paste manually.", err.name);
+                // Permission denied or not available — will show manual fallback
+                console.log('Auto-paste not available:', err.name);
+                return false;
             }
-        };
+            return false;
+        }
 
-        elements.quizDataInput.addEventListener('focus', tryAutoPaste);
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && window.location.hash === '#paste') {
-                tryAutoPaste();
+        // --- Show manual fallback gracefully ---
+        function showManualFallback() {
+            const waitingEl = document.getElementById('paste-waiting-state');
+            const fallbackEl = document.getElementById('paste-manual-fallback');
+            if (waitingEl) waitingEl.classList.add('hidden');
+            if (fallbackEl) fallbackEl.classList.remove('hidden');
+        }
+
+        // --- On visibilitychange: user returned to tab ---
+        async function onReturnToTab() {
+            if (document.hidden) return;
+            if (window.location.hash !== '#paste') return;
+
+            setPasteStatusMsg('🔍 Checking clipboard...');
+            const success = await tryAutoPaste();
+
+            if (!success && !autoPasteAttempted) {
+                autoPasteAttempted = true;
+                // Show manual fallback after first failed attempt on return
+                showManualFallback();
+            } else if (!success) {
+                setPasteStatusMsg('📋 Waiting... Paste the AI response when ready.');
             }
-        });
+        }
 
-        tryAutoPaste(); // Attempt once when the screen loads
+        document.addEventListener('visibilitychange', onReturnToTab);
+
+        // Also try once when the screen first loads (in case user is already back)
+        setTimeout(async () => {
+            const success = await tryAutoPaste();
+            if (!success) {
+                // Start polling every 2 seconds for 30 seconds (for when clipboard permission auto-granted)
+                let pollCount = 0;
+                pollingInterval = setInterval(async () => {
+                    pollCount++;
+                    if (document.hidden) return;
+                    if (pollCount > 15) { // Stop after ~30s
+                        clearInterval(pollingInterval);
+                        showManualFallback();
+                        return;
+                    }
+                    const ok = await tryAutoPaste();
+                    if (ok) clearInterval(pollingInterval);
+                }, 2000);
+            }
+        }, 500);
+
+        // textarea focus also triggers a check
+        const ta = document.getElementById('quiz-data-input');
+        if (ta) ta.addEventListener('focus', tryAutoPaste);
     }
 
     async function handlePasteFromClipboard() {
         try {
             const text = await navigator.clipboard.readText();
             if (text && text.trim()) {
-                elements.quizDataInput.value = text;
+                const ta = document.getElementById('quiz-data-input');
+                if (ta) ta.value = text;
                 showPasteNotification('✅ Pasted from clipboard! Parsing...');
                 handlePasteAndParse();
             } else {
-                showPasteNotification('🤔 Your clipboard is empty.');
+                showPasteNotification('🤔 Your clipboard is empty. Copy the AI response first!');
             }
         } catch (err) {
             console.error('Failed to read clipboard:', err);
-            alert('Could not read from clipboard. This can happen if you denied permission or are in a private browser window. Please paste the text manually into the box.');
+            // Show the textarea so user can paste manually
+            const fallbackEl = document.getElementById('paste-manual-fallback');
+            if (fallbackEl) fallbackEl.classList.remove('hidden');
+            const waitingEl = document.getElementById('paste-waiting-state');
+            if (waitingEl) waitingEl.classList.add('hidden');
+            alert('Could not read clipboard automatically.\n\nPlease paste the AI response manually into the text box below.');
         }
     }
     
@@ -3915,13 +4060,16 @@ STRICT ANTI-PATTERNS — THESE ARE FAILURES. NEVER DO ANY OF THE FOLLOWING:
 ════════════════════════════════════════════
 CRITICAL OUTPUT RULES — ZERO EXCEPTIONS
 ════════════════════════════════════════════
-1. OUTPUT FORMAT: Plain text only. NO Markdown, NO JSON, NO asterisks for bold, NO hashtags (#), NO code blocks. Pure plain text output.
+1. OUTPUT FORMAT: Plain text ONLY. Absolutely NO Markdown, NO JSON, NO asterisks (*) for bold, NO hashtags (#) for headers, NO backticks, NO code blocks, NO HTML tags. Pure unformatted plain text.
 2. QUESTION FORMAT: Generate ONLY "${QUESTION_FORMATS[formatKey].name}" format. No mixing formats.
-3. STRUCTURE: Follow the sample format example exactly. Every question must have: stem, 4 options (a/b/c/d), correct answer letter only (e.g., "Correct Answer: b"), then explanation.
-4. ANSWER LINE: Write ONLY the letter. Example: "Correct Answer: b" — never write the answer text on this line.
-5. STATEMENTS: For Statement-Based questions, each statement begins with asterisk-space (* ). Never number statements.
-6. MATH/PHYSICS: All math expressions in LaTeX: \\( ... \\) for inline, \\[ ... \\] for display. Never use $ symbols.
-7. COMPLETENESS: No question can be skipped or truncated. Every question needs all 4 parts (stem + options + answer + explanation).
+3. STRUCTURE: Every single question MUST have all 4 parts in this exact order: (1) Question line, (2) four option lines a/b/c/d, (3) Correct Answer line with ONLY the letter, (4) Explanation line. Missing ANY part will break the parser.
+4. ANSWER LINE: "Correct Answer:" must be followed by ONLY a single letter (a, b, c, or d). NEVER write the answer text. NEVER write "Correct Answer: b) Some text". NEVER write "Answer: (b)". ONLY "Correct Answer: b".
+5. OPTION FORMAT: Options MUST use lowercase letters: a) b) c) d) — NEVER use A. B. C. D. or (A) (B) (C) (D) or 1. 2. 3. 4.
+6. QUESTION PREFIX: Every question MUST start with "Question:" on its own — NEVER use "Q1." or "1." or "**Question 1**" or "Q." — ONLY "Question:".
+7. STATEMENTS: For Statement-Based questions, each statement begins with "* " (asterisk space). Never number statements.
+8. MATH/PHYSICS: All math in LaTeX: \\( ... \\) for inline, \\[ ... \\] for display. Never use $ symbols.
+9. COMPLETENESS: Every question needs all 4 parts. No truncation. No "..." filler. No skipped questions.
+10. SEPARATOR: Add ONE blank line between questions. NO dashes (---), NO equals (===), NO asterisks (***) as separators.
 
 ════════════════════════════════════════════
 MANDATORY ANSWER DISTRIBUTION — MUST FOLLOW
@@ -3973,6 +4121,50 @@ FORMAT EXAMPLE (Follow this structure exactly)
 ${sampleFormat}
 ════════════════════════════════════════════
 
+════════════════════════════════════════════
+⚠️ MANDATORY OUTPUT FORMAT — MACHINE-PARSED (READ CAREFULLY)
+════════════════════════════════════════════
+CRITICAL: Your output goes DIRECTLY into an automated quiz parser. Any deviation from this format will cause questions to be lost. Follow this EXACT structure for EVERY question — no exceptions:
+
+Question: [full question text here — no number prefix, no bold, no Q1.]
+a) [option A text]
+b) [option B text]
+c) [option C text]
+d) [option D text]
+Correct Answer: [SINGLE LETTER ONLY — e.g.: b — nothing else on this line]
+Explanation: [full explanation text here]
+
+[ONE blank line here, then next question starts]
+
+ABSOLUTE FORMAT RULES (violation = question lost):
+RULE 1 — QUESTION LINE: Must start with exactly "Question: " (with colon and space). NEVER "Q1:" or "1." or "**Q1**" or "Question 1:" or any variation.
+RULE 2 — OPTIONS: Must use lowercase letters: "a) " "b) " "c) " "d) " (letter, close-paren, space). NEVER "A." or "(A)" or "A)" uppercase or "1)" numbers.
+RULE 3 — NO "Options:" header: Do NOT write a separate "Options:" line before the options. Options start directly with "a) ".
+RULE 4 — ANSWER: Must be exactly "Correct Answer: " followed by ONE lowercase letter (a/b/c/d). NEVER "Answer: b) text" or "Correct: b" or "✅ b" or "(b)".
+RULE 5 — EXPLANATION: Must start with exactly "Explanation: " (with colon and space). NEVER skip it. NEVER write it as "Reason:" or "Solution:".
+RULE 6 — SEPARATOR: Exactly ONE blank line between questions. NEVER use --- or === or *** as separators.
+RULE 7 — NO MARKDOWN: Zero asterisks, zero #, zero **, zero backticks anywhere. Pure plain text only.
+RULE 8 — NO INTRO TEXT: Start directly with "Question: ..." for question 1. No preamble, no "Here are your questions:", no section headers.
+RULE 9 — NO TRAILING TEXT: After the last Explanation, stop. No summary, no "End of questions", no notes.
+
+WRONG FORMATS — each example below will break the parser:
+Example of WRONG: **Q1.** What is 2+2?  ← bold + Q prefix = WRONG
+Example of WRONG: A) 3  B) 4  C) 5  D) 6  ← uppercase + inline = WRONG  
+Example of WRONG: Answer: B  ← uppercase + wrong keyword = WRONG
+Example of WRONG: Correct Answer: b) Four  ← text after letter = WRONG
+Example of WRONG: ✅ Correct Answer: b  ← emoji prefix = WRONG
+
+ONLY CORRECT FORMAT:
+Question: What is 2+2?
+a) 3
+b) 4
+c) 5
+d) 6
+Correct Answer: b
+Explanation: 2 plus 2 equals 4 by the rules of integer addition. Option a (3) is wrong because that is 1+2. Option c (5) would be 2+3. Option d (6) would be 3+3.
+
+════════════════════════════════════════════
+
 `;
 
         if (sourceType === 'pdf' || sourceType === 'image') {
@@ -4010,7 +4202,21 @@ FINAL PRE-OUTPUT CHECKLIST (verify silently before generating):
 □ All facts, dates, names, and figures are 100% accurate
 □ Language and style matches ${exam} exam pattern
 
-Generate all ${numQuestions} questions now:`;
+════════════════════════════════════════════
+⚠️ FINAL REMINDER — DO NOT VIOLATE
+════════════════════════════════════════════
+DO NOT write any of the following before, between, or after questions:
+  ✗ "Here are your questions:"
+  ✗ "Sure! Here is the quiz:"
+  ✗ Any greeting, confirmation, or acknowledgment
+  ✗ Any section headers like "Section 1" or "Part A"
+  ✗ Any closing statement like "I hope this helps!" or "End of questions"
+  ✗ Any numbered prefix like "1." or "Q1." before the word "Question:"
+  ✗ Any markdown formatting (**bold**, ## headers, - bullets)
+
+YOUR ENTIRE RESPONSE MUST BE NOTHING BUT the ${numQuestions} questions in the exact plain-text format shown above. Start your response with "Question:" for question 1. Stop after "Explanation:" for the last question. No other text anywhere.
+
+BEGIN NOW:`;
         } else {
             prompt += `Generate exactly ${numQuestions} questions following ALL rules above. Use the mandatory answer key (${answerKey}).
 
@@ -4024,7 +4230,21 @@ FINAL PRE-OUTPUT CHECKLIST (verify silently before generating):
 □ All facts, dates, names, and figures are 100% accurate
 □ Language and style matches ${exam} exam pattern
 
-Generate all ${numQuestions} questions now:`;
+════════════════════════════════════════════
+⚠️ FINAL REMINDER — DO NOT VIOLATE
+════════════════════════════════════════════
+DO NOT write any of the following before, between, or after questions:
+  ✗ "Here are your questions:"
+  ✗ "Sure! Here is the quiz:"
+  ✗ Any greeting, confirmation, or acknowledgment
+  ✗ Any section headers like "Section 1" or "Part A"
+  ✗ Any closing statement like "I hope this helps!" or "End of questions"
+  ✗ Any numbered prefix like "1." or "Q1." before the word "Question:"
+  ✗ Any markdown formatting (**bold**, ## headers, - bullets)
+
+YOUR ENTIRE RESPONSE MUST BE NOTHING BUT the ${numQuestions} questions in the exact plain-text format shown above. Start your response with "Question:" for question 1. Stop after "Explanation:" for the last question. No other text anywhere.
+
+BEGIN NOW:`;
         }
 
         promptForGemini = prompt;
@@ -4357,96 +4577,309 @@ function generateTopicPrompt() {
     
     function flexibleParser(text) {
         const questions = [];
-        // **FIXED:** The regex for splitting questions is now more robust and generalized.
-        const blocks = text.replace(/\r\n/g, '\n').split(/\n(?=^\s*(?:Question:|Q\d|^\d+[\.\)]|Assertion\s*\(A\):))/im);
 
+        // ═══════════════════════════════════════════════════════════════════════
+        // STAGE 1: UNIVERSAL PRE-PROCESSING
+        // Normalize every known AI output quirk into clean plain-text
+        // ═══════════════════════════════════════════════════════════════════════
+        let t = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+        // Strip HTML tags some models inject
+        t = t.replace(/<br\s*\/?>/gi, '\n');
+        t = t.replace(/<[^>]+>/g, '');
+
+        // Strip ALL markdown bold/italic  (**text** → text)
+        t = t.replace(/\*\*\*(.+?)\*\*\*/g, '$1');
+        t = t.replace(/\*\*(.+?)\*\*/g, '$1');
+
+        // Protect statement markers (bullet list lines) before stripping lone *
+        t = t.replace(/^(\s*)\*\s+/gm, '$1STMTSEP ');
+        t = t.replace(/\*([a-dA-D1-4✅✔])\*/g, '$1');
+
+        // Strip markdown headers  ## → (nothing)
+        t = t.replace(/^#{1,6}\s*/gm, '');
+
+        // Strip horizontal rules  --- *** === ___
+        t = t.replace(/^\s*[-=*_]{3,}\s*$/gm, '');
+
+        // Strip code fences
+        t = t.replace(/^```[a-z]*\s*$/gim, '').replace(/^```\s*$/gim, '');
+
+        // Strip leading emojis from answer lines  ✅ b → b
+        t = t.replace(/^(\s*(?:Correct\s*Answer|Answer|Ans|Correct)\s*[:\-]\s*)[✅✔☑️✓►→•]+\s*/gim, '$1');
+
+        // Normalize answer keyword variants → "Correct Answer:"
+        t = t.replace(/^\s*(Correct\s*Option|Correct\s*Ans|Right\s*Answer|Answer\s*Key|Key\s*Answer)\s*[:\-]/gim, 'Correct Answer:');
+        t = t.replace(/^\s*(Ans)\s*[:\-]/gim, 'Correct Answer:');
+        t = t.replace(/^\s*Answer\s*[:\-]/gim, 'Correct Answer:');
+
+        // ── BUG 1 FIX: Protect Assertion-Reason "Reason (R):" BEFORE the global
+        // explanation sweep so it never becomes "Explanation (R):".
+        // We temporarily encode it as a token, then restore after the sweep.
+        t = t.replace(/^\s*Reason\s*\(R\)\s*[:\-]/gim, 'ASSERTION_REASON_TOKEN:');
+        // Also protect bare "Reason:" that appears INSIDE a question body
+        // (i.e. before any option line in that block). We handle this by only
+        // converting "Reason:" that appears AFTER options or answers — see
+        // Stage 3 per-block parsing instead. For now, the global sweep is
+        // intentionally limited to NON-question-body keywords only.
+        t = t.replace(/^\s*(Rationale|Solution|Why|Hint|Justification|Note)\s*[:\-]/gim, 'Explanation:');
+        // Convert standalone "Reason:" only when not part of an A-R question.
+        // We detect A-R blocks as lines containing "Assertion" on the same or
+        // adjacent line, and skip those. For safety, we do it line by line:
+        t = t.split('\n').map((line, idx, arr) => {
+            if (/^\s*Reason\s*[:\-]/i.test(line)) {
+                // Check surrounding 8 lines for Assertion context
+                const window = arr.slice(Math.max(0, idx - 8), Math.min(arr.length, idx + 4)).join('\n');
+                if (/Assertion\s*\(A\)|Assertion\s*[:\-]/i.test(window)) {
+                    return line; // keep as-is — it's part of an A-R question
+                }
+                return line.replace(/^\s*Reason\s*[:\-]/i, 'Explanation:');
+            }
+            return line;
+        }).join('\n');
+        // Restore the protected Assertion-Reason token
+        t = t.replace(/^ASSERTION_REASON_TOKEN:/gm, 'Reason (R):');
+
+        // ── BUG 3 FIX: Explode inline options (all on one line) before the
+        // per-line option normalisation runs.
+        // Pattern: A) text  B) text  C) text  D) text  (any delimiter A-D)
+        // We require at least 2 option-like segments to trigger.
+        t = t.replace(/^(.*?)([A-D]\))\s*(.+?)\s{2,}([A-D]\))\s*(.+?)(?:\s{2,}([A-D]\))\s*(.+?))?(?:\s{2,}([A-D]\))\s*(.+?))?$/gm,
+            (match, pre, l1, t1, l2, t2, l3, t3, l4, t4) => {
+                // Only fire when the pre-text is empty/whitespace (option lines start at line beginning)
+                if (pre && pre.trim()) return match;
+                let out = `${l1} ${t1}\n${l2} ${t2}`;
+                if (l3 && t3) out += `\n${l3} ${t3}`;
+                if (l4 && t4) out += `\n${l4} ${t4}`;
+                return out;
+            }
+        );
+
+        // Remove "Options:" header line (some AIs add it)
+        t = t.replace(/^\s*Options\s*:\s*$/gim, '');
+
+        // Normalize "Q1." / "Q.1" / "Question 1:" prefixes → "Question: "
+        // Must happen BEFORE the [1-4] → option letter conversion so that
+        // "1. Who was..." becomes "Question: Who was..." rather than "a) Who was..."
+        t = t.replace(/^\s*Q(?:uestion)?\s*\.?\s*\d+\s*[:\.\-\)]\s*/gim, 'Question: ');
+        t = t.replace(/^\s*Question\s+\d+\s*[:\-\.]\s*/gim, 'Question: ');
+
+        // ── BUG 2 & 5 FIX: Numbered prefix → "Question:" only when NOT inside a
+        // statement block. A statement block is introduced by phrases like
+        // "Consider the following statements" or when a STMTSEP was recently seen.
+        // We process line by line.
+        {
+            const rawLines = t.split('\n');
+            let inStatementBlock = false;
+            const numberedPfx = /^\s*(\d{1,2})\s*[\.)\-]\s+(?=[A-Z\(])/;
+            const stmtBlockTrigger = /consider\s+the\s+following|which\s+of\s+the\s+following\s+statements|statements?\s*[:\-]/i;
+            const stmtBlockEnd = /^\s*(?:a\)|b\)|c\)|d\)|Correct\s*Answer|Answer|Explanation)/i;
+            const out = rawLines.map(line => {
+                // A STMTSEP on this line means we're in a statement block
+                if (/STMTSEP/.test(line)) { inStatementBlock = true; return line; }
+                // Trigger phrase on this line enters statement-block mode
+                if (stmtBlockTrigger.test(line)) { inStatementBlock = true; return line; }
+                // First option / answer line exits statement-block mode
+                if (inStatementBlock && stmtBlockEnd.test(line.trim())) { inStatementBlock = false; }
+                // Only convert numbered prefix → Question: when NOT in a statement block
+                if (!inStatementBlock && numberedPfx.test(line)) {
+                    return line.replace(numberedPfx, 'Question: ');
+                }
+                return line;
+            });
+            t = out.join('\n');
+        }
+
+        // Options: (A) → a)  |  A. → a)  |  A) → a)  |  1) or 1. → a)
+        // Run AFTER numbered-question prefix conversion so "1. Question text"
+        // is already "Question: ..." before this [1-4] → letter step fires.
+        t = t.replace(/^\s*\(([a-dA-D])\)\s*/gm, (_, p1) => p1.toLowerCase() + ') ');
+        t = t.replace(/^\s*([A-D])\)\s*/gm, (_, p1) => p1.toLowerCase() + ') ');
+        t = t.replace(/^\s*([A-D])\.\s+/gm, (_, p1) => p1.toLowerCase() + ') ');
+        t = t.replace(/^\s*([1-4])[\.):]\s+(?=[A-Za-z\(])/gm, (_, p1) => String.fromCharCode(96 + parseInt(p1)) + ') ');
+
+        // Restore statement markers (STMTSEP → * )
+        t = t.replace(/^(\s*)STMTSEP /gm, '$1* ');
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // STAGE 2: BLOCK SPLITTING — detect question boundaries
+        // Try multiple strategies from most- to least-specific
+        // ═══════════════════════════════════════════════════════════════════════
+        const blockSplitter = /\n{2,}(?=\s*(?:Question\s*:|Q\.?\s*\d+[\.\-\):]|\d+[\.)\s]|Assertion\s*\(A\)\s*:))/i;
+        let blocks = t.split(blockSplitter);
+
+        if (blocks.length <= 1) {
+            blocks = t.split(/\n(?=\s*Question\s*:)/i);
+        }
+        if (blocks.length <= 1) {
+            blocks = t.split(/\n(?=\s*\d{1,2}[\.)\-]\s+[A-Z])/);
+        }
+        if (blocks.length <= 1) {
+            blocks = [t]; // fallback: treat whole text as one block attempt
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // STAGE 3: PER-BLOCK PARSING
+        // ═══════════════════════════════════════════════════════════════════════
         blocks.forEach(block => {
-            if (block.trim().length < 10) return;
+            if (!block || block.trim().length < 15) return;
 
             const lines = block.trim().split('\n');
-            let questionText = '';
+            let questionLines = [];
             const options = [];
             let correctAnswer = null;
-            let explanation = 'No explanation provided.';
-            
-            let questionLines = [];
-            let optionsStarted = false;
-            let answerFound = false;
-            let explanationStarted = false;
+            let explanationLines = [];
 
-            for (const line of lines) {
-                const trimmedLine = line.trim();
-                if (!trimmedLine) continue;
-                
-                // Use non-capturing groups (?:...) for matching to simplify logic
-                const isExplanation = trimmedLine.match(/^(?:Explanation:|Reason:)/i);
-                const isAnswer = trimmedLine.match(/^(?:Correct Answer:|Answer:|Ans:|Correct:)/i);
-                // This regex is flexible for options like a), a., 1), 1., *, -, etc.
-                const isOption = trimmedLine.match(/^([a-zA-Z0-9][\.\)]|[-*•])\s*(.*)/);
+            let mode = 'question';
+            let lastWasOption = false;
 
-                if (isExplanation) {
-                    explanationStarted = true;
-                    explanation = trimmedLine.replace(/^(?:Explanation:|Reason:)\s*/i, '');
+            for (let li = 0; li < lines.length; li++) {
+                const raw = lines[li];
+                const trimmed = raw.trim();
+                if (!trimmed) continue;
+
+                // ── EXPLANATION LINE ──────────────────────────────────────────
+                // Matches "Explanation:", "Reason:" (bare, not A-R context),
+                // "Rationale:", "Solution:", "Why:" — already normalised to
+                // "Explanation:" in Stage 1 except bare "Reason:" in A-R blocks.
+                if (/^(?:Explanation|Rationale|Solution|Why)\s*[:\-]/i.test(trimmed)) {
+                    mode = 'explanation';
+                    const afterColon = trimmed.replace(/^[^:\-]+[:\-]\s*/i, '').trim();
+                    if (afterColon) explanationLines.push(afterColon);
                     continue;
                 }
-                if (explanationStarted) {
-                    explanation += '\n' + trimmedLine;
+                // Bare "Reason:" that survived Stage 1 (i.e. it IS an A-R block)
+                // should NOT be treated as an explanation delimiter here — it will
+                // be handled as a question-body line (see question mode below).
+
+                if (mode === 'explanation') {
+                    // A new Question: marker resets mode (shouldn't normally happen
+                    // inside a block, but guard for safety)
+                    if (/^\s*Question\s*:/i.test(trimmed)) {
+                        mode = 'question'; questionLines = [trimmed.replace(/^\s*Question\s*:\s*/i, '')]; continue;
+                    }
+                    explanationLines.push(trimmed);
                     continue;
                 }
 
-                if (isAnswer) {
-                    answerFound = true;
-                    correctAnswer = trimmedLine.replace(/^(?:Correct Answer:|Answer:|Ans:|Correct:)\s*/i, '').trim();
+                // ── ANSWER LINE ───────────────────────────────────────────────
+                if (/^(?:Correct\s*Answer|Answer|Ans|Correct)\s*[:\-]/i.test(trimmed)) {
+                    mode = 'answer';
+                    const val = trimmed.replace(/^[^:\-]+[:\-]\s*/i, '').trim();
+                    correctAnswer = val;
                     continue;
                 }
-                // Once the answer is found, ignore subsequent lines unless they are part of the explanation
-                if (answerFound) continue;
+                if (mode === 'answer') {
+                    // If the answer value was empty on the same line, grab next non-empty
+                    if (!correctAnswer || correctAnswer.length === 0) { correctAnswer = trimmed; }
+                    mode = 'explanation';
+                    continue;
+                }
 
-                if (isOption) {
-                    optionsStarted = true;
-                    options.push({ original: trimmedLine, text: isOption[2].trim() });
+                // ── OPTION LINE ───────────────────────────────────────────────
+                // Strict match: a) / a. / a: / 1) etc. at line start
+                const strictOptMatch = trimmed.match(/^([a-dA-D][\.):]|[1-4][\.):])\s*(.*)/);
+                if (strictOptMatch) {
+                    mode = 'options';
+                    options.push({
+                        label: strictOptMatch[1].replace(/[\.):]/, '').toLowerCase(),
+                        text: strictOptMatch[2].trim()
+                    });
+                    lastWasOption = true;
                     continue;
                 }
-                
-                // If options haven't started, assume it's part of the question.
-                if (!optionsStarted) {
-                    questionLines.push(trimmedLine);
+
+                // Bullet option (after options have started): • / * / -
+                if (mode === 'options' && /^[•\-]\s+(.*)/.test(trimmed)) {
+                    // Note: bare * is now a statement marker, not an option bullet
+                    const m = trimmed.match(/^[•\-]\s+(.*)/);
+                    options.push({ label: String.fromCharCode(97 + options.length), text: m[1].trim() });
+                    lastWasOption = true;
+                    continue;
+                }
+
+                // Continuation of last option text (wrapped lines)
+                if (mode === 'options' && lastWasOption && options.length > 0) {
+                    if (!/^(?:Correct\s*Answer|Answer|Ans|Explanation|Rationale|Solution)\s*[:\-]/i.test(trimmed)) {
+                        options[options.length - 1].text += ' ' + trimmed;
+                        continue;
+                    }
+                }
+
+                // ── QUESTION / STATEMENT LINES ────────────────────────────────
+                if (mode === 'question') {
+                    // Strip any remaining "Question:" prefix
+                    const cleaned = trimmed.replace(/^Question\s*:\s*/i, '');
+                    if (cleaned) questionLines.push(cleaned);
+                    lastWasOption = false;
                 }
             }
 
-            if (questionLines.length > 0) {
-                // Clean up the start of the question text from prefixes like "1. ", "Question: " etc.
-                questionText = questionLines.join('\n').replace(/^(?:Question:|Q\d|^\d+[\.\)])\s*/i, '').trim();
+            // ── BUG 4 FIX: Extract statement lines from questionLines ──────────
+            // Lines that start with "* " are numbered statements, not question text.
+            const stmtLines = [];
+            const pureQuestionLines = [];
+            for (const ql of questionLines) {
+                if (/^\*\s+/.test(ql)) {
+                    stmtLines.push(ql.replace(/^\*\s+/, '').trim());
+                } else {
+                    pureQuestionLines.push(ql);
+                }
             }
 
-            if (questionText && options.length > 0 && correctAnswer !== null) {
-                let correctAnswerIndex = -1;
-                const cleanedAnswer = correctAnswer.replace(/[\.\)]$/, '').toLowerCase();
+            // ── RESOLVE CORRECT ANSWER INDEX ──────────────────────────────────
+            if (!correctAnswer || options.length < 2) return;
 
-                // Handles "c" or "c)"
-                if (cleanedAnswer.length === 1 && cleanedAnswer >= 'a' && cleanedAnswer <= 'z') {
-                    correctAnswerIndex = cleanedAnswer.charCodeAt(0) - 'a'.charCodeAt(0);
-                }
+            let correctAnswerIndex = -1;
+            let ca = correctAnswer.trim();
+            ca = ca.replace(/^\*\*?(.*?)\*\*?$/, '$1').trim();
+            // "b) Some text" → take just the letter
+            const letterWithText = ca.match(/^([a-dA-D])\s*[\.)\-]\s*.+/);
+            if (letterWithText) ca = letterWithText[1];
+            ca = ca.replace(/[\.)\:,;]$/, '').trim();
+            ca = ca.replace(/^\(/, '').trim();
 
-                // Fallback: If the answer wasn't a single letter, try to match the full text of the option
-                if (correctAnswerIndex === -1 || correctAnswerIndex >= options.length) {
+            if (/^[a-dA-D]$/.test(ca)) {
+                correctAnswerIndex = ca.toLowerCase().charCodeAt(0) - 97;
+            } else if (/^[1-4]$/.test(ca)) {
+                correctAnswerIndex = parseInt(ca, 10) - 1;
+            } else if (/^[Oo]ption\s+([a-dA-D1-4])/i.test(ca)) {
+                const m = ca.match(/^[Oo]ption\s+([a-dA-D1-4])/i);
+                const v = m[1].toLowerCase();
+                correctAnswerIndex = /[a-d]/.test(v) ? v.charCodeAt(0) - 97 : parseInt(v, 10) - 1;
+            } else if (/[✅✔☑️]\s*([a-dA-D1-4])/.test(ca)) {
+                const m = ca.match(/[✅✔☑️]\s*([a-dA-D1-4])/);
+                const v = m[1].toLowerCase();
+                correctAnswerIndex = /[a-d]/.test(v) ? v.charCodeAt(0) - 97 : parseInt(v, 10) - 1;
+            } else {
+                // Full text match against option text
+                correctAnswerIndex = options.findIndex(opt =>
+                    opt.text.toLowerCase().trim() === ca.toLowerCase().trim()
+                );
+                if (correctAnswerIndex === -1 && ca.length > 4) {
                     correctAnswerIndex = options.findIndex(opt =>
-                        opt.text.toLowerCase().trim() === correctAnswer.toLowerCase().trim()
+                        opt.text.toLowerCase().includes(ca.toLowerCase()) ||
+                        ca.toLowerCase().includes(opt.text.toLowerCase().substring(0, Math.min(opt.text.length, 25)))
                     );
                 }
-                
-                // Only add the question if we have a valid index
-                if (correctAnswerIndex >= 0 && correctAnswerIndex < options.length) {
-                    questions.push({
-                        question: questionText,
-                        options: options.map(o => o.text),
-                        correctAnswerIndex: correctAnswerIndex,
-                        explanation: explanation.trim(),
-                        statements: [], // This part can be enhanced further if needed
-                        image: null
-                    });
-                }
             }
+
+            // ── ASSEMBLE ──────────────────────────────────────────────────────
+            const questionText = pureQuestionLines.join('\n').trim();
+            if (!questionText || correctAnswerIndex < 0 || correctAnswerIndex >= options.length) return;
+
+            const explanation = explanationLines
+                .filter(l => !/^[-=*]{3,}$/.test(l.trim()))
+                .join('\n').trim() || 'No explanation provided.';
+
+            questions.push({
+                question: questionText,
+                options: options.map(o => o.text),
+                correctAnswerIndex: correctAnswerIndex,
+                explanation: explanation,
+                statements: stmtLines,   // ← BUG 4 FIX: now populated
+                image: null
+            });
         });
 
         return questions;
@@ -4510,22 +4943,82 @@ function generateTopicPrompt() {
     function resetAndStartQuestionTimer() { clearInterval(timerId); questionStartTime = new Date(); const emojiSequence = [elements.faces.happy, elements.faces.worried, elements.faces.sad, elements.faces.crying]; const updateTimerDisplay = () => { if (!questionStartTime) return; const elapsedTime = Math.round((new Date() - questionStartTime) / 1000); elements.timerText.textContent = `${String(Math.floor(elapsedTime / 60)).padStart(2, '0')}:${String(elapsedTime % 60).padStart(2, '0')}`; const emojiIntervalIndex = Math.floor(elapsedTime / 15); const currentEmoji = emojiSequence[emojiIntervalIndex % emojiSequence.length]; if (currentEmoji && !currentEmoji.classList.contains('visible')) { emojiSequence.forEach(face => face.classList.remove('visible')); currentEmoji.classList.add('visible'); } const pressureTextEl = document.getElementById('pressure-text-animation'); if (elapsedTime >= 45 && userAnswers[currentQuestionIndex].status !== 'answered') { if (isShakeReminderEnabled) { const checkBtn = document.getElementById('check-answer-btn'); if (checkBtn) checkBtn.classList.add('vibrating'); } if (pressureTextEl) { document.getElementById('pressure-mode-toggle-btn').classList.add('hidden'); pressureTextEl.classList.remove('hidden'); pressureTextEl.textContent = `Tik Tik ${pressureTextCounter}`; pressureTextCounter++; } } }; updateTimerDisplay(); timerId = setInterval(updateTimerDisplay, 1000); }
     function startQuiz(){ showScreen('player'); quizStartTime=new Date(); currentQuestionIndex=0; userAnswers=quizData.map((q, i)=>({selected:null,isCorrect:null,status:'unseen', startTime: null, endTime: null})); bookmarkedQuestions.clear(); originalQuizData=JSON.parse(JSON.stringify(quizData)); loadQuestion(0); }
     function loadQuestion(index){ if(index<0||index>=originalQuizData.length)return; currentQuestionIndex=index;selectedOptionIndex=null; const question=originalQuizData[currentQuestionIndex]; const answer=userAnswers[currentQuestionIndex]; elements.congratsAnimationContainer.innerHTML = ''; if (!clapSound.paused) { clapSound.pause(); clapSound.currentTime = 0; } pressureTextCounter = 1; const pressureTextEl = document.getElementById('pressure-text-animation'); if(pressureTextEl) pressureTextEl.classList.add('hidden'); document.getElementById('pressure-mode-toggle-btn').classList.remove('hidden'); if(answer.status==='answered'){ clearInterval(timerId); elements.timerText.textContent="--:--"; Object.values(elements.faces).forEach(face=>face.classList.remove('visible')) } else { resetAndStartQuestionTimer() } updateQuestionUI(question); updateOptionsAndExplanationState(); updateQuizActions(); if (window.MathJax) MathJax.typesetPromise([elements.quizPlayerContainer]); }
+    function _renderMarkdown(text) {
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+    }
     function updateQuestionUI(q) {
         elements.questionTopic.textContent = quizMetaData.topic || "";
         elements.progress.textContent = `Question ${currentQuestionIndex + 1} / ${originalQuizData.length}`;
-        elements.questionText.innerHTML = q.question.replace(/\n/g, '<br>');
+        elements.questionText.innerHTML = _renderMarkdown(q.question).replace(/\n/g, '<br>');
         elements.bookmarkBtn.classList.toggle('bookmarked', bookmarkedQuestions.has(currentQuestionIndex));
-        elements.statementsList.innerHTML = q.statements?.map(stmt => `<p>• ${stmt}</p>`).join('') || '';
+        elements.statementsList.innerHTML = q.statements?.map(stmt => `<p>• ${_renderMarkdown(stmt)}</p>`).join('') || '';
         elements.optionsContainer.innerHTML = '';
+
+        // Smart mini progress bar
+        const answeredCount = userAnswers.filter(a => a.status === 'answered').length;
+        const skippedCount = userAnswers.filter(a => a.status === 'skipped').length;
+        const totalQ = originalQuizData.length;
+        const pct = Math.round((answeredCount / totalQ) * 100);
+        let progressBarEl = document.getElementById('smart-progress-bar');
+        if (!progressBarEl) {
+            progressBarEl = document.createElement('div');
+            progressBarEl.id = 'smart-progress-bar';
+            progressBarEl.style.cssText = 'display:flex;gap:4px;margin-bottom:0.8rem;font-size:0.8em;align-items:center;flex-wrap:wrap;';
+            elements.optionsContainer.parentNode.insertBefore(progressBarEl, elements.optionsContainer);
+        }
+        progressBarEl.innerHTML = `<span style="background:var(--correct-color);color:white;padding:2px 8px;border-radius:10px;">✔ ${answeredCount}</span><span style="background:var(--skipped-color);color:#333;padding:2px 8px;border-radius:10px;">⟶ ${skippedCount}</span><span style="background:var(--component-bg);padding:2px 8px;border-radius:10px;border:1px solid var(--border-color);">◯ ${totalQ - answeredCount - skippedCount} left</span><span style="margin-left:auto;font-weight:600;opacity:0.8;">${pct}% done</span>`;
+
         q.options.forEach((optionText, i) => {
             const optionDiv = document.createElement('div');
             optionDiv.className = 'option';
             optionDiv.dataset.index = i;
-            optionDiv.innerHTML = `<span class="option-text">${optionText}</span><div class="option-feedback"><span class="user-choice-emoji"></span><span class="feedback-icon"></span></div>`;
+            const cleanOpt = _renderMarkdown(optionText);
+            const optLabel = String.fromCharCode(97 + i);
+            optionDiv.innerHTML = `<span class="option-label" style="font-weight:700;min-width:22px;flex-shrink:0;color:var(--accent-color);">${optLabel})</span><span class="option-text" style="flex:1;">${cleanOpt}</span><div class="option-feedback"><span class="user-choice-emoji"></span><span class="feedback-icon"></span></div>`;
+            optionDiv.style.cssText = optionDiv.style.cssText + 'display:flex;align-items:flex-start;gap:8px;';
             elements.optionsContainer.appendChild(optionDiv);
         });
     }
-    function updateOptionsAndExplanationState() { const answer = userAnswers[currentQuestionIndex]; const question = originalQuizData[currentQuestionIndex]; const correctEmojis = ['🥳', '🎉', '🤩', '👍', '💯']; const incorrectEmojis = ['🤔', '😟', '🤨', '🤦‍♂️', '❌']; document.querySelectorAll('.option').forEach((optionDiv, i) => { if (answer.status === 'answered') { optionDiv.classList.add('disabled'); if (i === question.correctAnswerIndex) { optionDiv.classList.add('correct'); optionDiv.querySelector('.feedback-icon').textContent = '✔️'; } if (i === answer.selected) { const userChoiceEmoji = optionDiv.querySelector('.user-choice-emoji'); if (answer.isCorrect) userChoiceEmoji.textContent = correctEmojis[Math.floor(Math.random() * correctEmojis.length)]; else { optionDiv.classList.add('incorrect'); optionDiv.querySelector('.feedback-icon').textContent = '❌'; userChoiceEmoji.textContent = incorrectEmojis[Math.floor(Math.random() * incorrectEmojis.length)]; } userChoiceEmoji.classList.add('visible'); } } }); const isAnswered = answer.status === 'answered'; elements.explanationContainer.classList.toggle('hidden', !isAnswered); if (isAnswered) { elements.explanationText.innerHTML = question.explanation; } }
+    function updateOptionsAndExplanationState() {
+        const answer = userAnswers[currentQuestionIndex];
+        const question = originalQuizData[currentQuestionIndex];
+        const correctEmojis = ['🥳', '🎉', '🤩', '👍', '💯'];
+        const incorrectEmojis = ['🤔', '😟', '🤨', '🤦‍♂️', '❌'];
+        document.querySelectorAll('.option').forEach((optionDiv, i) => {
+            if (answer.status === 'answered') {
+                optionDiv.classList.add('disabled');
+                if (i === question.correctAnswerIndex) {
+                    optionDiv.classList.add('correct');
+                    optionDiv.querySelector('.feedback-icon').textContent = '✔️';
+                    // If user got it wrong, also label the correct option clearly
+                    if (answer.selected !== question.correctAnswerIndex) {
+                        const label = optionDiv.querySelector('.option-label');
+                        if (label) label.title = 'Correct Answer';
+                    }
+                }
+                if (i === answer.selected) {
+                    const userChoiceEmoji = optionDiv.querySelector('.user-choice-emoji');
+                    if (answer.isCorrect) {
+                        userChoiceEmoji.textContent = correctEmojis[Math.floor(Math.random() * correctEmojis.length)];
+                    } else {
+                        optionDiv.classList.add('incorrect');
+                        optionDiv.querySelector('.feedback-icon').textContent = '❌';
+                        userChoiceEmoji.textContent = incorrectEmojis[Math.floor(Math.random() * incorrectEmojis.length)];
+                    }
+                    userChoiceEmoji.classList.add('visible');
+                }
+            }
+        });
+        const isAnswered = answer.status === 'answered';
+        elements.explanationContainer.classList.toggle('hidden', !isAnswered);
+        if (isAnswered) {
+            // Render explanation with markdown and newlines
+            const cleanExp = _renderMarkdown(question.explanation).replace(/\n/g, '<br>');
+            elements.explanationText.innerHTML = cleanExp;
+        }
+    }
     
     // ====================================================================
     // ===== MODIFIED FUNCTION TO SWAP SUBMIT AND NEXT/SKIP BUTTONS =====
@@ -4549,22 +5042,31 @@ function generateTopicPrompt() {
             
             const skipBtn = document.createElement('button');
             skipBtn.id = 'skip-question-btn';
-            skipBtn.className = 'btn quiz-actions-bottom-right'; // MOVED TO RIGHT
+            skipBtn.className = 'btn quiz-actions-bottom-right';
             skipBtn.textContent = 'Skip ➡️';
             elements.quizActions.appendChild(skipBtn);
         } else {
+            // Smart next: if there are unanswered questions ahead, show "Next Unanswered" hint
+            const nextUnansweredIdx = userAnswers.findIndex((a, i) => i > currentQuestionIndex && a.status !== 'answered');
             const nextBtn = document.createElement('button');
             nextBtn.id = 'next-question-btn';
-            nextBtn.className = 'btn quiz-actions-bottom-right'; // MOVED TO RIGHT
-            nextBtn.textContent = 'Next ➡️';
-            nextBtn.disabled = currentQuestionIndex === originalQuizData.length - 1;
+            nextBtn.className = 'btn quiz-actions-bottom-right';
+            if (nextUnansweredIdx !== -1) {
+                nextBtn.textContent = `Next ➡️`;
+                nextBtn.title = `Next unanswered: Q${nextUnansweredIdx + 1}`;
+            } else {
+                nextBtn.textContent = currentQuestionIndex >= originalQuizData.length - 1 ? 'Review 📋' : 'Next ➡️';
+            }
+            nextBtn.disabled = currentQuestionIndex >= originalQuizData.length - 1;
             elements.quizActions.appendChild(nextBtn);
         }
         
         const submitBtn = document.createElement('button');
         submitBtn.id = 'submit-quiz-btn';
-        submitBtn.className = 'btn btn-danger quiz-actions-bottom-left'; // MOVED TO LEFT
-        submitBtn.textContent = 'Submit';
+        submitBtn.className = 'btn btn-danger quiz-actions-bottom-left';
+        // Show answered count on submit button for awareness
+        const doneCount = userAnswers.filter(a => a.status === 'answered').length;
+        submitBtn.textContent = `Submit (${doneCount}/${originalQuizData.length})`;
         elements.quizActions.appendChild(submitBtn);
     }
     // ====================================================================
@@ -4628,7 +5130,7 @@ function generateTopicPrompt() {
         elements.scorePerformanceChartContainer.innerHTML = ''; // Chart logic can be re-added here if needed
         elements.quizSummaryDetails.innerHTML=` <div class="summary-item"> <span class="summary-label">Status</span> <span class="summary-value remark">${remark}</span> </div> <div class="summary-item"> <span class="summary-label">Final Score</span> <span class="summary-value">${percentage.toFixed(1)}%</span> </div> <div class="summary-item"> <span class="summary-label">Correct Answers</span> <span class="summary-value" style="color: var(--correct-color);">${correctCount} / ${totalQuestions}</span> </div> <div class="summary-item"> <span class="summary-label">Incorrect Answers</span> <span class="summary-value" style="color: var(--incorrect-color);">${incorrectCount}</span> </div> <div class="summary-item"> <span class="summary-label">Skipped Questions</span> <span class="summary-value" style="color: var(--skipped-color);">${skippedCount}</span> </div> <div class="summary-item"> <span class="summary-label">Time Taken</span> <span class="summary-value">${timeTaken}</span> </div>`;
         document.querySelectorAll('.count-up').forEach(el => animateCountUp(el, el.dataset.value));
-        elements.resultsReview.innerHTML=originalQuizData.map((q,i)=>{const answer=userAnswers[i];const optionsHtml=q.options.map((opt,oi)=>{let classes='result-option';if(answer.status==='answered'&&oi===answer.selected)classes+=' user-selected';if(oi===q.correctAnswerIndex)classes+=' correct-answer';return`<li class="${classes}">${opt}</li>`}).join('');return`<div class="result-item"><p class="result-question"><strong>Q${i + 1}:</strong> ${q.question.replace(/<[^>]*>/g, '')}<span class="bookmark-indicator ${bookmarkedQuestions.has(i)?'visible':''}">⭐</span></p><ul class="result-options-list">${optionsHtml}</ul><div class="result-explanation"><h5>Explanation</h5><p>${q.explanation}</p></div></div>`}).join('');
+        elements.resultsReview.innerHTML=originalQuizData.map((q,i)=>{const answer=userAnswers[i];const optionsHtml=q.options.map((opt,oi)=>{let classes='result-option';if(answer.status==='answered'&&oi===answer.selected)classes+=' user-selected';if(oi===q.correctAnswerIndex)classes+=' correct-answer';const optLabel=String.fromCharCode(97+oi);return`<li class="${classes}"><strong>${optLabel})</strong> ${_renderMarkdown(opt)}</li>`}).join('');const cleanQ=_renderMarkdown(q.question.replace(/\n/g,'<br>'));const cleanExp=_renderMarkdown(q.explanation).replace(/\n/g,'<br>');return`<div class="result-item"><p class="result-question"><strong>Q${i + 1}:</strong> ${cleanQ}<span class="bookmark-indicator ${bookmarkedQuestions.has(i)?'visible':''}">⭐</span></p><ul class="result-options-list">${optionsHtml}</ul><div class="result-explanation"><h5>Explanation</h5><p>${cleanExp}</p></div></div>`}).join('');
         if (window.MathJax) MathJax.typesetPromise([elements.resultsScreen]);
     }
 
